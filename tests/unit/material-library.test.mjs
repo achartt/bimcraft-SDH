@@ -55,7 +55,7 @@ test('invalid material references and invalid defaults roll back without partial
   assert.throws(()=>m.change(saveWallAssembly({...recipe,layers:recipe.layers.map((l,i)=>i===0?{...l,materialId:'material-missing'}:l)})),/missing material/);
   assert.deepEqual(m.ed.save(),before);
   const material=readMaterials(m.w())[0];
-  for(const change of [{defaultThickness:0},{color:'red; background:url(x)'},{fill:'script'},{name:''}]) assert.throws(()=>m.change(op(w=>saveMaterial(w,{...material,...change}))));
+  for(const change of [{defaultThickness:-1},{color:'red; background:url(x)'},{fill:'script'},{name:''}]) assert.throws(()=>m.change(op(w=>saveMaterial(w,{...material,...change}))));
   assert.deepEqual(m.ed.save(),before);
   m.change(op(w=>{saveMaterial(w,{...material,id:'material-new',name:'My board'});return [];}));
   assert.throws(()=>m.change(op(w=>saveMaterial(w,{...material,name:'My board'}))),/already exists/);
@@ -78,4 +78,43 @@ test('IFC2X3 stores library materials and ventilated voids through save/reopen',
   const cavity=reopened.w().api.GetLine(reopened.w().mid,set.MaterialLayers[1].value,false);assert.equal(cavity.Material,null);assert.equal(val(cavity.IsVentilated),true);
   assert.ok(ids(reopened.w().api,reopened.w().mid,'IFCEXTENDEDMATERIALPROPERTIES').length>=4);
   assert.equal(ty.layers[1].t,25.4);assert.ok(readMaterials(reopened.w()).some(m=>m.name==='Unknown historical board'));
+});
+
+test('zero-thickness membranes retain schedule data without moving any wall reference',async()=>{
+  const m=await model(),level=readLevels(m.w())[0];m.change(saveWallAssembly(recipe));
+  m.change(drawWalls({storey:level.guid,typeKey:recipe.key,segs:[{a:[0,0],b:[5000,0]},{a:[0,3000],b:[5000,3000]}],height:2700}));
+  const [a,b]=readWalls(m.w());
+  for(const reference of WALL_REFERENCES)m.change(saveWallDimension({level:level.guid,view:'plan:'+level.guid,axis:'y',offset:1000,refs:[{wall:a.guid,reference,station:0.5},{wall:b.guid,reference,station:0.5}]}));
+  const before=snapshot(m),layers=[...recipe.layers];
+  layers.splice(2,0,{mat:'House wrap',t:0,function:'membrane',core:false});
+  m.change(saveWallAssembly({...recipe,layers}));
+  assert.deepEqual(snapshot(m).walls,before.walls);assert.deepEqual(snapshot(m).dims,before.dims);
+  const reopened=await model(m.ed.save()),ty=readAssemblies(reopened.w())[0];
+  assert.equal(ty.layers[2].t,0);assert.equal(ty.layers[2].mat,'House wrap');assert.equal(ty.layers[2].function,'membrane');
+  assert.equal(readMaterials(reopened.w()).find(x=>x.id===ty.layers[2].materialId).defaultThickness,0);
+  const set=reopened.w().api.GetLine(reopened.w().mid,reopened.w().materialRel(ty.id).def,false);
+  const membrane=reopened.w().api.GetLine(reopened.w().mid,set.MaterialLayers[2].value,false);
+  assert.equal(val(membrane.LayerThickness),0);assert.ok(membrane.Material.value);
+  assert.deepEqual(snapshot(reopened).dims,before.dims);assert.deepEqual(snapshot(reopened).walls,before.walls);
+  m.ed.undo();assert.equal(readAssemblies(m.w())[0].layers.length,recipe.layers.length);assert.deepEqual(snapshot(m).dims,before.dims);
+  m.ed.redo();assert.equal(readAssemblies(m.w())[0].layers[2].t,0);
+  for(const bad of [layers.map(l=>({...l,t:0})),layers.map(l=>l.t===0?{...l,function:'structure'}:l),layers.map(l=>l.t===0?{...l,kind:'cavity'}:l),layers.map(l=>({...l,core:l.t===0}))]) assert.throws(()=>m.change(saveWallAssembly({...recipe,layers:bad})));
+});
+test('IFC2X3 keeps membrane records without inventing physical layer thickness',async()=>{
+  const m=await model(fs.readFileSync(new URL('../tools/detailcraft-test/fixtures/ios-steel-ifc2x3.ifc',import.meta.url)));
+  const layers=[{mat:'Plastic film',t:0,function:'membrane',core:false},...recipe.layers];
+  m.change(saveWallAssembly({...recipe,layers}));const reopened=await model(m.ed.save()),ty=readAssemblies(reopened.w())[0];
+  assert.equal(ty.layers[0].t,0);assert.equal(ty.layers[0].mat,'Plastic film');
+  const set=reopened.w().api.GetLine(reopened.w().mid,reopened.w().materialRel(ty.id).def,false);
+  assert.equal(set.MaterialLayers.length,recipe.layers.length);
+  assert.ok(set.MaterialLayers.every(h=>val(reopened.w().api.GetLine(reopened.w().mid,h.value,false).LayerThickness)>0));
+});
+test('preview dimensions preserve exact zero boundaries and separate crowded labels',async()=>{
+  const {assemblyDimensionLayout}=await import('../../app/assembly-preview.js');
+  const layers=Array.from({length:32},(_,i)=>({t:i===31?100:0,core:i===31}));
+  const layout=assemblyDimensionLayout(layers,n=>n+' mm');
+  assert.equal(layout.total,100);assert.equal(layout.core,100);assert.equal(layout.segments[0].start,0);assert.equal(layout.segments[0].end,0);
+  assert.equal(layout.segments[31].end,1000);assert.equal(layout.coreStart,0);assert.equal(layout.coreEnd,1000);
+  assert.equal(new Set(layout.segments.slice(0,31).map(s=>s.lane)).size,31);
+  assert.equal(assemblyDimensionLayout([{t:NaN}],String),null);assert.equal(assemblyDimensionLayout([{t:0}],String),null);
 });

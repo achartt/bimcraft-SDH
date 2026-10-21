@@ -17,7 +17,7 @@ const starters = [
   ['insulation','Insulation','Insulation',100,'#e5cf89','diagonal'],
   ['render','Render','Finish',15,'#d0c6b5','solid'],
   ['plaster','Plaster','Finish',10,'#e5dfd0','solid'],
-  ['membrane','Membrane','Membrane',1,'#6b747a','solid'],
+  ['membrane','Membrane','Membrane',0,'#6b747a','solid'],
 ];
 export const STARTER_MATERIALS = starters.map(([legacyName,name,category,defaultThickness,color,fill])=>({id:'material-'+legacyName,legacyName,name,category,defaultThickness,color,fill,fillColor:'#555555',notes:'Generic starting value; verify the product and assembly before use.'}));
 export function legacyMaterialId(name) {
@@ -32,7 +32,7 @@ export function validateMaterial(input) {
   if(!/^material-[a-zA-Z0-9_-]{1,800}$/.test(m.id || '')) throw new Error('Invalid material ID.');
   if(!m.name || m.name.length>100 || !m.legacyName || m.legacyName.length>100) throw new Error('Enter a material name up to 100 characters.');
   if(m.category.length>100 || m.notes.length>2000) throw new Error('Category or notes are too long.');
-  if(!Number.isFinite(m.defaultThickness) || m.defaultThickness<=0 || m.defaultThickness>2000) throw new Error('Default thickness must be greater than zero and at most 2000 mm.');
+  if(!Number.isFinite(m.defaultThickness) || m.defaultThickness<0 || m.defaultThickness>2000) throw new Error('Default thickness must be between 0 and 2000 mm; use 0 for a membrane with no nominal thickness.');
   if(!/^#[0-9a-f]{6}$/i.test(m.color) || !/^#[0-9a-f]{6}$/i.test(m.fillColor) || !FILLS.includes(m.fill)) throw new Error('Choose valid colors and a fill pattern.');
   return m;
 }
@@ -63,7 +63,7 @@ export function readMaterials(w, additionalLayers=[]) {
     if(new Set(materials.map(m=>m.id)).size!==materials.length) throw new Error('Duplicate material IDs in the project library.');
   } else materials=structuredClone(STARTER_MATERIALS);
   for(const rawLayer of [...legacyLayers(w),...additionalLayers]) {
-    if(typeof rawLayer?.mat!=='string' || !rawLayer.mat.trim() || rawLayer.mat.length>100 || !Number.isFinite(rawLayer.t) || rawLayer.t<=0 || rawLayer.t>2000) continue;
+    if(typeof rawLayer?.mat!=='string' || !rawLayer.mat.trim() || rawLayer.mat.length>100 || !Number.isFinite(rawLayer.t) || rawLayer.t<0 || rawLayer.t>2000) continue;
     const l=normalizeLayer(rawLayer);
     if(l.kind==='cavity' || materials.some(m=>m.id===l.materialId)) continue;
     // Only known legacy names can create a fallback. Broken explicit references must remain visible.
@@ -109,7 +109,9 @@ export function writeMaterialLayers(w,layers) {
   const normalized=layers.map(normalizeLayer), materials=readMaterials(w,normalized);
   for(const l of normalized) if(l.kind==='material' && !materials.some(m=>m.id===l.materialId)) throw new Error('A layer references a missing material. Choose a material from the library.');
   writeMaterials(w,materials);
-  return normalized.map(l=>{
+  // IFC2X3 requires positive material-layer thickness. Keep zero-thickness membranes
+  // in the authoritative Recipe/library rather than inventing physical thickness.
+  return normalized.filter(l=>w.v4 || l.t>0).map(l=>{
     const m=l.kind==='material'?materials.find(m=>m.id===l.materialId):null;
     return w.make('IFCMATERIALLAYER',m?w.H(materialEntity(w,m)):null,w.u(l.t),l.kind==='cavity' && l.ventilation!=='unspecified'?w.T('IFCLOGICAL',l.ventilation==='ventilated'):null,...(w.v4?[w.L(m?.name || 'Air cavity'),null,w.L(l.function || 'finish'),null]:[]));
   });

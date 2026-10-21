@@ -1,4 +1,5 @@
 /* SPDX-License-Identifier: Apache-2.0 */
+import { assemblyDimensionLayout, drawAssemblyDimensions } from './assembly-preview.js';
 import { el } from './ui-util.js';
 import { ModelWriter } from './model-write.js';
 import { wallType, typeName, typeThickness } from './model-walls.js';
@@ -21,17 +22,29 @@ export function mountWallAssemblies(modelUi) {
     const name=el('input',{className:'bc-input',value:editing?typeName(source):typeName(source)+' copy',maxlength:100,'aria-label':t('name'),'data-assembly-name':''});
     const exterior=el('input',{type:'checkbox',checked:recipe.exterior});
     const rows=el('tbody'), total=el('p',{className:'bc-muted','aria-live':'polite'}), error=el('p',{className:'bc-error',role:'alert'});
-    const preview=el('div',{'aria-label':t('preview'),style:'display:flex;height:40px;border:1px solid currentColor;margin:12px 0'});
+    const preview=el('div',{'aria-label':t('preview'),style:'position:relative;height:40px;outline:1px solid currentColor;margin:12px 0 0'});
+    const dimensions=el('div',{'data-assembly-dimensions':''});
+    const membraneNote=el('p',{className:'bc-muted'},t('membraneNote'));
     const orientation=el('div',{'data-assembly-orientation':'',style:'display:flex;justify-content:space-between;gap:16px;font-weight:600'},el('span',{},t('exteriorSide')),el('span',{'aria-hidden':'true'},'→'),el('span',{},t('interiorSide')));
     const dlg=el('dialog',{className:'bc-dialog bc-fam-dlg','aria-label':t('title'),'data-assembly-editor':'',style:'width:min(1050px,96vw);max-width:1050px'});
     const save=button(t('save'),()=>submit(),{'data-assembly-save':''});
     function totals() {
       const th=typeThickness(recipe), core=recipe.layers.filter(l=>l.core).reduce((s,l)=>s+l.t,0);
       total.textContent=t('total')+' '+L(th)+' · '+t('core')+' '+L(core);
-      preview.replaceChildren(...recipe.layers.map(l=>el('div',{style:`flex:${Math.max(0.01,l.t)};background:${l.kind==='cavity'?'transparent':materialBackground(materials.find(m=>m.id===l.materialId))};border-right:1px solid #888;${l.core?'box-shadow:inset 0 -5px #527687;':''}`,title:(l.kind==='cavity'?mt('cavity'):materials.find(m=>m.id===l.materialId)?.name || l.mat)+' · '+L(l.t)+(l.core?' · '+t('core'):'' )})));
+      const layout=assemblyDimensionLayout(recipe.layers,L);
+      preview.replaceChildren();
+      if(layout) for(const [i,l] of recipe.layers.entries()) {
+        const span=layout.segments[i],m=materials.find(m=>m.id===l.materialId);
+        const label=`${i+1}: ${l.kind==='cavity'?mt('cavity'):m?.name || l.mat} · ${L(l.t)}`;
+        preview.append(el('div',{style:`position:absolute;box-sizing:border-box;left:${span.start/10}%;width:${(span.end-span.start)/10}%;height:100%;background:${l.kind==='cavity'?'transparent':materialBackground(m)};border-right:1px solid #888;${l.core?'box-shadow:inset 0 -5px #527687;':''}${l.t===0?`border-right:3px dashed ${m?.color || '#888'};z-index:1;`:''}`,title:label,'aria-label':label}));
+      }
+      drawAssemblyDimensions(dimensions,layout,L,{dimensions:t('dimensions'),core:t('core'),total:t('total')});
+      membraneNote.hidden=!recipe.layers.some(l=>l.t===0);
+
     }
     function selectMaterial(layer,m) {
       Object.assign(layer,{kind:'material',materialId:m.id,mat:m.legacyName,t:m.defaultThickness});
+      if(m.defaultThickness===0) layer.function='membrane';
       delete layer.ventilation;
     }
     function draw() {
@@ -53,14 +66,15 @@ export function mountWallAssemblies(modelUi) {
         });
         const vent=el('select',{'aria-label':mt('ventilation')+' '+(i+1),className:'bc-input'},...VENTILATION.map(v=>el('option',{value:v,selected:layer.ventilation===v},mt(v))));
         vent.addEventListener('change',()=>{layer.ventilation=vent.value;});
-        const useDefault=button(mt('useDefault'),()=>{const m=materials.find(m=>m.id===layer.materialId);if(m){layer.t=m.defaultThickness;draw();}},{disabled:layer.kind==='cavity'});
+        const useDefault=button(mt('useDefault'),()=>{const m=materials.find(m=>m.id===layer.materialId);if(m){layer.t=m.defaultThickness;if(layer.t===0)layer.function='membrane';draw();}},{disabled:layer.kind==='cavity'});
         const thickness=el('input',{className:'bc-input',value:L(layer.t),size:9,'aria-label':t('thickness')+' '+(i+1)});
-        thickness.addEventListener('input',()=>{const v=parseLen(thickness.value,A.units());layer.t=v;totals();});
+        thickness.addEventListener('input',()=>{const v=parseLen(thickness.value,A.units());layer.t=v;if(v===0 && layer.kind==='material'){layer.function='membrane';fn.value='membrane';}totals();});
         const fn=el('select',{className:'bc-mb-select','aria-label':t('function')+' '+(i+1)},...LAYER_FUNCTIONS.map(f=>el('option',{value:f,selected:f===layer.function},t('function.'+f))));
         fn.addEventListener('change',()=>{layer.function=fn.value;});
         const core=el('input',{type:'checkbox',checked:layer.core,'aria-label':t('core')+' '+(i+1)});core.addEventListener('change',()=>{layer.core=core.checked;totals();});
         const move=delta=>{[recipe.layers[i],recipe.layers[i+delta]]=[recipe.layers[i+delta],recipe.layers[i]];draw();};
-        return el('tr',{},el('td',{},kind,layer.kind==='cavity'?vent:mat),el('td',{},thickness,useDefault),el('td',{},fn),el('td',{},core),el('td',{},button('↑',()=>move(-1),{disabled:i===0,'aria-label':t('up')}),button('↓',()=>move(1),{disabled:i===recipe.layers.length-1,'aria-label':t('down')}),button('×',()=>{recipe.layers.splice(i,1);draw();},{'aria-label':t('remove')})));
+        const swatch=el('span',{'data-layer-swatch':'',role:'img','aria-label':t('swatch')+' '+(i+1),title:layer.kind==='cavity'?mt('cavity'):materials.find(m=>m.id===layer.materialId)?.name || layer.mat,style:`display:inline-block;flex:0 0 24px;width:24px;height:24px;border:1px solid #888;background:${layer.kind==='cavity'?'transparent':materialBackground(materials.find(m=>m.id===layer.materialId))}`});
+        return el('tr',{},el('td',{},el('div',{style:'display:flex;align-items:center;gap:8px'},el('span',{},String(i+1)),swatch,kind),layer.kind==='cavity'?vent:mat),el('td',{},thickness,useDefault),el('td',{},fn),el('td',{},core),el('td',{},button('↑',()=>move(-1),{disabled:i===0,'aria-label':t('up')}),button('↓',()=>move(1),{disabled:i===recipe.layers.length-1,'aria-label':t('down')}),button('×',()=>{recipe.layers.splice(i,1);draw();},{'aria-label':t('remove')})));
       }));
       const boundary=label=>el('tr',{},el('th',{colSpan:5,style:'text-align:left;padding:8px 4px;background:rgba(128,128,128,.12)'},label));
       rows.prepend(boundary(t('exteriorSide')+' ↓'));
@@ -68,8 +82,8 @@ export function mountWallAssemblies(modelUi) {
       totals();
     }
     const copy=button(t('duplicate'),()=>{duplicate=true;name.value+=' copy';copy.disabled=true;save.textContent=t('savecopy');});
-    dlg.append(el('h2',{className:'bc-h'},t('title')),el('label',{className:'bc-dlg-field'},t('name'),name),el('label',{},exterior,' '+t('exterior')),el('p',{},t('order')),orientation,preview,total,el('div',{style:'overflow:auto'},el('table',{},el('thead',{},el('tr',{},...['material','thickness','function','core','actions'].map(k=>el('th',{},t(k))))),rows)),
-      button(t('add'),()=>{const m=materials.find(m=>m.id==='material-gypsum') || materials[0];recipe.layers.push(normalizeLayer({mat:m.legacyName,materialId:m.id,t:m.defaultThickness,function:'finish',core:false}));draw();}),button(mt('addCavity'),()=>{recipe.layers.push(normalizeLayer({mat:'air',kind:'cavity',t:25.4,function:'substrate',core:false}));draw();}),button(mt('title'),()=>openMaterialLibrary(A,()=>{materials=readMaterials(W(),recipe.layers);draw();})),el('p',{className:'bc-muted'},mt('defaults')),el('p',{className:'bc-muted'},t('scope')),error,
+    dlg.append(el('h2',{className:'bc-h'},t('title')),el('label',{className:'bc-dlg-field'},t('name'),name),el('label',{},exterior,' '+t('exterior')),el('p',{},t('order')),el('div',{style:'overflow-x:auto'},el('div',{style:'min-width:900px;padding:0 12px'},orientation,preview,dimensions)),membraneNote,total,el('div',{style:'overflow:auto'},el('table',{},el('thead',{},el('tr',{},...['material','thickness','function','core','actions'].map(k=>el('th',{},t(k))))),rows)),
+      button(t('add'),()=>{const m=materials.find(m=>m.id==='material-gypsum') || materials[0];recipe.layers.push(normalizeLayer({mat:m.legacyName,materialId:m.id,t:m.defaultThickness,function:m.defaultThickness===0?'membrane':'finish',core:false}));draw();}),button(t('addMembrane'),()=>{const m=materials.find(m=>m.id==='material-membrane') || materials[0];recipe.layers.push(normalizeLayer({mat:m.legacyName,materialId:m.id,t:0,function:'membrane',core:false}));draw();}),button(mt('addCavity'),()=>{recipe.layers.push(normalizeLayer({mat:'air',kind:'cavity',t:25.4,function:'substrate',core:false}));draw();}),button(mt('title'),()=>openMaterialLibrary(A,()=>{materials=readMaterials(W(),recipe.layers);draw();})),el('p',{className:'bc-muted'},mt('defaults')),el('p',{className:'bc-muted'},t('scope')),error,
       el('p',{className:'bc-lib-actions'},...(editing?[copy]:[]),button(t('cancel'),()=>dlg.close()),save));
     dlg.addEventListener('close',()=>dlg.remove());
     dlg.addEventListener('keydown',e=>e.stopPropagation());

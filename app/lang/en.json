@@ -5281,5 +5281,10 @@
   "materials.missing": "Missing material:",
   "assembly.exteriorSide": "Exterior side",
   "assembly.interiorSide": "Interior side",
-  "materials.createFromPicker": "+ New material…"
+  "materials.createFromPicker": "+ New material…",
+  "materials.zeroHint": "Use 0 for house wrap or plastic film with no nominal thickness. Selecting it sets the layer function to Membrane.",
+  "assembly.addMembrane": "Add membrane",
+  "assembly.membraneNote": "* Zero nominal thickness: retained in the assembly for future schedules; does not add to wall or core thickness. Dashed lines mark membrane locations.",
+  "assembly.dimensions": "Layer, core and total thickness dimensions",
+  "assembly.swatch": "Material swatch for layer"
 }

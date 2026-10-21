@@ -14,14 +14,17 @@ export function validateAssembly(input) {
   const layers = input.layers.map(l => {
     const mat = String(l.mat || '').trim(), t = Number(l.t);
     if (!mat || mat.length > 100) fail('Each layer needs a material name (up to 100 characters).');
-    if (!Number.isFinite(t) || t <= 0 || t > 2000) fail('Layer thickness must be greater than zero and at most 2000 mm.');
+    if (!Number.isFinite(t) || t < 0 || t > 2000) fail('Layer thickness must be between 0 and 2000 mm.');
     if (!LAYER_FUNCTIONS.includes(l.function)) fail('Choose a function for each layer.');
     if(l.kind!=null && !['material','cavity'].includes(l.kind)) fail('Choose a valid layer kind.');
     const layer=normalizeLayer({ ...l, mat, t, function: l.function, core: l.core === true });
+    if(t===0 && (layer.kind!=='material' || layer.function!=='membrane')) fail('Only a material layer with the Membrane function can have zero thickness.');
     if(layer.kind==='cavity' && !VENTILATION.includes(layer.ventilation)) fail('Choose a valid cavity ventilation setting.');
     return {mat,t,function:layer.function,core:layer.core,kind:layer.kind,materialId:layer.materialId,...(layer.kind==='cavity'?{ventilation:layer.ventilation}:{})};
   });
   if (layers.reduce((s,l)=>s+l.t,0)>2000) fail('Total wall thickness must not exceed 2000 mm.');
+  if(!layers.some(l=>l.t>0)) fail('An assembly needs at least one layer with physical thickness.');
+  if(!layers.some(l=>l.core && l.t>0)) fail('The core needs physical thickness.');
   const core = layers.map((l,i)=>l.core?i:-1).filter(i=>i>=0);
   if (!core.length || core.at(-1)-core[0]+1!==core.length) fail('Mark one contiguous group of layers as the core.');
   return { key: input.key, name, exterior: input.exterior === true, layers, custom: true };
