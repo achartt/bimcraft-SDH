@@ -113,7 +113,13 @@ export function start(opts = {}) {
         res.writeHead(500, { ...head, 'Content-Type': 'text/plain; charset=utf-8' });
         return res.end('render.php failed:\n' + r.error);
       }
-      const html = r ? r.html : fs.readFileSync(path.join(HERE, 'index.html'), 'utf8');
+      let html = r ? r.html : fs.readFileSync(path.join(HERE, 'index.html'), 'utf8');
+      // The PHP-free shell still needs current JS labels when the app's catalog changes.
+      if (!r) html = html.replace(/(<script[^>]*id="cc-lang"[^>]*>)([\s\S]*?)(<\/script>)/, (_, start, json, end) => {
+        const catalog = JSON.parse(json);
+        Object.assign(catalog.strings, JSON.parse(fs.readFileSync(path.join(APP_DIR, 'lang/en.json'), 'utf8')));
+        return start + JSON.stringify(catalog).replace(/</g, '\\u003c') + end;
+      });
       res.writeHead(200, { ...head, 'Content-Type': MIME['.html'] });
       return res.end(req.method === 'HEAD' ? undefined : html);
     }

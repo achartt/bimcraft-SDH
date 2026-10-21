@@ -1,4 +1,5 @@
 /* SPDX-License-Identifier: Apache-2.0 */
+import { dimensionFootprint } from './dimension-geometry.js';
 /**
  * res-sheets.js — a print-ready drawing set made from the model (0.5 part 4, RC.5): plans of each level, the four exterior
  * elevations, building sections from section lines, schedules, framing elevations of each framed wall — laid out on
@@ -80,6 +81,7 @@ function planItems(scene, P, k) {
     const u = [(d.b[0] - d.a[0]) / L, (d.b[1] - d.a[1]) / L], n = [-u[1], u[0]], off = d.offPx !== undefined ? d.offPx * 0.3 / k : d.off || 0;   // screen px → about 0.3 mm of paper
     const A = [d.a[0] + n[0] * off, d.a[1] + n[1] * off], B = [d.b[0] + n[0] * off, d.b[1] + n[1] * off];
     out.push({ t: 'line', pts: [P(A), P(B)], w: 0.13, g: 0 });
+    if (d.witnesses) for (const [i, q] of [A, B].entries()) out.push({ t: 'line', pts: [P(d.witnesses[i]), P(q)], w: 0.13, g: 0 });
     const tk = 1 / k, tick = [(u[0] - n[0]) * tk, (u[1] - n[1]) * tk];
     for (const q of [A, B]) out.push({ t: 'line', pts: [P([q[0] - tick[0], q[1] - tick[1]]), P([q[0] + tick[0], q[1] + tick[1]])], w: 0.13, g: 0 });
     let rot = Math.atan2(u[1], u[0]);
@@ -164,6 +166,7 @@ function boundsOfScene(scene) {
   for (const s of scene.symbols || []) for (const q of s.poly || []) g(q[0], q[1]);
   for (const x of scene.grids || []) { g(x.a[0], x.a[1]); g(x.b[0], x.b[1]); }   // 0.6 DF.16
   for (const d of scene.drafting || []) for (const l of d.lines || []) for (const q of l) g(q[0], q[1]);   // 0.6 DC.117 (d)
+  for (const d of scene.dims || []) if (d.key) for (const q of dimensionFootprint(d)) g(q[0], q[1]);
   if (!Number.isFinite(b.x0)) return null;
   const pad = Math.max(b.x1 - b.x0, b.y1 - b.y0) * 0.03 + 300;
   return { x0: b.x0 - pad, y0: b.y0 - pad, x1: b.x1 + pad, y1: b.y1 + pad };
