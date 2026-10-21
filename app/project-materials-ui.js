@@ -31,6 +31,7 @@ export function openMaterialLibrary(A,onClose=()=>{}, {createNew=false}={}) {
       c.setAttribute('aria-label',t(key));controls[key]=c;
       c.addEventListener('input',()=>{dirty=true;sample();});
       fields.append(el('label',{className:'bc-dlg-field'},t(key),c));
+      if(key==='defaultThickness') fields.append(el('small',{className:'bc-muted'},t('zeroHint')));
     }
     fields.append(el('div',{'data-material-swatch':'',style:'height:50px;border:1px solid #888'}));sample();
   }
