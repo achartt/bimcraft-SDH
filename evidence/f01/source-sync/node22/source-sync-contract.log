@@ -1,0 +1,166 @@
+TAP version 13
+# Subtest: terrain: absent source verifies bundled assets and explicitly skips live parity
+ok 1 - terrain: absent source verifies bundled assets and explicitly skips live parity
+  ---
+  duration_ms: 29.761542
+  type: 'test'
+  ...
+# Subtest: terrain: partial source app fails instead of skipping
+ok 2 - terrain: partial source app fails instead of skipping
+  ---
+  duration_ms: 28.782166
+  type: 'test'
+  ...
+# Subtest: terrain: file source app fails instead of skipping
+ok 3 - terrain: file source app fails instead of skipping
+  ---
+  duration_ms: 26.492833
+  type: 'test'
+  ...
+# Subtest: terrain: dangling source app fails instead of skipping
+ok 4 - terrain: dangling source app fails instead of skipping
+  ---
+  duration_ms: 26.542917
+  type: 'test'
+  ...
+# Subtest: terrain: write mode cannot substitute pins for absent source
+ok 5 - terrain: write mode cannot substitute pins for absent source
+  ---
+  duration_ms: 23.963666
+  type: 'test'
+  ...
+# Subtest: terrain: present matching source executes comparator/generator
+ok 6 - terrain: present matching source executes comparator/generator
+  ---
+  duration_ms: 33.55475
+  type: 'test'
+  ...
+# Subtest: terrain: present differing source fails comparison
+ok 7 - terrain: present differing source fails comparison
+  ---
+  duration_ms: 34.429792
+  type: 'test'
+  ...
+# Subtest: terrain: malformed source errors propagate
+ok 8 - terrain: malformed source errors propagate
+  ---
+  duration_ms: 29.528416
+  type: 'test'
+  ...
+# Subtest: terrain: changed bundled tin.js fails even without source
+ok 9 - terrain: changed bundled tin.js fails even without source
+  ---
+  duration_ms: 25.187333
+  type: 'test'
+  ...
+# Subtest: terrain: missing bundled tin.js fails even without source
+ok 10 - terrain: missing bundled tin.js fails even without source
+  ---
+  duration_ms: 24.873708
+  type: 'test'
+  ...
+# Subtest: terrain: changed bundled raster.js fails even without source
+ok 11 - terrain: changed bundled raster.js fails even without source
+  ---
+  duration_ms: 26.823625
+  type: 'test'
+  ...
+# Subtest: terrain: missing bundled raster.js fails even without source
+ok 12 - terrain: missing bundled raster.js fails even without source
+  ---
+  duration_ms: 24.633459
+  type: 'test'
+  ...
+# Subtest: electrical: absent source verifies bundled assets and explicitly skips live parity
+ok 13 - electrical: absent source verifies bundled assets and explicitly skips live parity
+  ---
+  duration_ms: 26.0345
+  type: 'test'
+  ...
+# Subtest: electrical: partial source app fails instead of skipping
+ok 14 - electrical: partial source app fails instead of skipping
+  ---
+  duration_ms: 26.427125
+  type: 'test'
+  ...
+# Subtest: electrical: file source app fails instead of skipping
+ok 15 - electrical: file source app fails instead of skipping
+  ---
+  duration_ms: 27.058416
+  type: 'test'
+  ...
+# Subtest: electrical: dangling source app fails instead of skipping
+ok 16 - electrical: dangling source app fails instead of skipping
+  ---
+  duration_ms: 24.18975
+  type: 'test'
+  ...
+# Subtest: electrical: write mode cannot substitute pins for absent source
+ok 17 - electrical: write mode cannot substitute pins for absent source
+  ---
+  duration_ms: 24.723625
+  type: 'test'
+  ...
+# Subtest: electrical: present matching source executes comparator/generator
+ok 18 - electrical: present matching source executes comparator/generator
+  ---
+  duration_ms: 25.615
+  type: 'test'
+  ...
+# Subtest: electrical: present differing source fails comparison
+ok 19 - electrical: present differing source fails comparison
+  ---
+  duration_ms: 24.267042
+  type: 'test'
+  ...
+# Subtest: electrical: malformed source errors propagate
+ok 20 - electrical: malformed source errors propagate
+  ---
+  duration_ms: 25.072
+  type: 'test'
+  ...
+# Subtest: electrical: changed bundled res-elec-symbols.js fails even without source
+ok 21 - electrical: changed bundled res-elec-symbols.js fails even without source
+  ---
+  duration_ms: 25.778625
+  type: 'test'
+  ...
+# Subtest: electrical: missing bundled res-elec-symbols.js fails even without source
+ok 22 - electrical: missing bundled res-elec-symbols.js fails even without source
+  ---
+  duration_ms: 23.938333
+  type: 'test'
+  ...
+# Subtest: terrain: invalid bundled mapping fails
+ok 23 - terrain: invalid bundled mapping fails
+  ---
+  duration_ms: 24.401125
+  type: 'test'
+  ...
+# Subtest: terrain: invalid bundled missing-key fails
+ok 24 - terrain: invalid bundled missing-key fails
+  ---
+  duration_ms: 30.576
+  type: 'test'
+  ...
+# Subtest: terrain: invalid bundled object-string fails
+ok 25 - terrain: invalid bundled object-string fails
+  ---
+  duration_ms: 29.62875
+  type: 'test'
+  ...
+# Subtest: terrain: invalid bundled invalid-json fails
+ok 26 - terrain: invalid bundled invalid-json fails
+  ---
+  duration_ms: 26.233208
+  type: 'test'
+  ...
+1..26
+# tests 26
+# suites 0
+# pass 26
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 733.630209
