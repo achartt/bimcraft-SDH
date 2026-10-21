@@ -22,6 +22,7 @@ export function mountWallAssemblies(modelUi) {
     const exterior=el('input',{type:'checkbox',checked:recipe.exterior});
     const rows=el('tbody'), total=el('p',{className:'bc-muted','aria-live':'polite'}), error=el('p',{className:'bc-error',role:'alert'});
     const preview=el('div',{'aria-label':t('preview'),style:'display:flex;height:40px;border:1px solid currentColor;margin:12px 0'});
+    const orientation=el('div',{'data-assembly-orientation':'',style:'display:flex;justify-content:space-between;gap:16px;font-weight:600'},el('span',{},t('exteriorSide')),el('span',{'aria-hidden':'true'},'→'),el('span',{},t('interiorSide')));
     const dlg=el('dialog',{className:'bc-dialog bc-fam-dlg','aria-label':t('title'),'data-assembly-editor':'',style:'width:min(1050px,96vw);max-width:1050px'});
     const save=button(t('save'),()=>submit(),{'data-assembly-save':''});
     function totals() {
@@ -29,13 +30,27 @@ export function mountWallAssemblies(modelUi) {
       total.textContent=t('total')+' '+L(th)+' · '+t('core')+' '+L(core);
       preview.replaceChildren(...recipe.layers.map(l=>el('div',{style:`flex:${Math.max(0.01,l.t)};background:${l.kind==='cavity'?'transparent':materialBackground(materials.find(m=>m.id===l.materialId))};border-right:1px solid #888;${l.core?'box-shadow:inset 0 -5px #527687;':''}`,title:(l.kind==='cavity'?mt('cavity'):materials.find(m=>m.id===l.materialId)?.name || l.mat)+' · '+L(l.t)+(l.core?' · '+t('core'):'' )})));
     }
+    function selectMaterial(layer,m) {
+      Object.assign(layer,{kind:'material',materialId:m.id,mat:m.legacyName,t:m.defaultThickness});
+      delete layer.ventilation;
+    }
     function draw() {
       rows.replaceChildren(...recipe.layers.map((layer,i)=>{
         const kind=el('select',{'aria-label':mt('kind')+' '+(i+1),className:'bc-mb-select'},...['material','cavity'].map(k=>el('option',{value:k,selected:layer.kind===k},mt(k))));
-        kind.addEventListener('change',()=>{if(kind.value==='cavity'){Object.assign(layer,{kind:'cavity',materialId:null,mat:'air',ventilation:'unspecified'});}else{const m=materials[0];Object.assign(layer,{kind:'material',materialId:m.id,mat:m.legacyName});delete layer.ventilation;}draw();});
-        const mat=el('select',{className:'bc-input','aria-label':t('material')+' '+(i+1)},...materials.map(m=>el('option',{value:m.id,selected:m.id===layer.materialId},m.name)));
+        kind.addEventListener('change',()=>{if(kind.value==='cavity'){Object.assign(layer,{kind:'cavity',materialId:null,mat:'air',ventilation:'unspecified'});}else{selectMaterial(layer,materials[0]);}draw();});
+        const mat=el('select',{className:'bc-input','aria-label':t('material')+' '+(i+1)},...materials.map(m=>el('option',{value:m.id,selected:m.id===layer.materialId},m.name)),el('option',{value:'__new__'},mt('createFromPicker')));
         if(layer.kind==='material' && !materials.some(m=>m.id===layer.materialId)) mat.prepend(el('option',{value:layer.materialId,selected:true},mt('missing')+' '+layer.mat));
-        mat.addEventListener('change',()=>{const m=materials.find(m=>m.id===mat.value);layer.materialId=m.id;layer.mat=m.legacyName;totals();});
+        mat.addEventListener('change',()=>{
+          if(mat.value==='__new__') {
+            mat.value=layer.materialId;
+            openMaterialLibrary(A,saved=>{
+              if(A.ed()!==editor || !dlg.isConnected) return;
+              materials=readMaterials(W(),recipe.layers);
+              if(saved) selectMaterial(layer,saved);
+              draw();
+            },{createNew:true});
+          } else {selectMaterial(layer,materials.find(m=>m.id===mat.value));draw();}
+        });
         const vent=el('select',{'aria-label':mt('ventilation')+' '+(i+1),className:'bc-input'},...VENTILATION.map(v=>el('option',{value:v,selected:layer.ventilation===v},mt(v))));
         vent.addEventListener('change',()=>{layer.ventilation=vent.value;});
         const useDefault=button(mt('useDefault'),()=>{const m=materials.find(m=>m.id===layer.materialId);if(m){layer.t=m.defaultThickness;draw();}},{disabled:layer.kind==='cavity'});
@@ -46,10 +61,14 @@ export function mountWallAssemblies(modelUi) {
         const core=el('input',{type:'checkbox',checked:layer.core,'aria-label':t('core')+' '+(i+1)});core.addEventListener('change',()=>{layer.core=core.checked;totals();});
         const move=delta=>{[recipe.layers[i],recipe.layers[i+delta]]=[recipe.layers[i+delta],recipe.layers[i]];draw();};
         return el('tr',{},el('td',{},kind,layer.kind==='cavity'?vent:mat),el('td',{},thickness,useDefault),el('td',{},fn),el('td',{},core),el('td',{},button('↑',()=>move(-1),{disabled:i===0,'aria-label':t('up')}),button('↓',()=>move(1),{disabled:i===recipe.layers.length-1,'aria-label':t('down')}),button('×',()=>{recipe.layers.splice(i,1);draw();},{'aria-label':t('remove')})));
-      }));totals();
+      }));
+      const boundary=label=>el('tr',{},el('th',{colSpan:5,style:'text-align:left;padding:8px 4px;background:rgba(128,128,128,.12)'},label));
+      rows.prepend(boundary(t('exteriorSide')+' ↓'));
+      rows.append(boundary(t('interiorSide')+' ↑'));
+      totals();
     }
     const copy=button(t('duplicate'),()=>{duplicate=true;name.value+=' copy';copy.disabled=true;save.textContent=t('savecopy');});
-    dlg.append(el('h2',{className:'bc-h'},t('title')),el('label',{className:'bc-dlg-field'},t('name'),name),el('label',{},exterior,' '+t('exterior')),el('p',{},t('order')),preview,total,el('div',{style:'overflow:auto'},el('table',{},el('thead',{},el('tr',{},...['material','thickness','function','core','actions'].map(k=>el('th',{},t(k))))),rows)),
+    dlg.append(el('h2',{className:'bc-h'},t('title')),el('label',{className:'bc-dlg-field'},t('name'),name),el('label',{},exterior,' '+t('exterior')),el('p',{},t('order')),orientation,preview,total,el('div',{style:'overflow:auto'},el('table',{},el('thead',{},el('tr',{},...['material','thickness','function','core','actions'].map(k=>el('th',{},t(k))))),rows)),
       button(t('add'),()=>{const m=materials.find(m=>m.id==='material-gypsum') || materials[0];recipe.layers.push(normalizeLayer({mat:m.legacyName,materialId:m.id,t:m.defaultThickness,function:'finish',core:false}));draw();}),button(mt('addCavity'),()=>{recipe.layers.push(normalizeLayer({mat:'air',kind:'cavity',t:25.4,function:'substrate',core:false}));draw();}),button(mt('title'),()=>openMaterialLibrary(A,()=>{materials=readMaterials(W(),recipe.layers);draw();})),el('p',{className:'bc-muted'},mt('defaults')),el('p',{className:'bc-muted'},t('scope')),error,
       el('p',{className:'bc-lib-actions'},...(editing?[copy]:[]),button(t('cancel'),()=>dlg.close()),save));
     dlg.addEventListener('close',()=>dlg.remove());
