@@ -3,10 +3,12 @@
 // no global registry (two open documents may use the same key differently).
 import { ids, val } from './ifc-util.js';
 import { normalizeLayer, VENTILATION, writeMaterialLayers } from './project-materials.js';
+import { checkRecordVersion, parseRecord, recordError } from './record-contract.js';
 export const ASSEMBLY_PSET = 'CadCraft_WallType';
 export const LAYER_FUNCTIONS = ['finish', 'substrate', 'structure', 'insulation', 'membrane'];
 const fail = (message) => { throw new Error(message); };
 export function validateAssembly(input) {
+  checkRecordVersion(input, 'assembly');
   if (!/^wall-[a-zA-Z0-9_-]{1,80}$/.test(input?.key || '')) fail('Invalid wall type key.');
   const name = String(input.name || '').trim();
   if (!name || name.length > 100) fail('Enter a wall type name (up to 100 characters).');
@@ -27,9 +29,9 @@ export function validateAssembly(input) {
   if(!layers.some(l=>l.core && l.t>0)) fail('The core needs physical thickness.');
   const core = layers.map((l,i)=>l.core?i:-1).filter(i=>i>=0);
   if (!core.length || core.at(-1)-core[0]+1!==core.length) fail('Mark one contiguous group of layers as the core.');
-  return { key: input.key, name, exterior: input.exterior === true, layers, custom: true };
+  return { version: 1, key: input.key, name, exterior: input.exterior === true, layers, custom: true };
 }
-export function readAssemblies(w) {
+export function readAssemblyRecords(w) {
   if (!w) return [];
   const out=[];
   for (const id of ids(w.api,w.mid,'IFCWALLTYPE')) {
@@ -38,13 +40,24 @@ export function readAssemblies(w) {
       const ps=w.api.GetLine(w.mid,h.value,false);
       if(val(ps?.Name)!==ASSEMBLY_PSET) continue;
       const props=Object.fromEntries((ps.HasProperties || []).map(h=>{const p=w.api.GetLine(w.mid,h.value,false);return [val(p.Name),val(p.NominalValue)];}));
-      if (!props.Recipe) continue;
-      try { out.push({...validateAssembly(JSON.parse(props.Recipe)),id,guid:val(line.GlobalId),psetId:h.value}); } catch { /* Unknown/corrupt recipes are never silently guessed. */ }
+      if (!Object.hasOwn(props, 'Recipe')) continue;
+      const identity={id,guid:val(line.GlobalId),psetId:h.value,key:props.Key,raw:props.Recipe};
+      try { const raw=parseRecord(props.Recipe,'assembly'); const recipe=validateAssembly(raw);
+        if (recipe.key !== props.Key) throw recordError('assembly','corrupt');
+        out.push({...recipe,...identity});
+      } catch(e) { out.push({...identity,issue:e.recordIssue || 'corrupt',message:recordError('assembly',e.recordIssue || 'corrupt').message}); }
     }
   }
-  return out;
+  return out.map(r=>out.filter(x=>x.key===r.key || x.guid===r.guid).length>1?{...r,issue:'corrupt',message:recordError('assembly','corrupt').message}:r);
+}
+export const readAssemblies = w => readAssemblyRecords(w).filter(r=>!r.issue);
+export function assertAssembliesEditable(w) {
+  const records=readAssemblyRecords(w), bad=records.find(r=>r.issue);
+  if(bad) throw recordError('assembly',bad.issue);
+  if(new Set(records.map(r=>r.key)).size!==records.length) throw recordError('assembly','corrupt');
 }
 export function writeAssembly(w,input,guid=null) {
+  assertAssembliesEditable(w);
   const recipe=validateAssembly(input), previous=readAssemblies(w).find(x=>x.key===recipe.key);
   if(readAssemblies(w).some(x=>x.key!==recipe.key && x.name.toLowerCase()===recipe.name.toLowerCase())) fail('A wall type with this name already exists.');
   const layers=writeMaterialLayers(w,recipe.layers);

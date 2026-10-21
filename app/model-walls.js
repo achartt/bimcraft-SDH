@@ -41,7 +41,7 @@ import { planLoops } from './model-rooms.js';
 import { t as tr } from './i18n.js';
 import { wallGeom, arcOf, arcLength, chordFor, flatPoly, arcAxisCurve, profileCurve, profileKeyPoints, BULGE_MAX } from './model-arcs.js';   // 0.6 round 2 (bim-comforts_PART_2): curved walls
 
-import { readAssemblies } from './wall-assemblies.js';
+import { readAssemblies, readAssemblyRecords } from './wall-assemblies.js';
 
 export const WALL_PSET = 'CadCraft_Wall';
 export const WALLTYPE_PSET = 'CadCraft_WallType';
@@ -309,7 +309,7 @@ export function locationLine(wall) {
 // --------------------------------------------------------------------------------------------------------------- reading
 /** Every wall the tools made, in its storey's plan axes (mm). `storey` limits it to one storey. */
 export function readWalls(w, storey = null) {
-  const out = [], assemblies = readAssemblies(w);
+  const out = [], records = readAssemblyRecords(w), assemblies = records.filter(r=>!r.issue);
   let list = [];
   try { list = ids(w.api, w.mid, 'IFCWALL', true); } catch (e) { list = ids(w.api, w.mid, 'IFCWALL'); }
   const levels = readLevels(w);
@@ -326,7 +326,7 @@ export function readWalls(w, storey = null) {
     const M = w.relMatrix(stLine.ObjectPlacement.value, lp);
     const len = Number(ps.Length) * w.unitMm, th = Number(ps.Thickness) * w.unitMm;
     // 0.6 round 2: a curved wall's Length is along its arc; its end is the chord away (Bulge = tan(θ / 4), + anticlockwise)
-    const bulge = Number(ps.Bulge) || 0, chord = chordFor(len, bulge);
+    const bulge = Number(ps.Bulge ?? 0), chord = chordFor(len, bulge);
     const a = [M[12], M[13]], dir = [M[0], M[1]];
     const dl = Math.hypot(dir[0], dir[1]) || 1;
     const b = [a[0] + dir[0] / dl * chord, a[1] + dir[1] / dl * chord];
@@ -338,7 +338,8 @@ export function readWalls(w, storey = null) {
       name: val(line.Name) || '',
       bulge, justification: JUSTIFICATIONS.includes(ps.Justification) ? ps.Justification : 'center',
     };
-    wall.assembly = wallType(wall.typeKey, assemblies);
+    wall.referenceIssue = records.find(r=>r.key===wall.typeKey && r.issue)?.issue || null;
+    wall.assembly = wall.referenceIssue ? null : wallType(wall.typeKey, assemblies);
     wall.height = wallHeight(wall, levels, base);
     out.push(wall);
   }
@@ -376,7 +377,12 @@ function layerSetOf(w, typeId) {
   return m?.def ?? null;
 }
 
+function validWallChanges(changes) {
+  for(const key of ['a','b']) if(Object.hasOwn(changes,key) && (!Array.isArray(changes[key]) || changes[key].length!==2 || !changes[key].every(Number.isFinite))) throw new Error(tr('contract.wallinvalid'));
+  for(const key of ['bulge','height','baseOffset','topOffset']) if(Object.hasOwn(changes,key) && !Number.isFinite(changes[key])) throw new Error(tr('contract.wallinvalid'));
+}
 export function addWall(w, { storey, a, b, typeKey = 'ext-2x6', baseOffset = 0, topLevel = '', topOffset = 0, height = 0, extSide = 'left', guid, bulge = 0, justification = 'center' } = {}) {
+  validWallChanges({a,b,bulge,height,baseOffset,topOffset});
   if (!(dist(a, b) >= 1)) throw Object.assign(new Error('model.err.short'), { key: 'model.err.short' });
   checkBulge(bulge);
   const L = arcLength(a, b, bulge);   // 0.6 round 2: along the arc for a curved wall
@@ -415,6 +421,7 @@ function usage(w, set, th, extSide) {
  * → { guids } the walls changed (the page regenerates them and their neighbours).
  */
 export function updateWall(w, guid, changes = {}, { carryJoined = true, previousType = null } = {}) {
+  validWallChanges(changes);
   const all = readWalls(w);
   const wall = all.find((x) => x.guid === guid);
   if (!wall) throw Object.assign(new Error('model.err.nowall'), { key: 'model.err.nowall' });
@@ -539,6 +546,8 @@ export function deleteWalls(w, guids) {
  * gets a new shape, quantities and pset values; `force` (GlobalIds) are redone anyway (their openings changed).
  * Call it after any change to walls, levels or openings. → { walls: how many were rewritten }
  */
+// Below the 0.005 mm F02 bound; keep the separate 1 mm join tolerance unchanged.
+const SHAPE_TOL_MM = 0.001;
 export function regenWalls(w, storey, force = null) {
   const walls = readWalls(w, storey);
   if (!walls.length) return { walls: 0 };
@@ -552,7 +561,7 @@ export function regenWalls(w, storey, force = null) {
     const local = profileKeyPoints(toLocal(wall, poly.bulged || poly), w.v4);
     if (!forced.has(wall.guid)) {
       const cur = storedShape(w, wall.id);
-      if (cur && Math.abs(cur.depth - wall.height) < 0.01 && Math.abs(cur.len - wall.len) < 0.01 && samePoly(cur.points, local)) continue;
+      if (cur && Math.abs(cur.depth - wall.height) < SHAPE_TOL_MM && Math.abs(cur.len - wall.len) < SHAPE_TOL_MM && samePoly(cur.points, local)) continue;
     }
     writeWallShape(w, wall, poly, host);
     n++;
@@ -565,7 +574,7 @@ const toLocal = (wall, poly) => {
 };
 function samePoly(a, b) {
   if (a.length !== b.length) return false;
-  for (let k = 0; k < a.length; k++) { if (a.every((p, i) => dist(p, b[(i + k) % b.length]) < 0.01)) return true; }
+  for (let k = 0; k < a.length; k++) { if (a.every((p, i) => dist(p, b[(i + k) % b.length]) < SHAPE_TOL_MM)) return true; }
   return false;
 }
 /** What the wall's shape holds now: its body outline (wall axes, mm, closing point dropped), extrusion depth, axis length. */

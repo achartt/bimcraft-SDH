@@ -5317,8 +5317,8 @@
   "dimension.hint.offset": "Click to place the dimension line.",
   "dimension.pickwall": "Pick near a wall in this level.",
   "dimension.coincident": "These references coincide in this direction. Choose another reference or direction.",
-  "dimension.status.missing": "Unresolved — wall or core reference missing",
-  "dimension.status.coincident": "References coincide",
+  "dimension.status.missing": "Unresolved — wall or core reference missing or invalid. Undo the host change or use Rebind to select replacement references.",
+  "dimension.status.coincident": "Unresolved — references coincide in this direction. Use Rebind to choose distinct references.",
   "dimension.value": "Measurement",
   "dimension.first": "First reference",
   "dimension.second": "Second reference",
@@ -5381,5 +5381,16 @@
   "assembly.addMembrane": "Add membrane",
   "assembly.membraneNote": "* Zero nominal thickness: retained in the assembly for future schedules; does not add to wall or core thickness. Dashed lines mark membrane locations.",
   "assembly.dimensions": "Layer, core and total thickness dimensions",
-  "assembly.swatch": "Material swatch for layer"
+  "assembly.swatch": "Material swatch for layer",
+  "contract.wallinvalid": "Wall coordinates and dimensions must be finite numbers. The edit was not applied.",
+  "contract.assembly": "Wall assembly",
+  "contract.materials": "Project material library",
+  "contract.dimension": "Wall reference dimension",
+  "contract.unsupported": "Unsupported data version. Editing and reference updates are unavailable.",
+  "contract.corrupt": "The saved record is corrupt or ambiguous. Editing and reference updates are unavailable.",
+  "contract.recovery": "The original records are preserved. Open this file in a compatible BimCraft version or restore a known-good copy. No automatic conversion has been made.",
+  "dimension.status.unsupported": "Unresolved — unsupported reference or wall assembly version",
+  "dimension.status.corrupt": "Unresolved — corrupt reference or wall assembly record",
+  "dimension.status.invalid": "Unresolved — invalid reference settings",
+  "dimension.status.ambiguous": "Unresolved — duplicate dimension identity"
 }
