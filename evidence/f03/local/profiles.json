@@ -1,0 +1,629 @@
+[
+  {
+    "file": "large-model.cpuprofile",
+    "samples": 12433,
+    "sampledMs": 1959.34,
+    "self": [
+      {
+        "function": "ofType — ifc/model.js:117",
+        "sampledMs": 436.167,
+        "percent": 22.260914389539334
+      },
+      {
+        "function": "GetLine — ifc/api.js:146",
+        "sampledMs": 249.964,
+        "percent": 12.757561219594352
+      },
+      {
+        "function": "lineObject — ifc/api.js:151",
+        "sampledMs": 237.662,
+        "percent": 12.129696734614717
+      },
+      {
+        "function": "toApi — ifc/api.js:440",
+        "sampledMs": 89.22,
+        "percent": 4.553574162728266
+      },
+      {
+        "function": "(garbage collector) — native:0",
+        "sampledMs": 54.348,
+        "percent": 2.773791174579195
+      },
+      {
+        "function": "crc32 — ifc/schema.js:29",
+        "sampledMs": 51.754,
+        "percent": 2.6413996549858627
+      },
+      {
+        "function": "post — node:inspector:115",
+        "sampledMs": 49.647,
+        "percent": 2.5338634438127126
+      },
+      {
+        "function": "typedApi — ifc/api.js:469",
+        "sampledMs": 41.402,
+        "percent": 2.1130584788755398
+      },
+      {
+        "function": "(program) — native:0",
+        "sampledMs": 39.544,
+        "percent": 2.0182306286810863
+      },
+      {
+        "function": "typeCode — ifc/schema.js:36",
+        "sampledMs": 38.256,
+        "percent": 1.9524942072330478
+      },
+      {
+        "function": "planLoops — app/model-rooms.js:23",
+        "sampledMs": 36.191,
+        "percent": 1.8471015750201598
+      },
+      {
+        "function": "readWalls — app/model-walls.js:311",
+        "sampledMs": 33.905,
+        "percent": 1.7304296344687498
+      },
+      {
+        "function": "readPset — app/model-write.js:249",
+        "sampledMs": 29.291,
+        "percent": 1.4949421744056672
+      },
+      {
+        "function": "touch — app/ifc-place.js:83",
+        "sampledMs": 24.96,
+        "percent": 1.2738983535272081
+      },
+      {
+        "function": "placement — ifc/geo-ctx.js:177",
+        "sampledMs": 24.225,
+        "percent": 1.2363857217226208
+      },
+      {
+        "function": "GetLineIDsWithType — ifc/api.js:132",
+        "sampledMs": 21.385,
+        "percent": 1.0914389539334675
+      },
+      {
+        "function": "axis2 — ifc/geo-ctx.js:126",
+        "sampledMs": 19.433,
+        "percent": 0.9918135698755703
+      },
+      {
+        "function": "set — ifc/model.js:191",
+        "sampledMs": 18.756,
+        "percent": 0.9572611185399165
+      },
+      {
+        "function": "type — ifc/model.js:65",
+        "sampledMs": 17.215,
+        "percent": 0.8786121857360132
+      },
+      {
+        "function": "GetWorldTransformMatrix — ifc/api.js:284",
+        "sampledMs": 15.515,
+        "percent": 0.7918482754396888
+      }
+    ],
+    "inclusive": [
+      {
+        "function": "(root) — native:0",
+        "sampledMs": 1959.34,
+        "percent": 100
+      },
+      {
+        "function": "(anonymous) — f03/model.mjs:0",
+        "sampledMs": 1858.094,
+        "percent": 94.83264772831667
+      },
+      {
+        "function": "processTicksAndRejections — process/task_queues:72",
+        "sampledMs": 1858.094,
+        "percent": 94.83264772831667
+      },
+      {
+        "function": "(anonymous) — app/model-ops.js:30",
+        "sampledMs": 1678.137,
+        "percent": 85.64807537231925
+      },
+      {
+        "function": "modelChange — app/ifc-edit.js:178",
+        "sampledMs": 1678.137,
+        "percent": 85.64807537231925
+      },
+      {
+        "function": "run — app/model-write.js:51",
+        "sampledMs": 1677.824,
+        "percent": 85.63210060530587
+      },
+      {
+        "function": "(anonymous) — app/model-ops.js:32",
+        "sampledMs": 1677.522,
+        "percent": 85.6166872518297
+      },
+      {
+        "function": "(anonymous) — app/model-ops.js:65",
+        "sampledMs": 1649.383,
+        "percent": 84.18054038604836
+      },
+      {
+        "function": "updateWall — app/model-walls.js:424",
+        "sampledMs": 1193.804,
+        "percent": 60.92888421611359
+      },
+      {
+        "function": "readWalls — app/model-walls.js:311",
+        "sampledMs": 1106.406,
+        "percent": 56.46830055018527
+      },
+      {
+        "function": "GetLine — ifc/api.js:146",
+        "sampledMs": 765.096,
+        "percent": 39.04865924239795
+      },
+      {
+        "function": "readPset — app/model-write.js:249",
+        "sampledMs": 593.422,
+        "percent": 30.28683127992079
+      },
+      {
+        "function": "lineObject — ifc/api.js:151",
+        "sampledMs": 507.782,
+        "percent": 25.915971704757723
+      },
+      {
+        "function": "rejoinAssemblyCorners — app/model-ops.js:80",
+        "sampledMs": 483.088,
+        "percent": 24.655649351312178
+      },
+      {
+        "function": "ids — app/ifc-util.js:36",
+        "sampledMs": 461.09,
+        "percent": 23.53292435207774
+      },
+      {
+        "function": "GetLineIDsWithType — ifc/api.js:132",
+        "sampledMs": 458.011,
+        "percent": 23.37577959925281
+      },
+      {
+        "function": "ofType — ifc/model.js:117",
+        "sampledMs": 436.472,
+        "percent": 22.276480855798383
+      },
+      {
+        "function": "afterWallMove — app/model-ops.js:170",
+        "sampledMs": 248.138,
+        "percent": 12.664366572417242
+      },
+      {
+        "function": "updateOpening — app/model-openings.js:261",
+        "sampledMs": 241.575,
+        "percent": 12.32940684107914
+      },
+      {
+        "function": "settle — app/model-ops.js:55",
+        "sampledMs": 180.506,
+        "percent": 9.212591995263711
+      }
+    ]
+  },
+  {
+    "file": "medium-model.cpuprofile",
+    "samples": 2414,
+    "sampledMs": 415.971,
+    "self": [
+      {
+        "function": "ofType — ifc/model.js:117",
+        "sampledMs": 72.92,
+        "percent": 17.53006820186984
+      },
+      {
+        "function": "post — node:inspector:115",
+        "sampledMs": 45.788,
+        "percent": 11.007498118859248
+      },
+      {
+        "function": "GetLine — ifc/api.js:146",
+        "sampledMs": 42.572,
+        "percent": 10.234367299643484
+      },
+      {
+        "function": "lineObject — ifc/api.js:151",
+        "sampledMs": 39.494,
+        "percent": 9.494411870058249
+      },
+      {
+        "function": "toApi — ifc/api.js:440",
+        "sampledMs": 15.95,
+        "percent": 3.83440191744136
+      },
+      {
+        "function": "(garbage collector) — native:0",
+        "sampledMs": 11.867,
+        "percent": 2.8528431068511986
+      },
+      {
+        "function": "crc32 — ifc/schema.js:29",
+        "sampledMs": 9.997,
+        "percent": 2.4032925372201426
+      },
+      {
+        "function": "typeCode — ifc/schema.js:36",
+        "sampledMs": 7.597,
+        "percent": 1.8263292392979318
+      },
+      {
+        "function": "(program) — native:0",
+        "sampledMs": 7.033,
+        "percent": 1.6907428642862123
+      },
+      {
+        "function": "typedApi — ifc/api.js:469",
+        "sampledMs": 5.695,
+        "percent": 1.3690858256945797
+      },
+      {
+        "function": "planLoops — app/model-rooms.js:23",
+        "sampledMs": 5.657,
+        "percent": 1.359950573477478
+      },
+      {
+        "function": "readWalls — app/model-walls.js:311",
+        "sampledMs": 5.519,
+        "percent": 1.3267751838469508
+      },
+      {
+        "function": "entity — ifc/schema.js:70",
+        "sampledMs": 5.206,
+        "percent": 1.2515295537429292
+      },
+      {
+        "function": "touch — app/ifc-place.js:83",
+        "sampledMs": 5.051,
+        "percent": 1.2142673407521198
+      },
+      {
+        "function": "GetLineIDsWithType — ifc/api.js:132",
+        "sampledMs": 4.904,
+        "percent": 1.1789283387543843
+      },
+      {
+        "function": "set — ifc/model.js:191",
+        "sampledMs": 4.48,
+        "percent": 1.0769981561214603
+      },
+      {
+        "function": "dropTree — app/model-write.js:180",
+        "sampledMs": 4.463,
+        "percent": 1.0729113327611781
+      },
+      {
+        "function": "readPset — app/model-write.js:249",
+        "sampledMs": 4.121,
+        "percent": 0.990694062807263
+      },
+      {
+        "function": "#encode — node:internal/encoding:344",
+        "sampledMs": 4.008,
+        "percent": 0.9635287075300922
+      },
+      {
+        "function": "clear — ifc/geometry.js:50",
+        "sampledMs": 3.993,
+        "percent": 0.9599226869180785
+      }
+    ],
+    "inclusive": [
+      {
+        "function": "(root) — native:0",
+        "sampledMs": 415.971,
+        "percent": 100
+      },
+      {
+        "function": "(anonymous) — f03/model.mjs:0",
+        "sampledMs": 395.856,
+        "percent": 95.16432635928948
+      },
+      {
+        "function": "processTicksAndRejections — process/task_queues:72",
+        "sampledMs": 395.856,
+        "percent": 95.16432635928948
+      },
+      {
+        "function": "modelChange — app/ifc-edit.js:178",
+        "sampledMs": 301.001,
+        "percent": 72.36105401578476
+      },
+      {
+        "function": "(anonymous) — app/model-ops.js:30",
+        "sampledMs": 300.845,
+        "percent": 72.3235514014198
+      },
+      {
+        "function": "(anonymous) — app/model-ops.js:32",
+        "sampledMs": 300.693,
+        "percent": 72.28701039255141
+      },
+      {
+        "function": "run — app/model-write.js:51",
+        "sampledMs": 300.693,
+        "percent": 72.28701039255141
+      },
+      {
+        "function": "(anonymous) — app/model-ops.js:65",
+        "sampledMs": 291.724,
+        "percent": 70.13085046794127
+      },
+      {
+        "function": "updateWall — app/model-walls.js:424",
+        "sampledMs": 181.712,
+        "percent": 43.68381449668367
+      },
+      {
+        "function": "readWalls — app/model-walls.js:311",
+        "sampledMs": 167.721,
+        "percent": 40.32035887117131
+      },
+      {
+        "function": "GetLine — ifc/api.js:146",
+        "sampledMs": 131.843,
+        "percent": 31.695238369982523
+      },
+      {
+        "function": "lineObject — ifc/api.js:151",
+        "sampledMs": 88.96,
+        "percent": 21.386106242983285
+      },
+      {
+        "function": "readPset — app/model-write.js:249",
+        "sampledMs": 84.097,
+        "percent": 20.217034360568405
+      },
+      {
+        "function": "ids — app/ifc-util.js:36",
+        "sampledMs": 78.12,
+        "percent": 18.780155347367966
+      },
+      {
+        "function": "GetLineIDsWithType — ifc/api.js:132",
+        "sampledMs": 77.967,
+        "percent": 18.743373937125426
+      },
+      {
+        "function": "ofType — ifc/model.js:117",
+        "sampledMs": 73.063,
+        "percent": 17.56444559837104
+      },
+      {
+        "function": "rejoinAssemblyCorners — app/model-ops.js:80",
+        "sampledMs": 69.938,
+        "percent": 16.813191304201496
+      },
+      {
+        "function": "settle — app/model-ops.js:55",
+        "sampledMs": 53.457,
+        "percent": 12.851136257094845
+      },
+      {
+        "function": "afterWallMove — app/model-ops.js:170",
+        "sampledMs": 46.036,
+        "percent": 11.067117659644543
+      },
+      {
+        "function": "post — node:inspector:115",
+        "sampledMs": 45.788,
+        "percent": 11.007498118859248
+      }
+    ]
+  },
+  {
+    "file": "small-model.cpuprofile",
+    "samples": 615,
+    "sampledMs": 152.93,
+    "self": [
+      {
+        "function": "post — node:inspector:115",
+        "sampledMs": 56.19,
+        "percent": 36.7423003988753
+      },
+      {
+        "function": "ofType — ifc/model.js:117",
+        "sampledMs": 16.587,
+        "percent": 10.84613875629373
+      },
+      {
+        "function": "GetLine — ifc/api.js:146",
+        "sampledMs": 8.082,
+        "percent": 5.28477081017459
+      },
+      {
+        "function": "lineObject — ifc/api.js:151",
+        "sampledMs": 7.353,
+        "percent": 4.808082129078663
+      },
+      {
+        "function": "readWalls — app/model-walls.js:311",
+        "sampledMs": 3.615,
+        "percent": 2.3638265873275355
+      },
+      {
+        "function": "toApi — ifc/api.js:440",
+        "sampledMs": 3.365,
+        "percent": 2.2003531027267376
+      },
+      {
+        "function": "fromApi — ifc/api.js:215",
+        "sampledMs": 2.61,
+        "percent": 1.7066631792323286
+      },
+      {
+        "function": "set — ifc/model.js:191",
+        "sampledMs": 2.603,
+        "percent": 1.7020859216635063
+      },
+      {
+        "function": "(program) — native:0",
+        "sampledMs": 2.584,
+        "percent": 1.6896619368338455
+      },
+      {
+        "function": "(garbage collector) — native:0",
+        "sampledMs": 2.491,
+        "percent": 1.6288498005623488
+      },
+      {
+        "function": "clear — ifc/geometry.js:50",
+        "sampledMs": 2.169,
+        "percent": 1.4182959523965213
+      },
+      {
+        "function": "#encode — node:internal/encoding:344",
+        "sampledMs": 1.856,
+        "percent": 1.2136271496763225
+      },
+      {
+        "function": "typedApi — ifc/api.js:469",
+        "sampledMs": 1.835,
+        "percent": 1.1998953769698555
+      },
+      {
+        "function": "fix — app/ifc-util.js:49",
+        "sampledMs": 1.693,
+        "percent": 1.1070424377166024
+      },
+      {
+        "function": "typeCode — ifc/schema.js:36",
+        "sampledMs": 1.666,
+        "percent": 1.0893873013797162
+      },
+      {
+        "function": "save — ifc/model.js:232",
+        "sampledMs": 1.53,
+        "percent": 1.0004577257568823
+      },
+      {
+        "function": "touch — app/ifc-place.js:83",
+        "sampledMs": 1.376,
+        "percent": 0.8997580592427908
+      },
+      {
+        "function": "GetLineIDsWithType — ifc/api.js:132",
+        "sampledMs": 1.363,
+        "percent": 0.8912574380435493
+      },
+      {
+        "function": "formatValue — ifc/step.js:409",
+        "sampledMs": 1.236,
+        "percent": 0.808212907866344
+      },
+      {
+        "function": "readPset — app/model-write.js:249",
+        "sampledMs": 1.227,
+        "percent": 0.8023278624207154
+      }
+    ],
+    "inclusive": [
+      {
+        "function": "(root) — native:0",
+        "sampledMs": 152.93,
+        "percent": 100
+      },
+      {
+        "function": "(anonymous) — f03/model.mjs:0",
+        "sampledMs": 147.542,
+        "percent": 96.4768194598836
+      },
+      {
+        "function": "processTicksAndRejections — process/task_queues:72",
+        "sampledMs": 147.542,
+        "percent": 96.4768194598836
+      },
+      {
+        "function": "(anonymous) — app/model-ops.js:30",
+        "sampledMs": 68.751,
+        "percent": 44.95586215915778
+      },
+      {
+        "function": "modelChange — app/ifc-edit.js:178",
+        "sampledMs": 68.751,
+        "percent": 44.95586215915778
+      },
+      {
+        "function": "(anonymous) — app/model-ops.js:32",
+        "sampledMs": 68.594,
+        "percent": 44.85320081082848
+      },
+      {
+        "function": "run — app/model-write.js:51",
+        "sampledMs": 68.594,
+        "percent": 44.85320081082848
+      },
+      {
+        "function": "(anonymous) — app/model-ops.js:65",
+        "sampledMs": 65.224,
+        "percent": 42.64957823840973
+      },
+      {
+        "function": "post — node:inspector:115",
+        "sampledMs": 56.344,
+        "percent": 36.8430000653894
+      },
+      {
+        "function": "(anonymous) — f03/model.mjs:32",
+        "sampledMs": 56.344,
+        "percent": 36.8430000653894
+      },
+      {
+        "function": "post — f03/model.mjs:32",
+        "sampledMs": 56.344,
+        "percent": 36.8430000653894
+      },
+      {
+        "function": "updateWall — app/model-walls.js:424",
+        "sampledMs": 30.677,
+        "percent": 20.05950434839469
+      },
+      {
+        "function": "readWalls — app/model-walls.js:311",
+        "sampledMs": 28.388,
+        "percent": 18.562741123389785
+      },
+      {
+        "function": "GetLine — ifc/api.js:146",
+        "sampledMs": 25.027,
+        "percent": 16.36500359641666
+      },
+      {
+        "function": "settle — app/model-ops.js:55",
+        "sampledMs": 20.043,
+        "percent": 13.105996207415158
+      },
+      {
+        "function": "ids — app/ifc-util.js:36",
+        "sampledMs": 18.103,
+        "percent": 11.837441966912968
+      },
+      {
+        "function": "GetLineIDsWithType — ifc/api.js:132",
+        "sampledMs": 17.95,
+        "percent": 11.737396194337279
+      },
+      {
+        "function": "lineObject — ifc/api.js:151",
+        "sampledMs": 16.793,
+        "percent": 10.980840907604787
+      },
+      {
+        "function": "ofType — ifc/model.js:117",
+        "sampledMs": 16.587,
+        "percent": 10.84613875629373
+      },
+      {
+        "function": "syncDerived — app/model-slabs.js:261",
+        "sampledMs": 12.996,
+        "percent": 8.49800562348787
+      }
+    ]
+  }
+]
