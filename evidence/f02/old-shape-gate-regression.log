@@ -1,0 +1,144 @@
+TAP version 13
+# {"case":"mm-local","cycles":10,"maxGeometryMm":0.000004372376354199997,"maxDimensionMm":0.000003838060820271494,"maxCoreAnchorMm":0.000004372373968209113}
+# {"case":"mm-translated","cycles":10,"maxGeometryMm":0.0000043730877539702166,"maxDimensionMm":0.000003838213160634041,"maxCoreAnchorMm":0.000004373009450489388}
+# {"case":"inch-local","cycles":10,"maxGeometryMm":0.00014901232084111817,"maxDimensionMm":0.00003175148958689533,"maxCoreAnchorMm":0.00014901232084111817}
+# {"case":"inch-translated","cycles":10,"maxGeometryMm":0.00014337485115733495,"maxDimensionMm":0.00003175158053636551,"maxCoreAnchorMm":0.00014337485115733495}
+# {"case":"foot-local","cycles":10,"maxGeometryMm":0.0009182093334970703,"maxDimensionMm":0.0004199843597234576,"maxCoreAnchorMm":0.0009182093318628468}
+# {"case":"foot-translated","cycles":10,"maxGeometryMm":0.0009235836166065517,"maxDimensionMm":0.0004199844552204013,"maxCoreAnchorMm":0.0009235835641114618}
+# (node:76320) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///Users/austinhartt/Documents/ChatGPT/BimCraft%20Test/bimcraft-f02/app/model-walls.js is not specified and it doesn't parse as CommonJS.
+# Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+# To eliminate this warning, add "type": "module" to /Users/austinhartt/Documents/ChatGPT/BimCraft Test/bimcraft-f02/package.json.
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: mm-local: ten edit/undo/redo/save/reopen cycles
+ok 1 - mm-local: ten edit/undo/redo/save/reopen cycles
+  ---
+  duration_ms: 224.346542
+  type: 'test'
+  ...
+# Subtest: mm-translated: ten edit/undo/redo/save/reopen cycles
+ok 2 - mm-translated: ten edit/undo/redo/save/reopen cycles
+  ---
+  duration_ms: 146.882334
+  type: 'test'
+  ...
+# Subtest: m-local: ten edit/undo/redo/save/reopen cycles
+not ok 3 - m-local: ten edit/undo/redo/save/reopen cycles
+  ---
+  duration_ms: 20.587709
+  type: 'test'
+  location: '/Users/austinhartt/Documents/ChatGPT/BimCraft Test/bimcraft-f02/tests/features/f02/contract.test.mjs:29:22'
+  failureType: 'testCodeFailure'
+  error: '5312.5070000000005 differs from 5312.512345 by 0.005344999999579159 mm'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    near (file:///Users/austinhartt/Documents/ChatGPT/BimCraft%20Test/bimcraft-f02/tests/features/f02/contract.test.mjs:14:26)
+    check (file:///Users/austinhartt/Documents/ChatGPT/BimCraft%20Test/bimcraft-f02/tests/features/f02/contract.test.mjs:52:4)
+    TestContext.<anonymous> (file:///Users/austinhartt/Documents/ChatGPT/BimCraft%20Test/bimcraft-f02/tests/features/f02/contract.test.mjs:59:103)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: m-translated: ten edit/undo/redo/save/reopen cycles
+not ok 4 - m-translated: ten edit/undo/redo/save/reopen cycles
+  ---
+  duration_ms: 20.106459
+  type: 'test'
+  location: '/Users/austinhartt/Documents/ChatGPT/BimCraft Test/bimcraft-f02/tests/features/f02/contract.test.mjs:29:22'
+  failureType: 'testCodeFailure'
+  error: '5312.5070000000005 differs from 5312.512345 by 0.005344999999579159 mm'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    near (file:///Users/austinhartt/Documents/ChatGPT/BimCraft%20Test/bimcraft-f02/tests/features/f02/contract.test.mjs:14:26)
+    check (file:///Users/austinhartt/Documents/ChatGPT/BimCraft%20Test/bimcraft-f02/tests/features/f02/contract.test.mjs:52:4)
+    TestContext.<anonymous> (file:///Users/austinhartt/Documents/ChatGPT/BimCraft%20Test/bimcraft-f02/tests/features/f02/contract.test.mjs:59:103)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: inch-local: ten edit/undo/redo/save/reopen cycles
+ok 5 - inch-local: ten edit/undo/redo/save/reopen cycles
+  ---
+  duration_ms: 152.820875
+  type: 'test'
+  ...
+# Subtest: inch-translated: ten edit/undo/redo/save/reopen cycles
+ok 6 - inch-translated: ten edit/undo/redo/save/reopen cycles
+  ---
+  duration_ms: 148.573792
+  type: 'test'
+  ...
+# Subtest: foot-local: ten edit/undo/redo/save/reopen cycles
+ok 7 - foot-local: ten edit/undo/redo/save/reopen cycles
+  ---
+  duration_ms: 140.65125
+  type: 'test'
+  ...
+# Subtest: foot-translated: ten edit/undo/redo/save/reopen cycles
+ok 8 - foot-translated: ten edit/undo/redo/save/reopen cycles
+  ---
+  duration_ms: 144.540375
+  type: 'test'
+  ...
+# Subtest: dimension editing/rebind preserves exactly one annotation through undo/redo/reopen
+ok 9 - dimension editing/rebind preserves exactly one annotation through undo/redo/reopen
+  ---
+  duration_ms: 12.825
+  type: 'test'
+  ...
+# Subtest: invalid, duplicate, missing and coincident references never retain a numeric value
+ok 10 - invalid, duplicate, missing and coincident references never retain a numeric value
+  ---
+  duration_ms: 0.625958
+  type: 'test'
+  ...
+# Subtest: assembly: unsupported/corrupt versions preserved and edits refused atomically
+ok 11 - assembly: unsupported/corrupt versions preserved and edits refused atomically
+  ---
+  duration_ms: 6.647042
+  type: 'test'
+  ...
+# Subtest: dimension: unsupported/corrupt versions preserved and edits refused atomically
+ok 12 - dimension: unsupported/corrupt versions preserved and edits refused atomically
+  ---
+  duration_ms: 19.558625
+  type: 'test'
+  ...
+# Subtest: materials: unsupported/corrupt versions preserved and edits refused atomically
+ok 13 - materials: unsupported/corrupt versions preserved and edits refused atomically
+  ---
+  duration_ms: 7.372583
+  type: 'test'
+  ...
+# Subtest: legacy migration only on explicit save, reversible through journal
+ok 14 - legacy migration only on explicit save, reversible through journal
+  ---
+  duration_ms: 5.009625
+  type: 'test'
+  ...
+# Subtest: F02 behavior suite is wired into the executed baseline
+ok 15 - F02 behavior suite is wired into the executed baseline
+  ---
+  duration_ms: 0.077458
+  type: 'test'
+  ...
+# Subtest: nonfinite wall edits fail without changing any geometry or history
+ok 16 - nonfinite wall edits fail without changing any geometry or history
+  ---
+  duration_ms: 1.522667
+  type: 'test'
+  ...
+1..16
+# tests 16
+# suites 0
+# pass 14
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1149.184292

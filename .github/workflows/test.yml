@@ -50,6 +50,7 @@ jobs:
           .cc-test/tools/bimcraft-test/venv/bin/python -m pip install -r tests/features/f01/requirements-independent.txt
           node tests/features/f01/fixture.mjs --output-dir .cc-test/f01-generated
           .cc-test/tools/bimcraft-test/venv/bin/python -I tests/features/f01/independent.py fixtures/f01 .cc-test/f01-generated | tee .cc-test/baseline/independent-ifc.jsonl
+          .cc-test/tools/bimcraft-test/venv/bin/python -I tests/features/f02/independent.py | tee .cc-test/baseline/f02-independent-ifc.jsonl
       - name: npm test
         if: always()
         run: npm test -- --oracles

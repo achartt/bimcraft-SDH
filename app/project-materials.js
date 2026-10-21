@@ -1,6 +1,7 @@
 /* SPDX-License-Identifier: Apache-2.0 */
 // Project-owned defaults. Layer thickness is always explicit, never a live link to a default.
 import { ids, val } from './ifc-util.js';
+import { parseRecord, recordError, readRecordPset } from './record-contract.js';
 export const MATERIAL_PSET = 'CadCraft_MaterialLibrary';
 export const FILLS = ['none', 'solid', 'diagonal', 'crosshatch'];
 export const VENTILATION = ['unspecified', 'unventilated', 'ventilated'];
@@ -28,7 +29,7 @@ export function normalizeLayer(layer) {
   return {...layer,kind:cavity?'cavity':'material',materialId:cavity?null:(layer.materialId || legacyMaterialId(layer.mat)),...(cavity?{ventilation:layer.ventilation || 'unspecified'}:{})};
 }
 export function validateMaterial(input) {
-  const m={id:input?.id,name:String(input?.name || '').trim(),legacyName:String(input?.legacyName || input?.name || '').trim(),category:String(input?.category || '').trim(),defaultThickness:Number(input?.defaultThickness),color:input?.color,fill:input?.fill,fillColor:input?.fillColor,notes:String(input?.notes || '').trim()};
+  const m={id:input?.id,name:String(input?.name || '').trim(),legacyName:String(input?.legacyName || input?.name || '').trim(),category:String(input?.category || '').trim(),defaultThickness:input?.defaultThickness,color:input?.color,fill:input?.fill,fillColor:input?.fillColor,notes:String(input?.notes || '').trim()};
   if(!/^material-[a-zA-Z0-9_-]{1,800}$/.test(m.id || '')) throw new Error('Invalid material ID.');
   if(!m.name || m.name.length>100 || !m.legacyName || m.legacyName.length>100) throw new Error('Enter a material name up to 100 characters.');
   if(m.category.length>100 || m.notes.length>2000) throw new Error('Category or notes are too long.');
@@ -45,7 +46,7 @@ function legacyLayers(w) {
       if(val(ps?.Name)!=='CadCraft_WallType') continue;
       for(const ph of ps.HasProperties || []) {
         const p=w.api.GetLine(w.mid,ph.value,false);
-        if(val(p?.Name)==='Recipe') { try { const r=JSON.parse(val(p.NominalValue)); if(Array.isArray(r.layers)) layers.push(...r.layers); } catch { /* Preserve unreadable recipes untouched. */ } }
+        if(val(p?.Name)==='Recipe') { try { const r=JSON.parse(val(p.NominalValue)); if((!Object.hasOwn(r,'version') || r.version===1) && Array.isArray(r.layers)) layers.push(...r.layers); } catch { /* Preserve unreadable recipes untouched. */ } }
       }
     }
   }
@@ -54,13 +55,15 @@ function legacyLayers(w) {
 export function readMaterials(w, additionalLayers=[]) {
   if(!w) return structuredClone(STARTER_MATERIALS);
   const project=ids(w.api,w.mid,'IFCPROJECT')[0];
-  const raw=project && w.readPset(project,MATERIAL_PSET)?.Library;
+  const ps=project && readRecordPset(w,project,MATERIAL_PSET,'materials'), raw=ps?.Library;
   let materials;
-  if(raw) {
-    let doc; try { doc=JSON.parse(raw); } catch { throw new Error('The project material library cannot be read.'); }
-    if(doc.version!==1 || !Array.isArray(doc.materials) || !doc.materials.length) throw new Error('Unsupported project material library version.');
-    materials=doc.materials.map(validateMaterial);
-    if(new Set(materials.map(m=>m.id)).size!==materials.length) throw new Error('Duplicate material IDs in the project library.');
+  if(ps) {
+    const doc=parseRecord(raw,'materials',false);
+    try {
+      if(!Array.isArray(doc.materials) || !doc.materials.length) throw new Error();
+      materials=doc.materials.map(validateMaterial);
+      if(new Set(materials.map(m=>m.id)).size!==materials.length) throw new Error();
+    } catch { throw recordError('materials','corrupt'); }
   } else materials=structuredClone(STARTER_MATERIALS);
   for(const rawLayer of [...legacyLayers(w),...additionalLayers]) {
     if(typeof rawLayer?.mat!=='string' || !rawLayer.mat.trim() || rawLayer.mat.length>100 || !Number.isFinite(rawLayer.t) || rawLayer.t<0 || rawLayer.t>2000) continue;
@@ -73,6 +76,7 @@ export function readMaterials(w, additionalLayers=[]) {
   return materials;
 }
 export function writeMaterials(w,materials) {
+  readMaterials(w);
   const project=ids(w.api,w.mid,'IFCPROJECT')[0];
   if(!project) throw new Error('A project is required to save materials.');
   w.upsertPset(project,MATERIAL_PSET,[['Library','IFCTEXT',JSON.stringify({version:1,materials:materials.map(validateMaterial)})]]);
