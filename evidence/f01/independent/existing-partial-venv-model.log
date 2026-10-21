@@ -1,0 +1,149 @@
+== Units
+  ok   feet-inches to 1/16", fractions reduced, negatives
+  ok   millimetres
+  ok   feet and inches: 12'6", 12' 6, fractions, bare inches
+  ok   millimetres, any unit typed, refusals
+  ok   typed input: length, polar, relative, absolute, refusals
+  ok   relative steps take feet too
+== Joins (plan outlines)
+  ok   L: both walls share the mitre (outer 4100,−100 and inner 3900,100)
+  ok   L: the two outlines cover the corner once (1400000 mm²)
+  ok   room: four trapezoids, total = the ring 6200×4200 − 5800×3800
+  ok   T: the stem starts at the through wall's face (y = 100)
+  ok   T: the through wall is untouched
+  ok   T drawn to the face instead of the centre line: the same
+  ok   three ends at a point: corners round the node, the middle filled once (1780000)
+  ok   in a line: square ends, each its own thickness
+  ok   X: crossing walls keep their rectangles
+  ok   a wall shorter than its mitres: every outline still a simple polygon
+  ok   a 20° corner is cut square, no long mitre spike
+== A new building, levels
+  ok   two levels read back: elevations 0 / 3000, heights from CadCraft_Level
+== Draw a room (one undo step)
+  ok   four walls, 184.15 mm thick, 3000 tall (to Level 2)
+  ok   read back in plan: positions and lengths
+  ok   IFC: 4 IfcWall, 1 IfcWallType, layer set usages (exterior on the left: NEGATIVE)
+  ok   Qto_WallBaseQuantities, Pset_WallCommon, swept outline, Axis curve
+  ok   cc-ifc reopens it: 4 walls with geometry
+  ok   mesh volume 11.049 m³ = the joined ring 11.049 m³ (mitres, no overlap)
+  ok   quantities: Length 6000 mm, Height 3000 mm written
+== The plan: cut from the meshes, drawn walls from their outlines
+  ok   the room cut at 1200: 4 walls, each one closed outline
+  ok   the cut lies where the walls were drawn (outer faces at -92.1 … 6092.1)
+  ok   cut above the walls (3500): nothing cut, all 4 seen from above
+  ok   wallPieces: a door cut out of the plan; a high window (sill 1500) left in
+== Snapping
+  ok   near a wall end: snaps to it (or its face corner): 4000,0
+  ok   near the middle: midpoint
+  ok   beside the wall: onto its face (y = 100)
+  ok   Shift: square to the last point
+  ok   near 45°: held at 45°, the length rounded to 10 mm
+  ok   a free direction: the length rounded to 1/2"
+  ok   closing a chain needs three points and the first one
+  ok   anticlockwise loop: outside on the right; clockwise: on the left
+== Undo, redo
+  ok   undo: no walls left in the file
+  ok   redo: the same four walls (same GlobalIds)
+== A T wall, levels change heights
+  ok   the T wall runs face to face: 92.08 → 3907.93
+  ok   Level 1 made 3600 tall: Level 2 moves up, every wall follows to 3600
+  ok   undo puts the level and the walls back
+  ok   a new level at 6000
+  ok   renamed
+== Change a wall, delete a wall
+  ok   moving the south wall's start drags the joined west wall's end with it
+  ok   change type: thickness and name follow (Concrete block 8")
+  ok   a fixed height
+  ok   deleted
+  ok   saved file: no reference to a missing line
+  ok   cc-ifc reopens it with 4 walls
+  ok   web-ifc (oracle) opens the room: 4 walls, 48 triangles
+== Face-referenced wall chain and basement egress
+  ok   outside face stays on the clicked rectangle, including the closing mitre
+  ok   all four centerlines meet at joined corners
+  ok   undo closing wall restores the first open end too
+  ok   redo restores the closing wall with stable guids
+  ok   egress preset writes the window type and sill
+  ok   save/reopen retains the egress window and its IFC geometry
+  ok   resize and flip regenerate all three well sides
+  ok   well edit survives undo/redo
+  ok   deleting the host removes the window and well together
+== Doors and windows (BM.4)
+  ok   a 3'-0" × 6'-8" door at 1000 along the south wall
+  ok   IFC: IfcDoor in an IfcOpeningElement (voids + fills), IfcDoorType, SINGLE_SWING_LEFT
+  ok   Pset_DoorCommon, Qto_DoorBaseQuantities, coloured parts
+  ok   cc-ifc cuts the wall: 0.3422 m³ out = the opening 0.3422
+  ok   the wall's NetSideArea takes the door off: 16.1419 m²
+  ok   plan symbol: two jambs, the open leaf and its swing arc
+  ok   hand kinds: single / entry doors and casements hinge, sliding / pocket / barn doors slide, a bifold folds
+  ok   fixed, picture, hung, slider, awning and transom windows, double, French and garage doors: no hand to flip
+  ok   a double-hung window, centred, sill 1'-8", DOUBLE_PANEL_HORIZONTAL
+  ok   a 16' garage door does not fit the 4 m wall: refused
+  ok   a window above the top of the wall: refused
+  ok   a refused change leaves nothing behind
+  ok   moved to 3000 and hinged at the other end (SINGLE_SWING_RIGHT)
+  ok   moved past the end: stops at the end of the wall
+  ok   resized to 2'-8"
+  ok   the wall grows at its start: the door keeps its place (2000)
+  ok   a thinner wall type: its door is made again for the new thickness
+  ok   door deleted with its opening
+  ok   undo: the door is back
+  ok   deleting the east wall takes its window and opening; no dangling references
+  ok   three undos and three redos land in the same place
+  ok   cc-ifc reopens it with its door
+  ok   web-ifc (oracle): 1 door, 1 opening
+  ok   the walls with the door cut out: web-ifc 7.5455 m³, cc-ifc 7.5455 m³
+== Change it (BM.5): custom thickness, several at once, top to a level or fixed
+  ok   a 2×6 wall made 200 thick: the studs take the difference (Exterior 2×6, 200 mm)
+  ok   typeAt: back to the starter at its own thickness; thinner than the other layers refused
+  ok   Thickness 250: a new wall type "Exterior 2×6, 250 mm" in the file, the wall 250 thick
+  ok   Fixed height 2700: no longer follows Level 2
+  ok   Up to the level above, 300 below it: 2700, and it follows Level 2 again
+  ok   Base offset 150: it starts 150 up and ends where it did (2550 tall)
+  ok   two windows made 600 wide casements in one change
+  ok   one undo puts both back
+== Rooms, floors, ceilings, roofs (BM.6)
+  ok   planLoops: two rooms either side of a T wall (inner faces), a free-standing wall a hole in the left one
+  ok   the building outline (outer faces); loopAt finds the room round a point
+  ok   roofPlan: a hip roof, 6/12 over 6 m: the ridge 1500 up, the eave 150 below the wall top at a 300 overhang
+  ok   gable ends on the short sides: two faces, the ridge runs to the ends
+  ok   an L: the union of its rectangles' hip roofs (both wings and the corner at the right height)
+  ok   a shape with neither square corners nor a convex outline: refused
+  ok   two rooms appear as the walls close them: spaces 101 and 102, "Room 1" and "Room 2"
+  ok   NetFloorArea of each: 22.3955 m² (inside faces)
+  ok   spaces aggregated into the level, with Qto_SpaceBaseQuantities
+  ok   the middle wall deleted: the two rooms become one (the other space deleted)
+  ok   undo: two rooms again
+  ok   two floors (IfcSlab .FLOOR.) and a ceiling (IfcCovering .CEILING.)
+  ok   the room floor covers the room; the building floor reaches the outside faces
+  ok   the east wall moved 1000 out: the building floor grows with it, the rooms are still two
+  ok   a hip roof: IfcRoof on Level 2 with four IfcSlab .ROOF. faces
+  ok   cc-ifc draws it: the ridge's top at 4773 mm (the wall top 3000 + half the width × 6/12 + the roof's thickness)
+  ok   Qto_RoofBaseQuantities: the projected area includes the overhang
+  ok   gable ends on two sides: two faces and two gable walls
+  ok   a pitch of 85° is refused
+  ok   the wall moves on: the roof follows; no dangling references
+  ok   an L-shaped house: one room, a hip roof of six faces (RC.1: the straight skeleton), the valley where the wings meet
+  ok   Level 1 made 3300 tall: its rooms are 3300 high
+  ok   web-ifc (oracle): the roof, two spaces, the ceiling and the roof's soffit
+== Schedules, dimensions, the plan as a PDF (BM.7)
+  ok   marks: D1, D2 for the doors, W1 for the window (IFC Tag)
+  ok   Doors: D1, D2 in mark order; Windows: W1 with its sill
+  ok   Walls by type: 4 exterior 2×6 (28000 long), 1 interior 2×4 (6000) — Exterior 2×6, Interior 2×4
+  ok   their net area leaves out the doors and the window
+  ok   Rooms: 101 and 102 with their areas
+  ok   CSV: header, two doors, the total, through tableCsv
+  ok   south wall: a chain of 7 (corner, 2 doors, the window, corner) and the overall 8184, all on its outside (its right)
+  ok   the first one runs from the outside corner to the door: 1092
+  ok   the walls' joint outline (no mitre lines): its loops enclose exactly the walls' area, 5.147 m²
+  ok   planPdf: a PDF 1.4, at 1:50 on A4 landscape, every character printable
+  ok   in feet and inches on Letter: 1/4" = 1'-0"
+  --   poppler not installed: PDF checks skipped (spawnSync pdftotext ENOENT)
+== IfcOpenShell schema validation (when a venv with it is on this machine)
+  FAIL IfcOpenShell finds no schema errors in 
+
+126 passed, 1 failed
+Traceback (most recent call last):
+  File "/Users/austinhartt/Documents/ChatGPT/BimCraft Test/bimcraft-f01/.cc-test/tools/bimcraft-test/ifc_validate.py", line 14, in <module>
+    import ifcopenshell
+ModuleNotFoundError: No module named 'ifcopenshell'

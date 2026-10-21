@@ -216,7 +216,8 @@ export class IfcPlacer {
       const k = String(val(c.ContextIdentifier) || '').toLowerCase();
       if (k && !subs.has(k)) subs.set(k, id);
     }
-    const sub = (name, view) => subs.get(name.toLowerCase()) || this.make('IFCGEOMETRICREPRESENTATIONSUBCONTEXT', this.L(name), this.L('Model'), this.H(model), null, this.E(view), null);
+    const derived = { type: this.W.UNKNOWN, value: null, derived: true };
+    const sub = (name, view) => subs.get(name.toLowerCase()) || this.make('IFCGEOMETRICREPRESENTATIONSUBCONTEXT', this.L(name), this.L('Model'), derived, derived, derived, derived, this.H(model), null, this.E(view), null);
     this._ctx = { body: sub('Body', 'MODEL_VIEW'), foot: sub('FootPrint', 'MODEL_VIEW'), clear: null, model, sub };
     return this._ctx;
   }
@@ -482,7 +483,10 @@ export class IfcPlacer {
   relateType(id, typeId) {
     for (const rid of ids(this.api, this.mid, 'IFCRELDEFINESBYTYPE')) {
       const r = this.api.GetLine(this.mid, rid, false);
-      if (r.RelatingType?.value === typeId) { const l = this.touch(rid); l.RelatedObjects = [...l.RelatedObjects, this.H(id)]; this.write(l); return rid; }
+      if (r.RelatingType?.value === typeId) {
+        if ((r.RelatedObjects || []).some(h => h.value === id)) return rid;
+        const l = this.touch(rid); l.RelatedObjects = [...l.RelatedObjects, this.H(id)]; this.write(l); return rid;
+      }
     }
     return this.make('IFCRELDEFINESBYTYPE', this.guid(), this.ownerHistory(), null, null, [this.H(id)], this.H(typeId));
   }

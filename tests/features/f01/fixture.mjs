@@ -83,7 +83,12 @@ export async function verifyFixture(bytes, outDir) {
   if(outDir)fs.writeFileSync(path.join(outDir,'verification.json'),JSON.stringify(evidence,null,2)+'\n');
   console.log(JSON.stringify(evidence));console.log('1 passed, 0 failed');
 }
-const fixture=path.join(ROOT,'fixtures/f01/house.ifc');
+// A separate destination lets CI validate new producer output without replacing review identities.
+const outputIndex=process.argv.indexOf('--output-dir');
+if(outputIndex!==-1 && (!process.argv[outputIndex+1] || process.argv[outputIndex+1].startsWith('--')))throw new Error('--output-dir requires a directory');
+const generatedDir=outputIndex===-1?null:path.resolve(process.argv[outputIndex+1]);
+if(generatedDir && process.argv.includes('--verify'))throw new Error('--output-dir is for generating a new fixture set');
+const fixture=path.join(generatedDir || path.join(ROOT,'fixtures/f01'),'house.ifc');
 if(process.argv.includes('--verify')) {const out=process.argv.includes('--export')?path.join(ROOT,'.cc-test/f01-fixture'):null;if(out)fs.mkdirSync(out,{recursive:true});await verifyFixture(fs.readFileSync(fixture),out);}
 else {
   const m=await model(),level=readLevels(m.w())[0];m.change(saveWallAssembly(exterior));m.change(saveWallAssembly(interior));
@@ -92,7 +97,7 @@ else {
   m.change(drawWalls({storey:level.guid,typeKey:interior.key,segs:[{a:[3000,0],b:[3000,4000],justification:'coreCenter'}],height:2700}));
   const first=readWalls(m.w())[0];m.change(placeOpening({wall:first.guid,typeKey:'win-fixed',offset:1200,width:900,height:1200,sill:900}));
   for(const [i,refs] of [['exterior','interior'],['coreExterior','coreInterior']].entries())m.change(saveWallDimension({level:level.guid,view:'plan:'+level.guid,axis:'y',offset:-650-i*650,refs:refs.map(reference=>({wall:first.guid,reference,station:0.7}))}));
-  const out=path.join(ROOT,'.cc-test/f01-fixture');fs.mkdirSync(out,{recursive:true});fs.mkdirSync(path.dirname(fixture),{recursive:true});
+  const out=generatedDir || path.join(ROOT,'.cc-test/f01-fixture');fs.mkdirSync(out,{recursive:true});fs.mkdirSync(path.dirname(fixture),{recursive:true});
   fs.writeFileSync(fixture,m.ed.save());fs.writeFileSync(path.join(out,'baseline-plan.pdf'),plan(m,'F01 baseline: 209.55 mm assembly'));
   await verifyFixture(m.ed.save(),out);
   console.log('Fixture: '+fixture+'; exports: '+out);

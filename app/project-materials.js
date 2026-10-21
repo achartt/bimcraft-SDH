@@ -101,7 +101,7 @@ export function materialEntity(w,material) {
   }
   const id=w.make('IFCMATERIAL',w.L(material.name),...(w.v4?[null,w.L(material.category)]:[]));
   const props=w.propLines([['Id','IFCIDENTIFIER',material.id]]);
-  if(w.v4) w.make(cls,w.L('CadCraft_Material'),null,props,w.H(id));
+  if(w.v4) w.make(cls,w.T('IFCIDENTIFIER','CadCraft_Material'),null,props,w.H(id));
   else w.make(cls,w.H(id),props,null,w.L('CadCraft_Material'));
   return id;
 }
