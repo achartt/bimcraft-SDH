@@ -15,14 +15,16 @@ State: **review fixes implemented; renewed clean baseline and CI validation pend
 
 ## Review follow-up
 
-Review of PR head `b2724e786a8f397037936ce6d6a38b7388fe7598` found four defects in the new test boundaries:
+Review of PR head `b2724e786a8f397037936ce6d6a38b7388fe7598` found five defects in the new test boundaries:
 
 1. **P2 — Incomplete pin metadata could disable checks.** An empty file map or omitted import/key list could report bundled integrity without checking required assets. Validation now requires complete file/import sets, valid hashes/provenance and language keys matching the hash-verified source literals. Existing hashes were independently rechecked against the recorded immutable base; none changed.
 2. **P2 — Unusable translations could pass.** Null values and empty plural objects passed the presence check; a partial live source catalog could also escape validation. Both local and live catalogs now require usable strings/plural forms.
 3. **P2 — Broken TakeoffCraft could be skipped.** An empty app root or dangling root/`dev` link was treated as absent. Only actual app-root absence now skips; path errors and partial checkouts fail.
 4. **P2 — Incomplete PDF-reader packages could be skipped.** Testing the entry file's existence classified a present package without that entry as absent. Only package absence now skips; partial packages, broken parent links and import/runtime errors fail.
 
-Regression reproduction before fixes: **34 passed, 10 failed** (new tests exposed ten false-green cases in the old implementation). After fixes and expanded PDF/schema/source tests: **60 contract tests pass** (41 source-sync, 19 runner/dependency). The previous validation table below remains historical until clean validation of this review revision completes. No application code, source-sync pin hash, other app or merge is included.
+5. **P2 — Checksums could claim stale provenance.** Updating an asset and its checksum while retaining the old revision was not independently checked. Baseline now compares pin hashes/imports/key lists with actual Git blobs at the recorded revision; missing history and mismatches fail. CI fetches full history.
+
+Regression reproduction before fixes: **34 passed, 10 failed** (new tests exposed ten false-green cases in the old implementation). After fixes and expanded PDF/schema/source tests: **63 contract tests pass** (44 source-sync/provenance, 19 runner/dependency). The previous validation table below remains historical until clean validation of this review revision completes. No application code, source-sync pin hash, other app or merge is included.
 
 ## Source-sync resolution
 
