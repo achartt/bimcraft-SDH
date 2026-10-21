@@ -43,7 +43,7 @@ this does not certify normal pointer accessibility. No preview/icon/layout fix i
 | --- | --- |
 | 1. Units, coordinates, tolerances, rounding, failures | [F02-CONTRACT.md](F02-CONTRACT.md), operation table and roof/component inventory. Bounds are fixture claims, not universal kernel accuracy. |
 | 2. At least ten persistence cycles | Eight cases × ten edit/undo/redo/save/reopen cycles; 24 walls, 144 dimensions; mm/m/in/ft, local/project translations, positive/negative curves. Stable wall/type/material/dimension IDs and core anchors asserted. |
-| 3. Safe invalid references and atomic failure | Rebind duplication regression, missing/replaced/duplicate/degenerate hosts, coincident/invalid references, versions 99/null/string/fractional/missing and malformed JSON. Failed writes compare whole IFC bytes. UI screenshots and actual browser-saved/reopened IFC in `evidence/f02`. |
+| 3. Safe invalid references and atomic failure | Rebind duplication regression, missing/replaced/duplicate/degenerate hosts, coincident/invalid references, versions 99/null/string/fractional/missing and malformed JSON. Failed writes compare all IFC bytes with only the intentionally renewed header timestamp fixed. UI screenshots and actual browser-saved/reopened IFC in `evidence/f02`. |
 | 4. Material and IFC semantics | Existing eight material tests plus F02 lifecycle and independent checks. Default changes do not resize layers; cavity remains 25.4 mm/ventilated; zero membrane stays ordered. IFC2X3 existing tests retain metadata and omit zero physical layers; IFC4 independent checks retain zero physical layers. No artificial thickness. |
 | 5. Journal and project isolation | Legacy reads leave bytes untouched; explicit recipe/spec save adds v1 and Undo restores original bytes. Each cycle verifies a separately opened seed is unchanged. Unsupported data cannot be overwritten by scoped operations. |
 
@@ -138,3 +138,11 @@ PM should coordinate those contracts before their workflows are implemented. No 
 roof/component implementation, new kernel, roadmap reconciliation or deployment was done.
 INT-01 icons/menu access, INT-02 short labels, INT-03 external-reader cavity appearance,
 complex joins and generalized imported-IFC repair remain separate follow-ups.
+
+CI follow-up: rollback/preservation comparisons now freeze only the volatile IFC FILE_NAME
+timestamp through the serializer’s test option. Actual persistence loops still call the
+public editor save method. No data record is excluded from atomicity comparisons.
+The first CI artifact (run 39674569339, head 0dd8957) confirmed a single changed header
+seconds byte in the nonfinite-edit rollback test; all model suites passed. The reader
+repeat passed 16/16 before the correction, demonstrating the timing-dependent assertion.
+The failing excerpt is retained as `evidence/f02/ci-timestamp-failure.txt`.

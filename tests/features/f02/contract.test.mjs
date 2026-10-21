@@ -12,6 +12,9 @@ import {readWallDimensions,resolveDimension,saveWallDimension,referencePoint,DIM
 import {stages} from '../../../devshell/baseline.mjs';
 const read=c=>model(fs.readFileSync(new URL(c.name+'.ifc',directory)));
 const near=(a,b)=>assert.ok(Math.abs(a-b)<0.005,`${a} differs from ${b} by ${Math.abs(a-b)} mm`);
+// SaveModel renews FILE_NAME time on every call. Freeze only that header timestamp
+// for rollback comparisons; every data record and all other header fields remain compared.
+const snapshotBytes=m=>{const w=m.w();return w.api.file(w.mid).save({timeStamp:'2026-10-21T12:00:00'});};
 const resolved=m=>readWallDimensions(m.w()).map(d=>resolveDimension(d,readWalls(m.w())));
 const identity=m=>({walls:readWalls(m.w()).map(w=>w.guid),types:readAssemblies(m.w()).map(w=>w.guid),dims:readWallDimensions(m.w()).map(d=>[d.guid,d.refs]),materials:readMaterials(m.w()).map(m=>m.id)});
 // Independent analytic expectation for horizontal chords: no app geometry helper.
@@ -97,30 +100,30 @@ for(const kind of ['assembly','dimension','materials'])test(kind+': unsupported/
   if(version==='absent')delete record.version;else record.version=version;
   raw=version==='bad-json'?'{broken':JSON.stringify(record);
   if(kind==='assembly')setRecipe(m,raw);else if(kind==='dimension')setSpec(m,raw);else {const w=m.w();w.run(w=>w.upsertPset(w.api.GetLineIDsWithType(w.mid,w.W.IFCPROJECT).get(0),MATERIAL_PSET,[['Library','IFCTEXT',raw]]));}
-  const before=m.ed.save(),legacy=version==='absent' && kind!=='materials';
+  const before=snapshotBytes(m),legacy=version==='absent' && kind!=='materials';
   if(legacy) {assert.doesNotThrow(()=>kind==='assembly'?readAssemblies(m.w()):readWallDimensions(m.w()));continue;}
   if(kind==='assembly')assert.ok(readAssemblyRecords(m.w())[0].issue);
   if(kind==='dimension')assert.notEqual(resolved(m)[0].status,'ok');
   const wall=readWalls(m.w())[0];
   assert.throws(()=>m.change(changeWall(wall.guid,{height:2800})),/preserved/);
-  assert.deepEqual(m.ed.save(),before);
+  assert.deepEqual(snapshotBytes(m),before);
   if(kind==='materials')assert.throws(()=>m.w().run(w=>writeMaterials(w,record.materials)),/preserved/);
   if(kind==='dimension')assert.throws(()=>m.change(saveWallDimension({...readWallDimensions(m.w())[1],guid:record.guid,level:readLevels(m.w())[0].guid})),/preserved/);
-  assert.deepEqual((await model(m.ed.save())).ed.save(),before);
+  assert.deepEqual(snapshotBytes(await model(m.ed.save())),before);
  }
 });
 test('legacy migration only on explicit save, reversible through journal',async()=>{
  const m=await read(cases[0]);const r={...recipe};delete r.version;setRecipe(m,JSON.stringify(r));
  const d=readWallDimensions(m.w())[0];delete d.version;setSpec(m,JSON.stringify(d));
- const before=m.ed.save();readAssemblies(m.w());readWallDimensions(m.w());assert.deepEqual(m.ed.save(),before);
- m.change(saveWallAssembly(recipe));assert.equal(JSON.parse(readAssemblyRecords(m.w())[0].raw).version,1);m.ed.undo();assert.deepEqual(m.ed.save(),before);m.ed.redo();
- const old=m.ed.save();m.change(saveWallDimension({...d,level:readLevels(m.w())[0].guid}));assert.equal(JSON.parse(readWallDimensions(m.w())[0].raw).version,1);m.ed.undo();assert.deepEqual(m.ed.save(),old);
+ const before=snapshotBytes(m);readAssemblies(m.w());readWallDimensions(m.w());assert.deepEqual(snapshotBytes(m),before);
+ m.change(saveWallAssembly(recipe));assert.equal(JSON.parse(readAssemblyRecords(m.w())[0].raw).version,1);m.ed.undo();assert.deepEqual(snapshotBytes(m),before);m.ed.redo();
+ const old=snapshotBytes(m);m.change(saveWallDimension({...d,level:readLevels(m.w())[0].guid}));assert.equal(JSON.parse(readWallDimensions(m.w())[0].raw).version,1);m.ed.undo();assert.deepEqual(snapshotBytes(m),old);
 });
 test('F02 behavior suite is wired into the executed baseline',()=>assert.ok(stages.some(s=>s.name==='f02-contract'&&s.minimum>=15&&s.args.includes('tests/features/f02/contract.test.mjs'))));
 test('nonfinite wall edits fail without changing any geometry or history',async()=>{
- const m=await read(cases[0]),wall=readWalls(m.w())[0],before=m.ed.save();
+ const m=await read(cases[0]),wall=readWalls(m.w())[0],before=snapshotBytes(m);
  for(const change of [{a:[NaN,0]},{b:[Infinity,1]},{height:NaN},{bulge:Infinity},{baseOffset:NaN}]) {
-  assert.throws(()=>m.change(changeWall(wall.guid,change)),/finite/);assert.deepEqual(m.ed.save(),before);
+  assert.throws(()=>m.change(changeWall(wall.guid,change)),/finite/);assert.deepEqual(snapshotBytes(m),before);
  }
  assert.equal(m.ed.changes.length,0);
 });
