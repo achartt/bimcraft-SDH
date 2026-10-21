@@ -1,93 +1,85 @@
 # F01 feature handoff
 
 Feature: F01 — Integration baseline and standalone test workflow.
-State: **review findings fixed; standalone baseline and CI pass**. Draft review only; neither F01 nor the prototype is merged.
+State: **independent fixture and real upstream validation completed; approved export defects fixed**. Draft review only; PR #1 and PR #2 remain unmerged. Final committed-head CI observation is recorded in [PR #2](https://github.com/achartt/bimcraft-SDH/pull/2).
 
 ## Ownership and exact state
 
-- Branch: `feature/f01-integration-baseline`.
-- Checkout: `/Users/austinhartt/Documents/ChatGPT/BimCraft Test/bimcraft-f01`.
-- Port: 8016; owner chat `01a15f51-58fb-74b2-a2fe-d32bfcbd3c09`. Port 8015 was preserved.
-- Approved base: `72664187a1cc2694d1f8972fd2e1aa5b46106bc3`.
-- Reviewed implementation: `40d820e15fb9d93fb2153ccbcdcf91b6534b4b31` (boundary fixes `5e01eb2`, independent Git-provenance verification `40d820e`). This final handoff/evidence follow-up changes documentation only. Exact final delivery head and its CI status are recorded in [draft PR #2](https://github.com/achartt/bimcraft-SDH/pull/2).
-- PR target: `feature/wall-assemblies-dimensions`. PR #1 reverified open/draft/unmerged at the approved base; main remains `5d0e2b1cb59e3f28e72fed8c5fc6004d44564832`.
-- Fresh review validation clone: `/private/tmp/bimcraft-f01-review-20261021`, created using `git clone --no-local`, with no copied vendor cache, `.cc-test` or sibling apps. Vendor setup fetched and verified all 110 files. Both local runtime reports have `dirty: false`.
+- Branch / checkout: `feature/f01-integration-baseline`, `/Users/austinhartt/Documents/ChatGPT/BimCraft Test/bimcraft-f01`.
+- Port / owner: 8016, chat `01a15f51-58fb-74b2-a2fe-d32bfcbd3c09`. Port 8015 and the source checkout were preserved.
+- Approved base / PR target: `72664187a1cc2694d1f8972fd2e1aa5b46106bc3`, `feature/wall-assemblies-dimensions`.
+- Prior delivered head: `5c05e7a9874cdca451f5d19a3175eb2d2a2da2a6`; this follow-up extends its reviewed test-boundary fixes. Exact final SHA, clean-head results and CI links are in PR #2 to avoid a self-referential commit ID.
+- PR #1 reverified open/draft/unmerged at the approved base; main remains `5d0e2b1cb59e3f28e72fed8c5fc6004d44564832`.
+- Independent environment: `/private/tmp/f01-independent-validation-20261021`, Python 3.12.14 / IfcOpenShell 0.9.0 / pytest 9.1.1; Node 22.23.3 / web-ifc 0.0.78 / pdfjs-dist 6.3.289 / bundled Poppler. No oracle code is shipped or imported into the application.
 
-## Review follow-up
+## Findings and approved corrections
 
-Review of PR head `b2724e786a8f397037936ce6d6a38b7388fe7598` found five defects in the new test boundaries:
+Independent validation found that the inherited Python wrapper ignored IfcOpenShell's lowercase `error` severity. Its initial zero-error report was false; this was corrected before acceptance. File-path validation now retains parser findings, error severities are normalized, unknown severities fail, and `--rules` enables EXPRESS checks.
 
-1. **P2 — Incomplete pin metadata could disable checks.** An empty file map or omitted import/key list could report bundled integrity without checking required assets. Validation now requires complete file/import sets, valid hashes/provenance and language keys matching the hash-verified source literals. Existing hashes were independently rechecked against the recorded immutable base; none changed.
-2. **P2 — Unusable translations could pass.** Null values and empty plural objects passed the presence check; a partial live source catalog could also escape validation. Both local and live catalogs now require usable strings/plural forms.
-3. **P2 — Broken TakeoffCraft could be skipped.** An empty app root or dangling root/`dev` link was treated as absent. Only actual app-root absence now skips; path errors and partial checkouts fail.
-4. **P2 — Incomplete PDF-reader packages could be skipped.** Testing the entry file's existence classified a present package without that entry as absent. Only package absence now skips; partial packages, broken parent links and import/runtime errors fail.
-5. **P2 — Checksums could claim stale provenance.** Updating an asset and its checksum while retaining the old revision was not independently checked. Baseline now compares pin hashes/imports/key lists with actual Git blobs at the recorded revision; missing history and mismatches fail. CI fetches full history.
+The user explicitly approved these application changes:
 
-Regression reproduction before fixes: **34 passed, 10 failed** (new tests exposed ten false-green cases in the old implementation). After fixes and expanded PDF/schema/source tests: **63 contract tests pass** (44 source-sync/provenance, 19 runner/dependency). The validation table below records the reviewed implementation. Regression evidence is in `evidence/f01/review/`. No application code, source-sync pin hash, other app or merge is included.
+1. `project-materials.js`: IFC4 material-property Name is an `IfcIdentifier`, not an `IfcLabel` wrapper. IFC2X3's distinct argument remains unchanged.
+2. `ifc-place.js`: relating an already typed object to the same type is idempotent, preventing duplicated RelatedObjects on assembly edits. This prevents new duplicates; it is not an arbitrary imported-file migration.
+3. `new-model.js`: ADDED owner history receives the required modification timestamp, equal to its creation timestamp.
+4. `ifc-place.js`: newly created representation subcontexts include the four derived fields before ParentContext/TargetView. Broader independent checks found this additional defect; the user separately approved the tested correction.
 
-## Source-sync resolution
+The original fixture set had **6 / 10 / 9 schema+EXPRESS errors**. The seed was narrowly repaired (five Name values and one timestamp), and both derivatives regenerated through the corrected producers. GlobalIds and geometry were preserved. Broader installed-reader testing then exposed **two failing suites** from the subcontext defect; after its correction all twelve saved IFC4/IFC2X3/unit variants pass structural validation. Before-fix errors remain in `evidence/f01/independent/`.
 
-The two previous standalone failures were missing source-app dependencies, not observed differences in the bundled assets. The checks now verify the bundled terrain files and generated electrical symbols against SHA-256 pins derived from the immutable approved BimCraft base. Terrain additionally checks its three vendor mappings, 38 required translation keys and invalid object-string translations. No `app/` file changed and no other app was imported.
+The three source-sync asset hashes and recorded base revision remain unchanged. No upstream app was imported wholesale, no CAD kernel was installed/replaced in the product, and no PM ledger/source checkout was edited.
 
-Absent CivilCraft/CadCraft app roots produce named **live source comparison** skips, separate from executed bundled-integrity passes. Present source apps still run the original byte comparison or electrical generator/comparator. Partial installs, broken paths/imports, malformed JSON and changed source output fail. Pin mismatch and missing local assets fail even when upstream is absent. Check mode cannot rewrite assets or pins; write mode requires real sources. Pin provenance and the manual review/update procedure are in [the workflow](F01-INTEGRATION-BASELINE.md#bundled-terrainelectrical-integrity-and-live-source-comparison).
+## Acceptance and validation
 
-The 44 source-sync/provenance tests exercise these boundaries, including controlled matching source fixtures. These fixtures test the comparator/generator paths; they do not establish independent CivilCraft/CadCraft integration. Real upstream parity remains unverified.
-
-## Acceptance
-
-| Criterion | Result and evidence |
+| Criterion | Current evidence |
 | --- | --- |
-| 1. Fresh checkout starts on 8016 and loads fixture | Previously demonstrated on implementation head `4c01852`, Node 22.23.3: six model elements, 164 triangles; `browser-clean-node22.jpg`. Startup/application code is unchanged by the sync fix. Fresh sync clone independently fetched its vendors and completed baseline. |
-| 2. Explicit baseline, execution assertions and nonzero failures | Pass. Clean Node 22/26: **603 passed, 0 failed, exit 0**. All 15 focused tests and named modes execute. Forty-four source-sync/provenance tests and nineteen runner/dependency tests verify failure propagation, discovery and dependency boundaries. |
-| 3. Missing TakeoffCraft does not abort residential coverage | Pass. BimCraft quantities and PDF generation execute; cross-app checks print a named skip. Partial/broken dependencies fail in harness. Real TakeoffCraft integration remains unverified. |
-| 4. Fixture editing, dimensions, isolation, persistence and missing hosts | Pass within prototype scope. Lifecycle scenario rerun with the fix. Prior browser evidence demonstrates edit, undo/redo, Save IFC/reopen with 9½-inch finish and 5½-inch core dimensions, and visible unresolved missing-host rows. Full-plan and 1:10 detail PDFs rendered and inspected. Short labels at 1:50 remain an application limitation. |
-| 5. CI invokes baseline; reader availability explicit | Pass on reviewed implementation: baseline **607 / 0**, legacy `npm test -- --oracles` **3 / 3 files**, evidence upload successful. Final-head status is in PR #2. |
-| 6. Prototype vs F01 vs integrated work distinguished | Pass. No application changes, source PM edits or merge. Main still lacks prototype/F01. |
+| Fresh standalone start and fixture loading | Prior isolated Node 22 startup/browser evidence on 8016 remains in `evidence/f01/`; export corrections do not alter fixture geometry. Final-head standalone baseline is rerun separately from enriched validation. |
+| Explicit baseline and nonzero failures | Nine stages include all 15 focused tests, named modes, lifecycle, 44 sync/provenance and 19 runner contracts. Historical clean baseline: 603 local / 607 Ubuntu checks. Installed-reader and final-head counts are separate below/in the PR. |
+| Optional-source boundaries | Only absent app/package roots skip. Present partial trees, broken links/imports, malformed JSON and drift fail. Controlled failure tests remain; actual sources now pass as well. |
+| Independent fixture acceptance | **Six IFC files pass**: committed seed/edited/missing-host plus a freshly generated trio, with zero IfcOpenShell schema/EXPRESS diagnostics. Independent Body geometry, thickness, height, opening/window, real dimension curves, IDs/references and missing-host checks pass. Three real negative controls must fail. |
+| Lifecycle and print evidence | Core-anchored edit 209.55 → 241.30 mm, core 139.7 mm, stable IDs, material-default isolation, 25.4 mm cavity, zero membrane, undo/redo/reopen and missing host pass. Regenerated plan/detail PDFs are byte-identical to previously rendered/inspected exports. |
+| Real upstream parity / integration | CivilCraft terrain, CadCraft 16 symbols, TakeoffCraft 31 mappings and RC.8 **15/0** pass from immutable real sources; no upstream skips. |
+| CI | Requires standalone baseline, independent fixture acceptance and legacy tests, then reruns the baseline with installed readers. Evidence uploads even on failure. Final observed run is linked in PR #2. |
+| Integration state | Both PRs draft/unmerged; main lacks prototype/F01. Four application export fixes are explicitly approved follow-up scope. |
 
-## Validation
+Enriched run with approved fixes, all selected upstream files and installed readers: **637 passed, 0 failed, exit 0**.
 
-Fresh clone setup and initial Node 22 baseline: `npm run test:baseline` (downloads and verifies all 110 vendor files). After adding Git-provenance verification, reran `npm run test:baseline -- --offline` at the reviewed implementation SHA.
-Node 26 command in that clone: `npm run test:baseline -- --offline`.
-
-| Stage | Clean Node 22.23.3 | Clean Node 26.9.0 | GitHub Ubuntu / Node 22 |
-| --- | --- | --- | --- |
-| Precision | 7 / 0 | 7 / 0 | 7 / 0 |
-| Materials | 8 / 0 | 8 / 0 | 8 / 0 |
-| Model | 122 / 0 | 122 / 0 | 124 / 0 |
-| Comforts | 103 / 0 | 103 / 0 | 103 / 0 |
-| Views2 | 104 / 0 | 104 / 0 | 104 / 0 |
-| Residential | 195 / 0 | 195 / 0 | 197 / 0 |
-| Fixture lifecycle | 1 / 0 | 1 / 0 | 1 / 0 |
-| Source-sync / provenance contracts | 44 / 0 | 44 / 0 | 44 / 0 |
-| Runner / dependency contracts | 19 / 0 | 19 / 0 | 19 / 0 |
-| Total / exit | 603 / 0; exit 0 | 603 / 0; exit 0 | 607 / 0; exit 0 |
-
-Cells are passed / failed; skipped coverage is never included. Review evidence is in `evidence/f01/review/`: before-fix reproduction, Node 22 contract logs and summary, both command logs, Node 26 summary and complete successful GitHub job log. Full local stage logs remain in the isolated clone. Remote extra passes come from Poppler PDF checks. The successful implementation CI run is [39646484489](https://github.com/achartt/bimcraft-SDH/actions/runs/39646484489). GitHub uses the PR merge checkout; local reports identify the branch SHA directly. The PR records the subsequent documentation-only head's CI observation.
-
-Prior source-sync delivery `b2724e7` passed 574 local / 578 CI checks; its evidence remains in `evidence/f01/source-sync/`. The review adds 29 contract checks.
-
-Historical red logs remain unchanged: earlier standalone deliveries had 545 local / 549 remote passes and two source-sync failures; initial residential testing aborted at missing TakeoffCraft. Those results are superseded by the source-sync evidence, not relabeled as passes.
-
-The earlier local full `npm test -- --oracles` command passed its three discovered files, but pinned `ezdxf==1.4.4` and `ifcopenshell==0.9.0` could not install on this Python environment. Its partial venvs subsequently caused four genuine schema-check failures. These logs remain retained. The fresh baseline does not install or inherit those partial venvs; this change does not suppress their failures or fix optional package installation.
-
-| Optional capability | Availability and evidence |
+| Stage | Pass / fail |
 | --- | --- |
-| CivilCraft/CadCraft live source parity | Actual sources absent; explicitly skipped and unverified. Bundled integrity and harness comparison paths pass separately. |
-| TakeoffCraft real reader/estimate/pack sync | Absent; skipped and unverified. Absence, incomplete directory and thrown import tested. |
-| External IFC reader (`web-ifc`) | Absent/skipped in fresh baseline. Installed by the separate full oracle setup; it is not IFC schema validation. |
-| IFC schema (`IfcOpenShell`) | Absent/skipped in fresh baseline. Prior local pinned install and partial-venv attempts failed; no positive schema acceptance claimed. |
-| PDF reader (`pdftotext`) | Absent locally; PDF text checks skipped. GitHub installs Poppler. |
-| PDF inspection (`pdfinfo`, `pdftoppm`) | Bundled tools used separately for prior one-page A4 export inspection; does not imply all local suite PDF checks ran. |
-| Library-repository residential assets | Absent, named skip. Synthetic fixture needs none. |
+| Precision / materials | 7 / 0; 8 / 0 |
+| Model | 129 / 0 |
+| Comforts | 106 / 0 |
+| Views2 | 105 / 0 |
+| Residential | 218 / 0 |
+| Fixture lifecycle | 1 / 0 |
+| Source-sync / runner contracts | 44 / 0; 19 / 0 |
 
-## Remaining review items
+Only the unrelated library-repository asset check skips in that run. The report honestly says `dirty: true`: the isolated clone started at the prior head and received the approved patches. Clean committed-head and remote results are recorded separately in the PR. Optional skips are never included in pass counts.
 
-1. Independent IFC schema acceptance and real CivilCraft/CadCraft/TakeoffCraft integration remain unverified. Review legacy optional-reader setup and partial venv reporting separately.
-2. Review PR #1's application diff: stable IDs, unknown-version handling, geometry/reference precision, IFC2X3/IFC4 compatibility and supported host limits. F01 exercises these contracts without certifying every imported IFC case.
-3. Prior UI observations remain: blank/clipped controls and suppressed short dimension labels at whole-house scale. The 1:10 detail supplies numeric review evidence; no UI/renderer fix is included.
+## Real source provenance
 
-Shared contracts: explicit baseline discovery and exit reporting, separate optional notices, strict dependency boundaries, source pins verified against immutable Git history, feature-owned fixture/evidence layout. No schema, geometry, material-default, reference, license or kernel changes. Stable IDs, explicit cores, cavity widths, zero-width membranes, six reference modes and project isolation remain intact.
+Only **26 files / 840,876 bytes** were fetched into the isolated mirror, including required transitive imports and six packs. The committed `upstream-files.json` records immutable revisions, paths, Git blob IDs and SHA-256 values; all were verified. Actual source files remain outside the repository.
 
-No remaining blocker was found in the reviewed F01 changes after these fixes. The independent integration gaps above remain open.
+| Source | Revision | Result |
+| --- | --- | --- |
+| CivilCraft | `b57d9a6bfb08881625c4b7361d0b7083d1bfd916` | Terrain copies/imports/translations match |
+| CadCraft | `93b7f5eb58b94e726a5d5333dd792cca8f1d7a14` | Generator matches all 16 symbols |
+| TakeoffCraft | `0a334c467cd3f750afd818523fd48bb7715e736f` | 31 mappings match; PDF attachment/readProject/quantity/estimate tests pass |
 
-Recommended next action: review the fixes in draft PR #2, then obtain the independent validation needed before considering PR #1/F01 integration. Keep both PRs unmerged until approved.
+RC.8 reads the actual 3-sheet PDF with pdfjs and TakeoffCraft, loads 23 items/255 marks without warnings, verifies measured quantities, runs the estimate formulas and checks the 21-piece cut list. Poppler independently opens the PDF. Its only schema notice is “nothing saved”: RC.8 produces PDF/JSON, not IFC. Reproduction commands and exact outputs are in [the independent packet](../../evidence/f01/independent/README.md). Baseline setup/CI never fetches these other apps; the explicit helper fetches only the reviewed file closure. Parity is established at the recorded revisions, not at every future upstream tip.
+
+## Reader availability and remaining limits
+
+| Capability | Result / limit |
+| --- | --- |
+| IfcOpenShell | Mandatory dedicated fixture checks pass with EXPRESS rules; broader saved-model structural checks pass with the approved fixes. Python 3.12 resolved the earlier Python 3.9 install gap. |
+| web-ifc | Independent counts/identity/geometry pass for all six files (6/6/4 meshed products, 140/140/48 triangles per set). **Material/color diagnostics remain** for the valid null-material cavity layer; this is not a clean appearance acceptance claim. |
+| PDF | Actual TakeoffCraft/pdfjs attachment readback and Poppler pass. Regenerated review PDFs exactly match the previously inspected files. Short full-plan labels are still suppressed by the prototype; detail export supplies readable dimensions. |
+| Library repository | Absent; item checks explicitly skip. Not needed by this synthetic fixture. |
+| Existing partial local venvs | The main working checkout's old partial venv still fails four schema checks. These failures are preserved in the evidence; no environment deletion or false-green skip was used. Fresh/isolated environments pass. |
+
+Black-box web-ifc experiments eliminated its messages by removing only material associations or assigning a temporary cavity material, while preserving mesh counts. Those temporary variants were **not** substituted for the accepted fixture. IfcOpenShell accepts the original null material; changing cavity semantics solely to suppress reader messages would be inappropriate. Keep this interoperability limit visible when reviewing PR #1.
+
+Prior review history remains valid: incomplete pins, unusable translations, partial TakeoffCraft roots, partial PDF packages and rehashed assets with stale provenance were fixed with 63 contract tests. Missing Git history still fails; CI fetches full history. Evidence remains under `evidence/f01/review/` and `source-sync/`. Earlier source-sync/partial-venv failures remain historical evidence, not passes.
+
+No known schema blocker remains in the exercised fixture and named regression modes. This does not certify arbitrary imported IFCs, all prototype UI behavior, solid-material takeoffs, roof/window scope or performance. Review PR #1's remaining application scope and the documented web-ifc appearance limitation. Stable material/type/product/reference IDs, explicit cores, all six reference modes, zero-width membranes and project isolation remain intact.
+
+Recommended next action: review the approved export fixes and the independent evidence in draft PR #2. Keep both PRs unmerged until integration is separately approved.

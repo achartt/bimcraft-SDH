@@ -1,0 +1,22 @@
+▶ precision: node --test --test-reporter=tap tests/unit/wall-precision.test.mjs
+PASS precision: 7 passed, 0 failed; 0 skip/availability notices
+▶ materials: node --test --test-reporter=tap tests/unit/material-library.test.mjs
+PASS materials: 8 passed, 0 failed; 0 skip/availability notices
+▶ model: node .cc-test/bin/test-bimcraft.mjs --model
+PASS model: 127 passed, 0 failed; 1 skip/availability notices
+  --   poppler not installed: PDF checks skipped (spawnSync pdftotext ENOENT)
+▶ comforts: node .cc-test/bin/test-bimcraft.mjs --comforts
+FAIL comforts: 105 passed, 1 failed; 0 skip/availability notices
+▶ views2: node .cc-test/bin/test-bimcraft.mjs --views2
+FAIL views2: 104 passed, 1 failed; 0 skip/availability notices
+▶ res: node .cc-test/bin/test-bimcraft.mjs --res
+PASS res: 216 passed, 0 failed; 2 skip/availability notices
+  --   no library repo at /private/tmp/f01-independent-validation-20261021/repo/repos/library: item checks skipped
+  --   poppler not installed: PDF reader checks skipped (spawnSync pdftotext ENOENT)
+▶ fixture: node tests/features/f01/fixture.mjs --verify
+PASS fixture: 1 passed, 0 failed; 0 skip/availability notices
+▶ source-sync-contract: node --test --test-reporter=tap tests/features/f01/source-sync.test.mjs
+PASS source-sync-contract: 44 passed, 0 failed; 0 skip/availability notices
+▶ runner-contract: node --test --test-reporter=tap tests/features/f01/runner.test.mjs
+PASS runner-contract: 19 passed, 0 failed; 0 skip/availability notices
+Evidence: /private/tmp/f01-independent-validation-20261021/repo/.cc-test/baseline/summary.json (optional skips are not passes)

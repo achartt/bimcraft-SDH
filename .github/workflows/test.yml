@@ -42,9 +42,21 @@ jobs:
       # PROVENANCE.md). Some apps' tests need them.
       - name: Standalone residential baseline
         run: npm run test:baseline
+      - name: Independent IFC fixture acceptance
+        shell: bash
+        run: |
+          mkdir -p .cc-test/baseline
+          python -m venv .cc-test/tools/bimcraft-test/venv
+          .cc-test/tools/bimcraft-test/venv/bin/python -m pip install -r tests/features/f01/requirements-independent.txt
+          node tests/features/f01/fixture.mjs --output-dir .cc-test/f01-generated
+          .cc-test/tools/bimcraft-test/venv/bin/python -I tests/features/f01/independent.py fixtures/f01 .cc-test/f01-generated | tee .cc-test/baseline/independent-ifc.jsonl
       - name: npm test
         if: always()
         run: npm test -- --oracles
+      - name: Residential baseline with installed readers
+        if: always()
+        run: |
+          node --input-type=module -e "import('./devshell/baseline.mjs').then(({stages,runStages})=>{process.exitCode=runStages(stages,{reportDir:'.cc-test/baseline/readers'}).exitCode})"
       - name: Baseline evidence
         if: always()
         uses: actions/upload-artifact@v4
