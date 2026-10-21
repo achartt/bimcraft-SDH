@@ -13,6 +13,8 @@
  * Every op ends by bringing the walls it may have changed up to date (model-walls.js regenWalls): joins, heights that
  * follow a level, quantities.
  */
+import { writeAssembly, validateAssembly } from './wall-assemblies.js';
+import { syncWallDimensions } from './wall-dimensions.js';
 import { ModelWriter } from './model-write.js';
 import { readLevels, addLevel, setLevel } from './model-levels.js';
 import { addWall, updateWall, deleteWalls, regenWalls, readWalls } from './model-walls.js';
@@ -26,7 +28,7 @@ import { syncResidential } from './res-follow.js';   // 0.5 part 4 track RC: wal
 export function op(fn) {
   return (ed) => {
     const w = new ModelWriter(ed.W, ed.api, ed.mid);
-    return w.run(fn);
+    return w.run(writer => { const result = fn(writer); syncWallDimensions(writer); return result; });
   };
 }
 const storeyId = (w, guid) => {
@@ -55,6 +57,61 @@ function settle(w, storeys, force = null) {
 /** For ops written elsewhere (model-trim.js, 0.6): the same follow-ups as this file's own wall changes. */
 export const afterWallMoveFor = (w, before, ops0, guids) => afterWallMove(w, before, ops0, guids, false);
 export const settleFor = (w, storeys, force = null) => settle(w, storeys, force);
+
+/** Edit a project type and all its instances as one undoable transaction. */
+export function saveWallAssembly(input, assign = []) {
+  const recipe = validateAssembly(input); let typeGuid = null;
+  return op(w => {
+    const before = readWalls(w), openings = readOpenings(w, null, before);
+    typeGuid ||= val(w.guid());
+    const result = writeAssembly(w, recipe, typeGuid);
+    const affected = before.filter(x => x.typeKey === recipe.key || assign.includes(x.guid));
+    for (const wall of affected) updateWall(w, wall.guid, { typeKey: recipe.key, refreshType: true }, { carryJoined: false, previousType: wall.assembly });
+    const guids = rejoinAssemblyCorners(w, before, affected.map(x => x.guid));
+    afterWallMove(w, before, openings, guids, true);
+    settle(w, affected.map(x => x.storey));
+    return { id: affected[0]?.id ?? null, ids: affected.map(x => x.id), typeId: result.id };
+  });
+}
+
+// Intersect the final axes, after every instance has its new core offset. Intersecting
+// against a neighbour's old axis during each update would leave an open L corner.
+function rejoinAssemblyCorners(w, before, changed) {
+  const changedSet = new Set(changed), after = new Map(readWalls(w).map(x => [x.guid, x]));
+  const buckets = new Map(), nodes = [];
+  for (const wall of before) for (const end of ['a', 'b']) {
+    const p = wall[end], x = Math.floor(p[0]), y = Math.floor(p[1]);
+    let node = null;
+    for (let dx = -1; dx <= 1 && !node; dx++) for (let dy = -1; dy <= 1 && !node; dy++) {
+      node = (buckets.get(`${wall.storey}:${x+dx}:${y+dy}`) || []).find(n => Math.hypot(n.p[0]-p[0],n.p[1]-p[1]) <= 1);
+    }
+    if (!node) {
+      node = { p, ends: [] }; nodes.push(node);
+      const key = `${wall.storey}:${x}:${y}`;
+      if (!buckets.has(key)) buckets.set(key, []);
+      buckets.get(key).push(node);
+    }
+    node.ends.push({ wall, end });
+  }
+  const edits = new Map();
+  for (const node of nodes) {
+    if (node.ends.length !== 2 || !node.ends.some(e => changedSet.has(e.wall.guid))) continue;
+    const [a, b] = node.ends, A = after.get(a.wall.guid), B = after.get(b.wall.guid);
+    if (!A || !B || A.bulge || B.bulge) continue;
+    const u = [A.b[0]-A.a[0],A.b[1]-A.a[1]], v = [B.b[0]-B.a[0],B.b[1]-B.a[1]];
+    const cross = u[0]*v[1]-u[1]*v[0];
+    if (Math.abs(cross) < 1e-9 * A.len * B.len) continue;
+    const s = ((B.a[0]-A.a[0])*v[1]-(B.a[1]-A.a[1])*v[0])/cross;
+    const p = [A.a[0]+s*u[0],A.a[1]+s*u[1]];
+    if (Math.hypot(p[0]-node.p[0],p[1]-node.p[1]) > 4*Math.max(A.t,B.t)) continue;
+    for (const e of [a,b]) {
+      if (!edits.has(e.wall.guid)) edits.set(e.wall.guid, {});
+      edits.get(e.wall.guid)[e.end] = p;
+    }
+  }
+  for (const [guid, ch] of edits) { updateWall(w, guid, ch, { carryJoined: false }); changedSet.add(guid); }
+  return [...changedSet];
+}
 
 /** Draw walls on a storey: segs [{ a, b }] in its plan axes (mm). One undo step for all of them. */
 export function drawWalls({ storey, segs, typeKey, baseOffset = 0, topLevel = '', topOffset = 0, height = 0, extSide = 'left' }) {

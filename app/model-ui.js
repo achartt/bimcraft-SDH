@@ -23,7 +23,7 @@ import { PlanView } from './model-planview.js';
 import { planCut, chainLoops, viewerToPlan, wallPieces, wallDims } from './model-plan.js';
 import { schedules, scheduleCsv } from './model-schedule.js';
 import { planPdf } from './model-pdf.js';
-import { wallOutlines, WALL_TYPES, wallType, typeThickness, typeName, typeAt, JUSTIFICATIONS, locationLine } from './model-walls.js';
+import { wallOutlines, wallTypes, wallType, typeThickness, typeName, typeAt, JUSTIFICATIONS, locationLine } from './model-walls.js';
 import { wallGeom, wallMap, arcMid, arcLength, bulgeThrough, bulgeFromHeight, arcHeight, flatPoly, BULGE_MAX } from './model-arcs.js';   // 0.6 round 2 (bim-comforts_PART_2): curved walls
 import { snapPoint, closesChain, loopSide, wallPath } from './model-tools.js';
 import { fmtLen, parseLen, parseTyped, fmtAngle, fmtArea, parsePitch, fmtPitch, getDisplayUnits, setDisplayUnits, isMetric } from './model-units.js';
@@ -259,7 +259,7 @@ export function mountModel(host) {
     // the walls' outline as one: their joins (mitres, T ends) are not drawn, as on a drafted plan
     const pieces = scene.walls.flatMap((w) => w.pieces || []);
     if (pieces.length) { const L = planLoops(pieces); scene.wallEdges = [...L.rooms.flatMap((r) => [r.poly, ...r.holes]), ...L.outlines.map((o) => o.poly)]; }
-    if (S.dims && S.kind !== 'rcp') scene.dims = wallDims(walls, S.outlines, ops, (mm) => fmtLen(mm, S.units), { exteriorOf: (w) => wallType(w.typeKey)?.exterior ?? true });
+    if (S.dims && S.kind !== 'rcp') scene.dims = wallDims(walls, S.outlines, ops, (mm) => fmtLen(mm, S.units), { exteriorOf: (w) => (w.assembly || projectWallType(w.typeKey))?.exterior ?? true });
     for (const x of exts) x.scene?.(scene);
     return scene;
   }
@@ -319,7 +319,7 @@ export function mountModel(host) {
     const keysOf = (i) => {
       if (xs) return xs.scheduleKeys(S.sched, i) || [];
       if (S.sched === 'doors' || S.sched === 'windows') { const kind = S.sched === 'doors' ? 'door' : 'window'; const list = S.data.openings.filter((o) => o.kind === kind); const byRow = sc.rows[i][0]; const o = list.find((x) => x.mark === byRow); return o ? [k + o.id] : []; }
-      if (S.sched === 'walls') { const name = sc.rows[i][0]; return S.data.walls.filter((w) => (wallType(w.typeKey) ? typeName(wallType(w.typeKey)) : w.typeName) === name).map((w) => k + w.id); }
+      if (S.sched === 'walls') { const name = sc.rows[i][0]; return S.data.walls.filter((w) => (projectWallType(w.typeKey) ? typeName(projectWallType(w.typeKey)) : w.typeName) === name).map((w) => k + w.id); }
       const sp = (S.data.derived?.spaces || []).find((x) => x.number === sc.rows[i][0]); return sp ? [k + sp.id] : [];
     };
     const table = el('table', {}, el('thead', {}, el('tr', {}, ...sc.head.map((h) => el('th', {}, h)))),
@@ -438,13 +438,12 @@ export function mountModel(host) {
   }
   for (const b of ui.tools) b.addEventListener('click', () => setTool(b.dataset.mtool));
   function fillWallOpts() {
-    if (!ui.wallType) return;
-    if (ui.wallType.options.length) {
-      for (const x of WALL_TYPES) { const o = [...ui.wallType.options].find((v) => v.value === x.key); if (o) o.textContent = typeName(x) + ' (' + fmtLen(typeThickness(x), S.units) + ')'; }
-      if (ui.wallH && document.activeElement !== ui.wallH) ui.wallH.value = fmtLen(S.wall.height, S.units);
-      return;
-    }
-    ui.wallType.replaceChildren(...WALL_TYPES.map((x) => el('option', { value: x.key, selected: x.key === S.wall.typeKey }, typeName(x) + ' (' + fmtLen(typeThickness(x), S.units) + ')')));
+    if (!ui.wallType) { if (ui.wallH && document.activeElement !== ui.wallH) ui.wallH.value = fmtLen(S.wall.height, S.units); return; }
+    const types = wallTypes(famW());
+    if (!types.some(x => x.key === S.wall.typeKey)) S.wall.typeKey = types[0].key;
+    ui.wallType.replaceChildren(...types.map((x) => el('option', { value: x.key, selected: x.key === S.wall.typeKey }, typeName(x) + ' (' + fmtLen(typeThickness(x), S.units) + ')')));
+    if (ui.wallType.dataset.bound) { if (ui.wallH && document.activeElement !== ui.wallH) ui.wallH.value = fmtLen(S.wall.height, S.units); return; }
+    ui.wallType.dataset.bound = '1';
     ui.wallType.addEventListener('change', () => { endChain(); S.wall.typeKey = ui.wallType.value; drawOverlay(); });
     for (const [input, key] of [[ui.wallRef, 'reference'], [ui.wallSide, 'side'], [ui.wallShape, 'shape']]) input?.addEventListener('change', () => { endChain(); S.wall[key] = input.value; if (ui.hint && S.tool === 'wall') ui.hint.textContent = t(S.wall.shape === 'arc' ? 'comforts.hint.arcwall' : 'model.hint.wall'); drawOverlay(); });
     ui.wallTop.addEventListener('change', () => { S.wall.top = ui.wallTop.value; ui.wallH.hidden = S.wall.top !== 'fixed'; });
@@ -506,6 +505,7 @@ export function mountModel(host) {
   }
   /** A writer on the open model for the family lists (null without one). */
   function famW() { if (!ed()) return null; const w = new ModelWriter(ed().W, ed().api, ed().mid); familyWriter(w); return w; }
+  function projectWallType(key) { return wallType(key, famW()); }
   const near = (a, b) => Math.abs(a - b) < 0.5;
   /** The sizes the tool offers for its family (the file's sizes of it, then its own default when the file has none). */
   function toolSizes(kind, key = S.open[kind].family || S.open[kind].typeKey) {
@@ -791,7 +791,7 @@ export function mountModel(host) {
     let bg = bulgeTyped ?? bulgeThrough(a, q, b);
     if (!(Math.abs(bg) <= BULGE_MAX)) { host.status(t('comforts.err.arc'), true); return; }
     if (Math.abs(bg) < 1e-6) bg = 0;
-    const type = wallType(S.wall.typeKey), th = typeThickness(type);
+    const type = projectWallType(S.wall.typeKey), th = typeThickness(type);
     const above = levelAbove();
     const top = S.wall.top === 'level' && above ? { topLevel: above.guid } : { height: S.wall.top === 'fixed' ? S.wall.height : level()?.height || 2438.4 };
     const side = S.wall.reference === 'center' ? 'left' : S.wall.side;
@@ -817,7 +817,7 @@ export function mountModel(host) {
     if (Math.hypot(q[0] - a[0], q[1] - a[1]) < 1) return;
     const closing = closesChain(pts, q, 1);
     const b = closing ? pts[0] : q;
-    const type = wallType(S.wall.typeKey);
+    const type = projectWallType(S.wall.typeKey);
     const above = levelAbove();
     const top = S.wall.top === 'level' && above ? { topLevel: above.guid } : { height: S.wall.top === 'fixed' ? S.wall.height : level()?.height || 2438.4 };
     const seg = { a, b, t: typeThickness(type) };
@@ -899,7 +899,7 @@ export function mountModel(host) {
       for (const q of pts) o.points.push(q);
       if (S.arcEnd) o.points.push(S.arcEnd);
       if (p && S.arcEnd) {
-        const bg = Math.max(-BULGE_MAX, Math.min(BULGE_MAX, bulgeThrough(a, p, S.arcEnd))), th = typeThickness(wallType(S.wall.typeKey));
+        const bg = Math.max(-BULGE_MAX, Math.min(BULGE_MAX, bulgeThrough(a, p, S.arcEnd))), th = typeThickness(projectWallType(S.wall.typeKey));
         const c = arcCentre(a, S.arcEnd, bg, th);
         o.walls.push(previewOutline({ a: c.a, b: c.b, t: th, bulge: Math.abs(bg) < 1e-6 ? 0 : bg }));
         const g = wallGeom({ a, b: S.arcEnd, bulge: bg });
@@ -914,7 +914,7 @@ export function mountModel(host) {
       if (lst) {
         const b = lst.snap.p, L = Math.hypot(b[0] - a[0], b[1] - a[1]);
         if (L >= 1) {
-          const type = wallType(S.wall.typeKey), seg = { a, b, t: typeThickness(type) };
+          const type = projectWallType(S.wall.typeKey), seg = { a, b, t: typeThickness(type) };
           const path = wallPath([...pts, b], seg.t, S.wall.reference, S.wall.side);
           o.walls.push(previewOutline(path.at(-1) || seg));
           const ang = Math.atan2(b[1] - a[1], b[0] - a[0]) * 180 / Math.PI;
@@ -1135,18 +1135,19 @@ export function mountModel(host) {
       const w0 = walls[0], many = walls.length > 1, guids = walls.map((w) => w.guid);
       title = many ? t('model.walls', { n: walls.length }) : t('model.wall');
       const sameType = walls.every((w) => w.typeKey === w0.typeKey);
-      const typeOpts = WALL_TYPES.map((x) => [x.key, typeName(x)]);
-      if (sameType && !WALL_TYPES.some((x) => x.key === w0.typeKey) && wallType(w0.typeKey)) typeOpts.unshift([w0.typeKey, typeName(wallType(w0.typeKey))]);
+      const typeOpts = wallTypes(famW()).map((x) => [x.key, typeName(x)]);
+      if (sameType && !typeOpts.some((x) => x[0] === w0.typeKey) && projectWallType(w0.typeKey)) typeOpts.unshift([w0.typeKey, typeName(projectWallType(w0.typeKey))]);
       if (!sameType) typeOpts.unshift(['', t('model.prop.changetype')]);
       field(t('model.wall.type'), select(typeOpts, sameType ? w0.typeKey : '', 'data-mp-type', (v) => { if (v) commit(many ? changeWalls(guids, { typeKey: v }) : changeWall(w0.guid, { typeKey: v }), one(title)); }));
+      if (sameType) field('', button(t('assembly.open'), 'data-mp-assembly', () => api.ask('openAssembly', w0.typeKey, guids)));
       const above = (w) => { const i = levels.findIndex((l) => l.id === w.storey); return i >= 0 ? levels[i + 1] || null : null; };
       if (!many) {
-        field(t('model.prop.thickness'), lenInput(w0.t, 'data-mp-thick', (mm) => { const key = typeAt(w0.typeKey, mm); if (!key) { host.status(t('model.err.thin'), true); return; } commit(changeWall(w0.guid, { typeKey: key }), one(title)); }, { min: 10 }));
+        field(t('model.prop.thickness'), w0.assembly?.custom ? el('span', {}, fmtLen(w0.t, S.units)) : lenInput(w0.t, 'data-mp-thick', (mm) => { const key = typeAt(w0.typeKey, mm); if (!key) { host.status(t('model.err.thin'), true); return; } commit(changeWall(w0.guid, { typeKey: key }), one(title)); }, { min: 10 }));
         field(t('model.prop.length'), lenInput(w0.len, 'data-mp-len', (mm) => { const u = [(w0.b[0] - w0.a[0]) / w0.len, (w0.b[1] - w0.a[1]) / w0.len]; commit(changeWall(w0.guid, { b: [w0.a[0] + u[0] * mm, w0.a[1] + u[1] * mm] }), one(title)); }, { min: 10 }));
       }
       // 0.6 round 2: the location line (what stays put when the wall gets thicker or its outside flips)
       const sameJ = walls.every((w) => (w.justification || 'center') === (w0.justification || 'center'));
-      const jOpts = JUSTIFICATIONS.map((j) => [j, t('comforts.just.' + j)]);
+      const jOpts = JUSTIFICATIONS.map((j) => [j, t('comforts.just.' + j.toLowerCase())]);
       if (!sameJ) jOpts.unshift(['', t('model.prop.mixed')]);
       field(t('comforts.prop.just'), select(jOpts, sameJ ? (w0.justification || 'center') : '', 'data-mp-just', (v) => { if (v) commit(many ? changeWalls(guids, { justification: v }) : changeWall(w0.guid, { justification: v }), one(title)); }));
       const ab = !many ? above(w0) : null, toLevel = walls.every((w) => w.topLevel), fixed = walls.every((w) => !w.topLevel);

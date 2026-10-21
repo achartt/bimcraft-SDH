@@ -40,6 +40,8 @@ import { planLoops } from './model-rooms.js';
 import { t as tr } from './i18n.js';
 import { wallGeom, arcOf, arcLength, chordFor, flatPoly, arcAxisCurve, profileCurve, profileKeyPoints, BULGE_MAX } from './model-arcs.js';   // 0.6 round 2 (bim-comforts_PART_2): curved walls
 
+import { readAssemblies } from './wall-assemblies.js';
+
 export const WALL_PSET = 'CadCraft_Wall';
 export const WALLTYPE_PSET = 'CadCraft_WallType';
 const IN = 25.4;
@@ -59,15 +61,20 @@ export const WALL_TYPES = [
  * A wall type by key: a starter, or a starter at another thickness — key "<starter>@<mm>" (Properties › Thickness): the
  * thickest layer (the studs, the block) takes up the difference, the others keep theirs.
  */
-export function wallType(key) {
+export function wallType(key, source = null) {
+  const custom = (Array.isArray(source) ? source : readAssemblies(source)).find(x => x.key === key);
+  if (custom) return custom;
   const k = String(key || '');
   const base = WALL_TYPES.find((x) => x.key === k.split('@')[0]) || null;
-  if (!base || !k.includes('@')) return base;
+  if (!base) return null;
+  const coreIndex = base.layers.findIndex(l => ['studs', 'block', 'cmu', 'concrete'].includes(l.mat));
+  const recipe = { ...base, layers: base.layers.map((l, i) => ({ ...l, core: i === (coreIndex < 0 ? 0 : coreIndex), function: i === coreIndex ? 'structure' : l.mat === 'osb' ? 'substrate' : l.mat === 'insulation' ? 'insulation' : 'finish' })) };
+  if (!k.includes('@')) return recipe;
   const want = Number(k.split('@')[1]);
   const rest = base.layers.reduce((s, l) => s + l.t, 0) - Math.max(...base.layers.map((l) => l.t));
   if (!(want > rest + 1 && want <= 2000)) return null;
   const core = base.layers.indexOf(base.layers.reduce((a, b) => (b.t > a.t ? b : a)));
-  return { ...base, key: k, base: base.key, layers: base.layers.map((l, i) => (i === core ? { ...l, t: want - rest } : l)) };
+  return { ...recipe, key: k, base: base.key, layers: recipe.layers.map((l, i) => (i === core ? { ...l, t: want - rest } : l)) };
 }
 /** The key of `type` made `mm` thick (null when its other layers alone are thicker than that). */
 export function typeAt(typeKey, mm) {
@@ -77,8 +84,9 @@ export function typeAt(typeKey, mm) {
   const k = base.key + '@' + (Math.round(mm * 10) / 10);
   return wallType(k) ? k : null;
 }
+export const wallTypes = (w) => [...WALL_TYPES.map(x => wallType(x.key)), ...readAssemblies(w)];
 export const typeThickness = (type) => type.layers.reduce((s, l) => s + l.t, 0);
-export const typeName = (type) => (type.base ? tr('model.wt.custom', { name: tr('model.wt.' + type.base), t: Math.round(typeThickness(type)) }) : tr('model.wt.' + type.key));
+export const typeName = (type) => type.name || (type.base ? tr('model.wt.custom', { name: tr('model.wt.' + type.base), t: Math.round(typeThickness(type)) }) : tr('model.wt.' + type.key));
 const matName = (mat) => tr('model.mat.' + mat);
 
 // ---------------------------------------------------------------------------------------------------------------- joins
@@ -140,7 +148,7 @@ export function enclosingWalls(walls, { tol = 1 } = {}) {
  */
 export function buildingOutlines(walls) {
   const loopsOf = (list) => planLoops([...wallOutlines(list.map((x) => ({ key: x.guid, a: x.a, b: x.b, t: x.t, bulge: x.bulge }))).values()]).outlines.filter((o) => o.area > 1);
-  const ext = walls.filter((x) => wallType(x.typeKey)?.exterior);
+  const ext = walls.filter((x) => (x.assembly || wallType(x.typeKey))?.exterior);
   for (const list of [enclosingWalls(ext), enclosingWalls(walls)]) {
     if (!list.length) continue;
     const out = loopsOf(list);
@@ -277,15 +285,22 @@ function segCross(a, b, c, d) {
  * its outside is flipped. CadCraft_Wall Justification: center (the centre line, as before) | exterior | interior (its
  * outside / inside face) | left | right (a face, seen from its start). The centre line stays what is stored and placed.
  */
-export const JUSTIFICATIONS = ['center', 'exterior', 'interior', 'left', 'right'];
+export const JUSTIFICATIONS = ['center', 'exterior', 'interior', 'coreExterior', 'coreInterior', 'coreCenter', 'left', 'right'];
 /** How far the location line is from the centre line, to the wall's left (mm). */
-export function locationOffset(just, t, extSide) {
+export function locationOffset(just, t, extSide, assembly = null) {
+  if (String(just).startsWith('core')) {
+    const layers = assembly?.layers || [], first = layers.findIndex(l => l.core), last = layers.findLastIndex(l => l.core);
+    if (first < 0) return null;
+    const outer = layers.slice(0, first).reduce((s,l) => s+l.t, 0), inner = layers.slice(0, last+1).reduce((s,l) => s+l.t, 0);
+    const sign = extSide === 'right' ? -1 : 1;
+    return sign * (t/2 - (just === 'coreExterior' ? outer : just === 'coreInterior' ? inner : (outer+inner)/2));
+  }
   const ext = extSide === 'right' ? -t / 2 : t / 2;
   return just === 'left' ? t / 2 : just === 'right' ? -t / 2 : just === 'exterior' ? ext : just === 'interior' ? -ext : 0;
 }
 /** The location line of a wall (for the plan): its two ends and bulge (a curved wall's stays concentric). */
 export function locationLine(wall) {
-  const off = locationOffset(wall.justification, wall.t, wall.extSide);
+  const off = locationOffset(wall.justification, wall.t, wall.extSide, wall.assembly);
   if (!off) return { a: wall.a, b: wall.b, bulge: wall.bulge || 0, off: 0 };
   const g = wallGeom(wall);
   return { a: g.at(0, off), b: g.at(g.L, off), bulge: wall.bulge || 0, off };
@@ -294,7 +309,7 @@ export function locationLine(wall) {
 // --------------------------------------------------------------------------------------------------------------- reading
 /** Every wall the tools made, in its storey's plan axes (mm). `storey` limits it to one storey. */
 export function readWalls(w, storey = null) {
-  const out = [];
+  const out = [], assemblies = readAssemblies(w);
   let list = [];
   try { list = ids(w.api, w.mid, 'IFCWALL', true); } catch (e) { list = ids(w.api, w.mid, 'IFCWALL'); }
   const levels = readLevels(w);
@@ -323,6 +338,7 @@ export function readWalls(w, storey = null) {
       name: val(line.Name) || '',
       bulge, justification: JUSTIFICATIONS.includes(ps.Justification) ? ps.Justification : 'center',
     };
+    wall.assembly = wallType(wall.typeKey, assemblies);
     wall.height = wallHeight(wall, levels, base);
     out.push(wall);
   }
@@ -338,7 +354,7 @@ export function wallHeight(wall, levels, base = levels.find((l) => l.id === wall
 // --------------------------------------------------------------------------------------------------------------- writing
 /** The IfcWallType for a starter type: found by its CadCraft_WallType Key, else made with its layer set. */
 export function wallTypeLine(w, key) {
-  const type = wallType(key);
+  const type = wallType(key, w);
   if (!type) throw Object.assign(new Error('model.err.walltype'), { key: 'model.err.walltype' });
   for (const id of ids(w.api, w.mid, 'IFCWALLTYPE')) {
     const tl = w.api.GetLine(w.mid, id, false);
@@ -398,7 +414,7 @@ function usage(w, set, th, extSide) {
  * (a fixed height; sets topLevel ''), extSide. carryJoined: walls whose end sat on a moved end move with it.
  * → { guids } the walls changed (the page regenerates them and their neighbours).
  */
-export function updateWall(w, guid, changes = {}, { carryJoined = true } = {}) {
+export function updateWall(w, guid, changes = {}, { carryJoined = true, previousType = null } = {}) {
   const all = readWalls(w);
   const wall = all.find((x) => x.guid === guid);
   if (!wall) throw Object.assign(new Error('model.err.nowall'), { key: 'model.err.nowall' });
@@ -416,8 +432,8 @@ export function updateWall(w, guid, changes = {}, { carryJoined = true } = {}) {
   if (bulgeChanged) checkBulge(changes.bulge);
   const just = JUSTIFICATIONS.includes(changes.justification) ? changes.justification : wall.justification;
   if (!changes.a && !changes.b && just !== 'center') {
-    const ty = changes.typeKey ? wallType(changes.typeKey) : null, tNew = ty ? typeThickness(ty) : wall.t;
-    const shift = locationOffset(just, wall.t, wall.extSide) - locationOffset(just, tNew, changes.extSide || wall.extSide);
+    const ty = changes.typeKey ? wallType(changes.typeKey, w) : null, tNew = ty ? typeThickness(ty) : wall.t;
+    const shift = locationOffset(just, wall.t, wall.extSide, previousType || wall.assembly) - locationOffset(just, tNew, changes.extSide || wall.extSide, ty || wall.assembly);
     if (Math.abs(shift) > 1e-6) {
       const g = wallGeom(wall);
       a = g.at(0, shift); b = g.at(g.L, shift);
@@ -447,7 +463,7 @@ export function updateWall(w, guid, changes = {}, { carryJoined = true } = {}) {
     setGeom(w, wall, a, b);
   }
   const rows = [];
-  if (changes.typeKey && changes.typeKey !== wall.typeKey) {
+  if (changes.typeKey && (changes.typeKey !== wall.typeKey || changes.refreshType)) {
     const T = wallTypeLine(w, changes.typeKey);
     const th = typeThickness(T.type);
     // the type relation: out of the old one (gone when it is left empty), into the new type's

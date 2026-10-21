@@ -59,7 +59,7 @@ export function schedules(snap, loops, { fmtLen, fmtArea, t }) {
   };
   return { doors: opening('door'), windows: opening('window'), walls, rooms };
 }
-const wallTypeName = (w) => (w ? (wallType(w.typeKey) ? typeName(wallType(w.typeKey)) : w.typeName) : '');
+const wallTypeName = (w) => (w ? ((w.assembly || wallType(w.typeKey)) ? typeName((w.assembly || wallType(w.typeKey))) : w.typeName) : '');
 
 /** One schedule as CSV (the total row last). */
 export function scheduleCsv(s) {
