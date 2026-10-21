@@ -2,6 +2,7 @@
 // Project-scoped wall recipes. The IFC type and material layer set are authoritative;
 // no global registry (two open documents may use the same key differently).
 import { ids, val } from './ifc-util.js';
+import { normalizeLayer, VENTILATION, writeMaterialLayers } from './project-materials.js';
 export const ASSEMBLY_PSET = 'CadCraft_WallType';
 export const LAYER_FUNCTIONS = ['finish', 'substrate', 'structure', 'insulation', 'membrane'];
 const fail = (message) => { throw new Error(message); };
@@ -15,7 +16,10 @@ export function validateAssembly(input) {
     if (!mat || mat.length > 100) fail('Each layer needs a material name (up to 100 characters).');
     if (!Number.isFinite(t) || t <= 0 || t > 2000) fail('Layer thickness must be greater than zero and at most 2000 mm.');
     if (!LAYER_FUNCTIONS.includes(l.function)) fail('Choose a function for each layer.');
-    return { mat, t, function: l.function, core: l.core === true };
+    if(l.kind!=null && !['material','cavity'].includes(l.kind)) fail('Choose a valid layer kind.');
+    const layer=normalizeLayer({ ...l, mat, t, function: l.function, core: l.core === true });
+    if(layer.kind==='cavity' && !VENTILATION.includes(layer.ventilation)) fail('Choose a valid cavity ventilation setting.');
+    return {mat,t,function:layer.function,core:layer.core,kind:layer.kind,materialId:layer.materialId,...(layer.kind==='cavity'?{ventilation:layer.ventilation}:{})};
   });
   if (layers.reduce((s,l)=>s+l.t,0)>2000) fail('Total wall thickness must not exceed 2000 mm.');
   const core = layers.map((l,i)=>l.core?i:-1).filter(i=>i>=0);
@@ -40,7 +44,7 @@ export function readAssemblies(w) {
 export function writeAssembly(w,input,guid=null) {
   const recipe=validateAssembly(input), previous=readAssemblies(w).find(x=>x.key===recipe.key);
   if(readAssemblies(w).some(x=>x.key!==recipe.key && x.name.toLowerCase()===recipe.name.toLowerCase())) fail('A wall type with this name already exists.');
-  const layers=recipe.layers.map(l=>w.make('IFCMATERIALLAYER',w.H(w.material(l.mat)),w.u(l.t),null,...(w.v4?[w.L(l.mat),null,w.L(l.function),null]:[])));
+  const layers=writeMaterialLayers(w,recipe.layers);
   const set=w.make('IFCMATERIALLAYERSET',layers.map(id=>w.H(id)),w.L(recipe.name),...(w.v4?[null]:[]));
   const ps=w.pset(ASSEMBLY_PSET,[['Key','IFCIDENTIFIER',recipe.key],['Thickness','IFCPOSITIVELENGTHMEASURE',w.u(recipe.layers.reduce((s,l)=>s+l.t,0))],['Recipe','IFCTEXT',JSON.stringify(recipe)]]);
   let id=previous?.id;

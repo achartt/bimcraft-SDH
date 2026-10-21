@@ -33,6 +33,7 @@
  * more). Faces that never cross (two walls in a line) end square; a mitre longer than four thicknesses is cut square.
  * An outline that comes out crossing itself (a wall shorter than its mitres) falls back to a plain rectangle.
  */
+import { normalizeLayer, writeMaterialLayers } from './project-materials.js';
 import { ids, val, deleteLine } from './ifc-util.js';
 import { round } from './model-write.js';
 import { readLevels } from './model-levels.js';
@@ -68,7 +69,7 @@ export function wallType(key, source = null) {
   const base = WALL_TYPES.find((x) => x.key === k.split('@')[0]) || null;
   if (!base) return null;
   const coreIndex = base.layers.findIndex(l => ['studs', 'block', 'cmu', 'concrete'].includes(l.mat));
-  const recipe = { ...base, layers: base.layers.map((l, i) => ({ ...l, core: i === (coreIndex < 0 ? 0 : coreIndex), function: i === coreIndex ? 'structure' : l.mat === 'osb' ? 'substrate' : l.mat === 'insulation' ? 'insulation' : 'finish' })) };
+  const recipe = { ...base, layers: base.layers.map((l, i) => normalizeLayer({ ...l, core: i === (coreIndex < 0 ? 0 : coreIndex), function: i === coreIndex ? 'structure' : l.mat === 'osb' ? 'substrate' : l.mat === 'insulation' ? 'insulation' : 'finish' })) };
   if (!k.includes('@')) return recipe;
   const want = Number(k.split('@')[1]);
   const rest = base.layers.reduce((s, l) => s + l.t, 0) - Math.max(...base.layers.map((l) => l.t));
@@ -87,7 +88,6 @@ export function typeAt(typeKey, mm) {
 export const wallTypes = (w) => [...WALL_TYPES.map(x => wallType(x.key)), ...readAssemblies(w)];
 export const typeThickness = (type) => type.layers.reduce((s, l) => s + l.t, 0);
 export const typeName = (type) => type.name || (type.base ? tr('model.wt.custom', { name: tr('model.wt.' + type.base), t: Math.round(typeThickness(type)) }) : tr('model.wt.' + type.key));
-const matName = (mat) => tr('model.mat.' + mat);
 
 // ---------------------------------------------------------------------------------------------------------------- joins
 const sub = (a, b) => [a[0] - b[0], a[1] - b[1]];
@@ -364,7 +364,7 @@ export function wallTypeLine(w, key) {
       for (const p of ps.HasProperties || []) { const pl = w.api.GetLine(w.mid, p.value, false); if (val(pl?.Name) === 'Key' && val(pl.NominalValue) === key) return { id, set: layerSetOf(w, id), type }; }
     }
   }
-  const layers = type.layers.map((l) => w.make('IFCMATERIALLAYER', w.H(w.material(matName(l.mat))), round(w.u(l.t)), null, ...(w.v4 ? [w.L(matName(l.mat)), null, null, null] : [])));
+  const layers = writeMaterialLayers(w, type.layers);
   const set = w.make('IFCMATERIALLAYERSET', layers.map((x) => w.H(x)), w.L(typeName(type)), ...(w.v4 ? [null] : []));
   const ps = w.pset(WALLTYPE_PSET, [['Key', 'IFCIDENTIFIER', key], ['Thickness', 'IFCPOSITIVELENGTHMEASURE', round(w.u(typeThickness(type)))]]);
   const id = w.make('IFCWALLTYPE', w.guid(), w.ownerHistory(), w.L(typeName(type)), null, null, [w.H(ps)], null, null, w.L(typeName(type)), 'STANDARD');
