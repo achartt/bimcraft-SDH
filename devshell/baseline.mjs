@@ -14,8 +14,8 @@ export const stages = [
   { name: 'materials', args: ['--test', '--test-reporter=tap', 'tests/unit/material-library.test.mjs'], minimum: 8, tap: true },
   ...['model', 'comforts', 'views2', 'res'].map((name, i) => ({ name, args: ['.cc-test/bin/test-bimcraft.mjs', '--' + name], minimum: [122, 103, 104, 195][i] })),
   { name: 'fixture', args: ['tests/features/f01/fixture.mjs', '--verify'], minimum: 1 },
-  { name: 'source-sync-contract', args: ['--test', '--test-reporter=tap', 'tests/features/f01/source-sync.test.mjs'], minimum: 26, tap: true },
-  { name: 'runner-contract', args: ['--test', '--test-reporter=tap', 'tests/features/f01/runner.test.mjs'], minimum: 8, tap: true },
+  { name: 'source-sync-contract', args: ['--test', '--test-reporter=tap', 'tests/features/f01/source-sync.test.mjs'], minimum: 41, tap: true },
+  { name: 'runner-contract', args: ['--test', '--test-reporter=tap', 'tests/features/f01/runner.test.mjs'], minimum: 19, tap: true },
 ];
 
 // Counts guard against accidentally running the default reader or discovering no focused tests.

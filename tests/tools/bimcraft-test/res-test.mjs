@@ -8,6 +8,7 @@
  */
 import path from 'node:path';
 import fs from 'node:fs';
+import { optionalDirectory, optionalPackageEntry } from './optional-dependency.mjs';
 
 export async function resMode({ APP, ROOT, WebIFC, IfcModel, quiet, require, args = [] }) {
   const N = await import(path.join(APP, 'new-model.js'));
@@ -948,7 +949,7 @@ export async function resMode({ APP, ROOT, WebIFC, IfcModel, quiet, require, arg
     const { ModelWriter } = await import(path.join(APP, 'model-write.js'));
     const TC = path.join(ROOT, 'public_html/assets/apps/takeoffcraft/dev');
     // Only an absent application directory is optional. A partial/broken installation must fail.
-    const hasTakeoff = fs.existsSync(TC);
+    const hasTakeoff = optionalDirectory(ROOT, 'public_html/assets/apps/takeoffcraft');
     const TM = hasTakeoff ? await import(path.join(TC, 'model.js')) : null;
     const EMB = hasTakeoff ? await import(path.join(TC, 'embed.js')) : null;
     if (!hasTakeoff) console.log('  SKIP RC.8 cross-app reader, quantities, estimate and pack sync: TakeoffCraft directory absent at ' + TC);
@@ -1001,8 +1002,8 @@ export async function resMode({ APP, ROOT, WebIFC, IfcModel, quiet, require, arg
     // TakeoffCraft's own reader: pdf.js finds the attachment, embed.js reads it, model.js loads the takeoff
     if (hasTakeoff) {
       let emb = null, pages = 0;
-      const pdfjsPath = path.join(ROOT, 'tools/takeoffcraft-test/node_modules/pdfjs-dist/legacy/build/pdf.mjs');
-      if (fs.existsSync(pdfjsPath)) {
+      const pdfjsPath = optionalPackageEntry(ROOT, 'tools/takeoffcraft-test/node_modules/pdfjs-dist', 'legacy/build/pdf.mjs');
+      if (pdfjsPath) {
         const pdfjs = await import(pdfjsPath);
         const doc = await pdfjs.getDocument({ data: res.pdf.slice(), isEvalSupported: false, verbosity: 0 }).promise;
         pages = doc.numPages;
