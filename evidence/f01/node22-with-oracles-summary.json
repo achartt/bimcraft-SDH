@@ -1,0 +1,85 @@
+{
+  "runtime": "v22.23.3",
+  "head": "72664187a1cc2694d1f8972fd2e1aa5b46106bc3",
+  "results": [
+    {
+      "name": "precision",
+      "status": "PASS",
+      "exitCode": 0,
+      "passed": 7,
+      "failed": 0,
+      "skipped": [],
+      "error": null
+    },
+    {
+      "name": "materials",
+      "status": "PASS",
+      "exitCode": 0,
+      "passed": 8,
+      "failed": 0,
+      "skipped": [],
+      "error": null
+    },
+    {
+      "name": "model",
+      "status": "FAIL",
+      "exitCode": 1,
+      "passed": 126,
+      "failed": 1,
+      "skipped": [
+        "  --   poppler not installed: PDF checks skipped (spawnSync pdftotext ENOENT)"
+      ],
+      "error": null
+    },
+    {
+      "name": "comforts",
+      "status": "FAIL",
+      "exitCode": 1,
+      "passed": 105,
+      "failed": 1,
+      "skipped": [],
+      "error": null
+    },
+    {
+      "name": "views2",
+      "status": "FAIL",
+      "exitCode": 1,
+      "passed": 104,
+      "failed": 1,
+      "skipped": [],
+      "error": null
+    },
+    {
+      "name": "res",
+      "status": "FAIL",
+      "exitCode": 1,
+      "passed": 201,
+      "failed": 3,
+      "skipped": [
+        "  --   no library repo at /Users/austinhartt/Documents/ChatGPT/BimCraft Test/bimcraft-f01/repos/library: item checks skipped",
+        "  --   poppler not installed: PDF reader checks skipped (spawnSync pdftotext ENOENT)",
+        "  SKIP RC.8 cross-app reader, quantities, estimate and pack sync: TakeoffCraft directory absent at /Users/austinhartt/Documents/ChatGPT/BimCraft Test/bimcraft-f01/.cc-test/public_html/assets/apps/takeoffcraft/dev"
+      ],
+      "error": null
+    },
+    {
+      "name": "fixture",
+      "status": "PASS",
+      "exitCode": 0,
+      "passed": 1,
+      "failed": 0,
+      "skipped": [],
+      "error": null
+    },
+    {
+      "name": "runner-contract",
+      "status": "PASS",
+      "exitCode": 0,
+      "passed": 7,
+      "failed": 0,
+      "skipped": [],
+      "error": null
+    }
+  ],
+  "exitCode": 1
+}

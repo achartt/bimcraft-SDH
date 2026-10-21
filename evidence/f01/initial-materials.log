@@ -1,0 +1,22 @@
+npm notice run test:materials
+npm notice run node --test tests/unit/material-library.test.mjs
+(node:25779) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///Users/austinhartt/Documents/ChatGPT/BimCraft%20Test/bimcraft-f01/app/ifc/api.js is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /Users/austinhartt/Documents/ChatGPT/BimCraft Test/bimcraft-f01/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ legacy recipes migrate losslessly and library edits never resize walls or move dimension references (10.096958ms)
+✔ cavities retain width, explicit cores and all references; IFC layers contain no solid material for air (12.599459ms)
+✔ invalid material references and invalid defaults roll back without partially migrating the library (0.740667ms)
+✔ new built-in brick walls use a cavity; stored library versions are not silently overwritten (1.446875ms)
+✔ IFC2X3 stores library materials and ventilated voids through save/reopen (1.40825ms)
+✔ zero-thickness membranes retain schedule data without moving any wall reference (9.458167ms)
+✔ IFC2X3 keeps membrane records without inventing physical layer thickness (0.927375ms)
+✔ preview dimensions preserve exact zero boundaries and separate crowded labels (0.470833ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 140.006208
