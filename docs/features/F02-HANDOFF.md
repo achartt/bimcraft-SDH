@@ -69,7 +69,7 @@ error **0.001456 mm**. All are below **0.005 mm**. The old 0.01 mm shape gate re
 fails two metre cases (`old-shape-gate-regression.log`); the initial independent experiment
 found 0.006725 mm radius drift. The final gate passes both in-app and independent checks.
 
-## Validation commands and actual results
+## Initial implementation validation (before review corrections)
 
 Node **22.23.3**; Python **3.12.14**, IfcOpenShell **0.9.0**. All output directories are
 F02-owned; committed F01 fixtures are unchanged.
@@ -146,3 +146,45 @@ The first CI artifact (run 39674569339, head 0dd8957) confirmed a single changed
 seconds byte in the nonfinite-edit rollback test; all model suites passed. The reader
 repeat passed 16/16 before the correction, demonstrating the timing-dependent assertion.
 The failing excerpt is retained as `evidence/f02/ci-timestamp-failure.txt`.
+
+## PR #4 review corrections
+
+Review of head `71e2460b3010a271d99b5684685eae19f87c070c` found and fixed three
+refusal/precision defects:
+
+1. Missing Recipe/Library/Spec payloads could disappear from diagnostics or supply
+   starter defaults. Recognized damaged containers now remain diagnostic records;
+   an annotation with the wall-dimension ObjectType marker stays owned even if its
+   entire property set is missing. Unknown custom assemblies cannot resolve numeric
+   wall references. Legacy starter types without Recipe remain supported.
+2. Generic first-set/last-property lookup could hide an unsupported record behind a
+   valid duplicate. Scoped readers now reject duplicate named property sets/properties
+   without choosing, rewriting or deleting either record.
+3. JavaScript numeric coercion accepted null/false/empty-array thicknesses as zero.
+   Layer widths and material defaults now require actual finite numbers. Valid zero
+   membranes remain supported; invalid values do not migrate or create physical widths.
+
+Five additional F02 tests cover those cases, full IFC rollback/preservation and reopen.
+The baseline minimum is now 21 F02 tests. Initial reproduction ran 16 passing/4 failing
+tests; the separate invalid-thickness regression also failed before correction. Review
+also removed a redundant annotation GUID-class entry: the pinned base already included
+annotations, so the original proposal's missing-index explanation was inaccurate.
+Existing-record identity lookup and ambiguity refusal remain in place.
+
+Review validation: local baseline **642 passed / 0 failed**; focused precision/material/
+F02 suites **36 passed / 0 failed**. Independent IfcOpenShell validation again passed
+**16 F02 + 6 F01 files and 3 malformed-export controls**, with unchanged maxima:
+point **0.002038602 mm**, dimension **0.000928668 mm**, Body/Axis/height **0.001456 mm**.
+Local optional skips remain the unavailable sibling/library/TakeoffCraft checks and
+Poppler-on-PATH checks listed above. No new annotation layout or drawing-export code
+changed in this review. Final committed-head CI results and SHA are recorded on the PR.
+
+Run `node tests/features/f02/review-fixtures.mjs` and open
+`.cc-test/f02-review/missing-payloads.ifc` on 8017 to try the new cases. A separate browser
+tab verified the material-library and custom-assembly refusal dialogs, disabled library
+editing, and one unresolved reference with recovery instructions and no valid value.
+Captured warning/error console entries: none. Screenshots are `evidence/f02/review-*.png`;
+the inherited clipped Annotate menu still required its DOM button (INT-01).
+
+Recommendation: review the updated draft PR before PM integration. No merge, deployment,
+other checkout changes, delegation or cross-chat messages occurred.

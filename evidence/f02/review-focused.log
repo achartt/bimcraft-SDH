@@ -1,0 +1,246 @@
+TAP version 13
+# {"case":"mm-local","cycles":10,"maxGeometryMm":0.000004372376354199997,"maxDimensionMm":0.000003838060820271494,"maxCoreAnchorMm":0.000004372373968209113}
+# {"case":"mm-translated","cycles":10,"maxGeometryMm":0.0000043730877539702166,"maxDimensionMm":0.000003838213160634041,"maxCoreAnchorMm":0.000004373009450489388}
+# {"case":"m-local","cycles":10,"maxGeometryMm":0.0018953062746975254,"maxDimensionMm":0.0007805431250744732,"maxCoreAnchorMm":0.0018934362144174233}
+# {"case":"m-translated","cycles":10,"maxGeometryMm":0.0018953054481503804,"maxDimensionMm":0.0007805430795997381,"maxCoreAnchorMm":0.0018934354027859192}
+# {"case":"inch-local","cycles":10,"maxGeometryMm":0.00014901232084111817,"maxDimensionMm":0.00003175148958689533,"maxCoreAnchorMm":0.00014901232084111817}
+# {"case":"inch-translated","cycles":10,"maxGeometryMm":0.00014337485115733495,"maxDimensionMm":0.00003175158053636551,"maxCoreAnchorMm":0.00014337485115733495}
+# {"case":"foot-local","cycles":10,"maxGeometryMm":0.0009182093334970703,"maxDimensionMm":0.0004199843597234576,"maxCoreAnchorMm":0.0009182093318628468}
+# {"case":"foot-translated","cycles":10,"maxGeometryMm":0.0009235836166065517,"maxDimensionMm":0.0004199844552204013,"maxCoreAnchorMm":0.0009235835641114618}
+# (node:87357) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///Users/austinhartt/Documents/ChatGPT/BimCraft%20Test/bimcraft-f02/app/model-walls.js is not specified and it doesn't parse as CommonJS.
+# Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+# To eliminate this warning, add "type": "module" to /Users/austinhartt/Documents/ChatGPT/BimCraft Test/bimcraft-f02/package.json.
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: mm-local: ten edit/undo/redo/save/reopen cycles
+ok 1 - mm-local: ten edit/undo/redo/save/reopen cycles
+  ---
+  duration_ms: 221.009958
+  type: 'test'
+  ...
+# Subtest: mm-translated: ten edit/undo/redo/save/reopen cycles
+ok 2 - mm-translated: ten edit/undo/redo/save/reopen cycles
+  ---
+  duration_ms: 139.979458
+  type: 'test'
+  ...
+# Subtest: m-local: ten edit/undo/redo/save/reopen cycles
+ok 3 - m-local: ten edit/undo/redo/save/reopen cycles
+  ---
+  duration_ms: 135
+  type: 'test'
+  ...
+# Subtest: m-translated: ten edit/undo/redo/save/reopen cycles
+ok 4 - m-translated: ten edit/undo/redo/save/reopen cycles
+  ---
+  duration_ms: 132.382667
+  type: 'test'
+  ...
+# Subtest: inch-local: ten edit/undo/redo/save/reopen cycles
+ok 5 - inch-local: ten edit/undo/redo/save/reopen cycles
+  ---
+  duration_ms: 146.7225
+  type: 'test'
+  ...
+# Subtest: inch-translated: ten edit/undo/redo/save/reopen cycles
+ok 6 - inch-translated: ten edit/undo/redo/save/reopen cycles
+  ---
+  duration_ms: 134.675792
+  type: 'test'
+  ...
+# Subtest: foot-local: ten edit/undo/redo/save/reopen cycles
+ok 7 - foot-local: ten edit/undo/redo/save/reopen cycles
+  ---
+  duration_ms: 134.645208
+  type: 'test'
+  ...
+# Subtest: foot-translated: ten edit/undo/redo/save/reopen cycles
+ok 8 - foot-translated: ten edit/undo/redo/save/reopen cycles
+  ---
+  duration_ms: 134.070334
+  type: 'test'
+  ...
+# Subtest: dimension editing/rebind preserves exactly one annotation through undo/redo/reopen
+ok 9 - dimension editing/rebind preserves exactly one annotation through undo/redo/reopen
+  ---
+  duration_ms: 11.53275
+  type: 'test'
+  ...
+# Subtest: invalid, duplicate, missing and coincident references never retain a numeric value
+ok 10 - invalid, duplicate, missing and coincident references never retain a numeric value
+  ---
+  duration_ms: 0.56525
+  type: 'test'
+  ...
+# Subtest: assembly: unsupported/corrupt versions preserved and edits refused atomically
+ok 11 - assembly: unsupported/corrupt versions preserved and edits refused atomically
+  ---
+  duration_ms: 8.2575
+  type: 'test'
+  ...
+# Subtest: dimension: unsupported/corrupt versions preserved and edits refused atomically
+ok 12 - dimension: unsupported/corrupt versions preserved and edits refused atomically
+  ---
+  duration_ms: 17.634042
+  type: 'test'
+  ...
+# Subtest: materials: unsupported/corrupt versions preserved and edits refused atomically
+ok 13 - materials: unsupported/corrupt versions preserved and edits refused atomically
+  ---
+  duration_ms: 6.764625
+  type: 'test'
+  ...
+# Subtest: legacy migration only on explicit save, reversible through journal
+ok 14 - legacy migration only on explicit save, reversible through journal
+  ---
+  duration_ms: 4.681416
+  type: 'test'
+  ...
+# Subtest: F02 behavior suite is wired into the executed baseline
+ok 15 - F02 behavior suite is wired into the executed baseline
+  ---
+  duration_ms: 0.0565
+  type: 'test'
+  ...
+# Subtest: nonfinite wall edits fail without changing any geometry or history
+ok 16 - nonfinite wall edits fail without changing any geometry or history
+  ---
+  duration_ms: 1.738833
+  type: 'test'
+  ...
+# Subtest: assembly: missing or ambiguous payloads are refused without rewriting
+ok 17 - assembly: missing or ambiguous payloads are refused without rewriting
+  ---
+  duration_ms: 6.06275
+  type: 'test'
+  ...
+# Subtest: dimension: missing or ambiguous payloads are refused without rewriting
+ok 18 - dimension: missing or ambiguous payloads are refused without rewriting
+  ---
+  duration_ms: 9.484583
+  type: 'test'
+  ...
+# Subtest: materials: missing or ambiguous payloads are refused without rewriting
+ok 19 - materials: missing or ambiguous payloads are refused without rewriting
+  ---
+  duration_ms: 3.374583
+  type: 'test'
+  ...
+# Subtest: a dimension with its whole property set missing still suppresses stale geometry
+ok 20 - a dimension with its whole property set missing still suppresses stale geometry
+  ---
+  duration_ms: 2.776917
+  type: 'test'
+  ...
+# Subtest: invalid thickness values cannot silently become zero membranes or material defaults
+ok 21 - invalid thickness values cannot silently become zero membranes or material defaults
+  ---
+  duration_ms: 15.043917
+  type: 'test'
+  ...
+# (node:87358) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///Users/austinhartt/Documents/ChatGPT/BimCraft%20Test/bimcraft-f02/app/ifc/api.js is not specified and it doesn't parse as CommonJS.
+# Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+# To eliminate this warning, add "type": "module" to /Users/austinhartt/Documents/ChatGPT/BimCraft Test/bimcraft-f02/package.json.
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: legacy recipes migrate losslessly and library edits never resize walls or move dimension references
+ok 22 - legacy recipes migrate losslessly and library edits never resize walls or move dimension references
+  ---
+  duration_ms: 14.50225
+  type: 'test'
+  ...
+# Subtest: cavities retain width, explicit cores and all references; IFC layers contain no solid material for air
+ok 23 - cavities retain width, explicit cores and all references; IFC layers contain no solid material for air
+  ---
+  duration_ms: 19.013417
+  type: 'test'
+  ...
+# Subtest: invalid material references and invalid defaults roll back without partially migrating the library
+ok 24 - invalid material references and invalid defaults roll back without partially migrating the library
+  ---
+  duration_ms: 1.067792
+  type: 'test'
+  ...
+# Subtest: new built-in brick walls use a cavity; stored library versions are not silently overwritten
+ok 25 - new built-in brick walls use a cavity; stored library versions are not silently overwritten
+  ---
+  duration_ms: 1.922
+  type: 'test'
+  ...
+# Subtest: IFC2X3 stores library materials and ventilated voids through save/reopen
+ok 26 - IFC2X3 stores library materials and ventilated voids through save/reopen
+  ---
+  duration_ms: 2.123208
+  type: 'test'
+  ...
+# Subtest: zero-thickness membranes retain schedule data without moving any wall reference
+ok 27 - zero-thickness membranes retain schedule data without moving any wall reference
+  ---
+  duration_ms: 13.11225
+  type: 'test'
+  ...
+# Subtest: IFC2X3 keeps membrane records without inventing physical layer thickness
+ok 28 - IFC2X3 keeps membrane records without inventing physical layer thickness
+  ---
+  duration_ms: 1.727083
+  type: 'test'
+  ...
+# Subtest: preview dimensions preserve exact zero boundaries and separate crowded labels
+ok 29 - preview dimensions preserve exact zero boundaries and separate crowded labels
+  ---
+  duration_ms: 0.94225
+  type: 'test'
+  ...
+# (node:87359) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///Users/austinhartt/Documents/ChatGPT/BimCraft%20Test/bimcraft-f02/app/ifc/api.js is not specified and it doesn't parse as CommonJS.
+# Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+# To eliminate this warning, add "type": "module" to /Users/austinhartt/Documents/ChatGPT/BimCraft Test/bimcraft-f02/package.json.
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: assembly validation requires a finite thickness and contiguous explicit core
+ok 30 - assembly validation requires a finite thickness and contiguous explicit core
+  ---
+  duration_ms: 0.590291
+  type: 'test'
+  ...
+# Subtest: custom types, core anchors, hosted openings, persistent dimensions, undo and IFC round trip
+ok 31 - custom types, core anchors, hosted openings, persistent dimensions, undo and IFC round trip
+  ---
+  duration_ms: 49.517583
+  type: 'test'
+  ...
+# Subtest: dimensions retain IDs across redo, type swaps, flips, curves and rebinds
+ok 32 - dimensions retain IDs across redo, type swaps, flips, curves and rebinds
+  ---
+  duration_ms: 11.399166
+  type: 'test'
+  ...
+# Subtest: failed type edits roll back, duplicate type applies only to selected walls
+ok 33 - failed type edits roll back, duplicate type applies only to selected walls
+  ---
+  duration_ms: 4.032209
+  type: 'test'
+  ...
+# Subtest: assembly changes preserve connected core-anchored corners
+ok 34 - assembly changes preserve connected core-anchored corners
+  ---
+  duration_ms: 3.305792
+  type: 'test'
+  ...
+# Subtest: sub-millimetre faces use the actual IFC layer set in metre-based files
+ok 35 - sub-millimetre faces use the actual IFC layer set in metre-based files
+  ---
+  duration_ms: 2.599333
+  type: 'test'
+  ...
+# Subtest: dimension picking, fit bounds and PDF export include offset lines and true witnesses
+ok 36 - dimension picking, fit bounds and PDF export include offset lines and true witnesses
+  ---
+  duration_ms: 3.393041
+  type: 'test'
+  ...
+1..36
+# tests 36
+# suites 0
+# pass 36
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1337.725625

@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: Apache-2.0 */
 // Project-owned defaults. Layer thickness is always explicit, never a live link to a default.
 import { ids, val } from './ifc-util.js';
-import { parseRecord, recordError } from './record-contract.js';
+import { parseRecord, recordError, readRecordPset } from './record-contract.js';
 export const MATERIAL_PSET = 'CadCraft_MaterialLibrary';
 export const FILLS = ['none', 'solid', 'diagonal', 'crosshatch'];
 export const VENTILATION = ['unspecified', 'unventilated', 'ventilated'];
@@ -29,7 +29,7 @@ export function normalizeLayer(layer) {
   return {...layer,kind:cavity?'cavity':'material',materialId:cavity?null:(layer.materialId || legacyMaterialId(layer.mat)),...(cavity?{ventilation:layer.ventilation || 'unspecified'}:{})};
 }
 export function validateMaterial(input) {
-  const m={id:input?.id,name:String(input?.name || '').trim(),legacyName:String(input?.legacyName || input?.name || '').trim(),category:String(input?.category || '').trim(),defaultThickness:Number(input?.defaultThickness),color:input?.color,fill:input?.fill,fillColor:input?.fillColor,notes:String(input?.notes || '').trim()};
+  const m={id:input?.id,name:String(input?.name || '').trim(),legacyName:String(input?.legacyName || input?.name || '').trim(),category:String(input?.category || '').trim(),defaultThickness:input?.defaultThickness,color:input?.color,fill:input?.fill,fillColor:input?.fillColor,notes:String(input?.notes || '').trim()};
   if(!/^material-[a-zA-Z0-9_-]{1,800}$/.test(m.id || '')) throw new Error('Invalid material ID.');
   if(!m.name || m.name.length>100 || !m.legacyName || m.legacyName.length>100) throw new Error('Enter a material name up to 100 characters.');
   if(m.category.length>100 || m.notes.length>2000) throw new Error('Category or notes are too long.');
@@ -55,9 +55,9 @@ function legacyLayers(w) {
 export function readMaterials(w, additionalLayers=[]) {
   if(!w) return structuredClone(STARTER_MATERIALS);
   const project=ids(w.api,w.mid,'IFCPROJECT')[0];
-  const ps=project && w.readPset(project,MATERIAL_PSET), raw=ps?.Library;
+  const ps=project && readRecordPset(w,project,MATERIAL_PSET,'materials'), raw=ps?.Library;
   let materials;
-  if(ps && Object.hasOwn(ps,'Library')) {
+  if(ps) {
     const doc=parseRecord(raw,'materials',false);
     try {
       if(!Array.isArray(doc.materials) || !doc.materials.length) throw new Error();

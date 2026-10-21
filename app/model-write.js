@@ -37,7 +37,7 @@ const KEEP = /^IFC(GEOMETRICREPRESENTATION(SUB)?CONTEXT|OWNERHISTORY|LOCALPLACEM
 const GUID_CLASSES = ['IFCANNOTATION', 'IFCBUILDINGSTOREY', 'IFCBUILDING', 'IFCWALL', 'IFCWALLSTANDARDCASE', 'IFCDOOR', 'IFCWINDOW', 'IFCOPENINGELEMENT', 'IFCSLAB', 'IFCCOVERING', 'IFCROOF', 'IFCSPACE',
   'IFCWALLTYPE', 'IFCDOORTYPE', 'IFCWINDOWTYPE', 'IFCSLABTYPE', 'IFCCOVERINGTYPE', 'IFCROOFTYPE',
   'IFCCOLUMN', 'IFCGRID', 'IFCRAMP', 'IFCRAMPFLIGHT', 'IFCSITE',   // 0.6 (bim-draw): columns, grids, ramps, the site
-  'IFCELEMENTASSEMBLY', 'IFCANNOTATION'];   // 0.6 DF.29: pipe and duct runs (mep-model.js)
+  'IFCELEMENTASSEMBLY'];   // 0.6 DF.29: pipe and duct runs (mep-model.js)
 export const round = (v, d = 6) => { const r = Math.round(v * 10 ** d) / 10 ** d; return Object.is(r, -0) ? 0 : r; };
 
 export class ModelWriter extends IfcPlacer {

@@ -5,11 +5,12 @@ import fs from 'node:fs';
 import {cases,directory,recipe,model} from './fixtures.mjs';
 import {readWalls,locationLine} from '../../../app/model-walls.js';
 import {readLevels} from '../../../app/model-levels.js';
-import {readAssemblies,readAssemblyRecords,ASSEMBLY_PSET} from '../../../app/wall-assemblies.js';
+import {readAssemblies,readAssemblyRecords,validateAssembly,ASSEMBLY_PSET} from '../../../app/wall-assemblies.js';
 import {readMaterials,saveMaterial,MATERIAL_PSET,writeMaterials} from '../../../app/project-materials.js';
 import {saveWallAssembly,changeWall,removeElements,drawWalls,op} from '../../../app/model-ops.js';
 import {readWallDimensions,resolveDimension,saveWallDimension,referencePoint,DIMENSION_PSET,WALL_REFERENCES} from '../../../app/wall-dimensions.js';
 import {stages} from '../../../devshell/baseline.mjs';
+import {ids} from '../../../app/ifc-util.js';
 const read=c=>model(fs.readFileSync(new URL(c.name+'.ifc',directory)));
 const near=(a,b)=>assert.ok(Math.abs(a-b)<0.005,`${a} differs from ${b} by ${Math.abs(a-b)} mm`);
 // SaveModel renews FILE_NAME time on every call. Freeze only that header timestamp
@@ -119,11 +120,57 @@ test('legacy migration only on explicit save, reversible through journal',async(
  m.change(saveWallAssembly(recipe));assert.equal(JSON.parse(readAssemblyRecords(m.w())[0].raw).version,1);m.ed.undo();assert.deepEqual(snapshotBytes(m),before);m.ed.redo();
  const old=snapshotBytes(m);m.change(saveWallDimension({...d,level:readLevels(m.w())[0].guid}));assert.equal(JSON.parse(readWallDimensions(m.w())[0].raw).version,1);m.ed.undo();assert.deepEqual(snapshotBytes(m),old);
 });
-test('F02 behavior suite is wired into the executed baseline',()=>assert.ok(stages.some(s=>s.name==='f02-contract'&&s.minimum>=15&&s.args.includes('tests/features/f02/contract.test.mjs'))));
+test('F02 behavior suite is wired into the executed baseline',()=>assert.ok(stages.some(s=>s.name==='f02-contract'&&s.minimum>=21&&s.args.includes('tests/features/f02/contract.test.mjs'))));
 test('nonfinite wall edits fail without changing any geometry or history',async()=>{
  const m=await read(cases[0]),wall=readWalls(m.w())[0],before=snapshotBytes(m);
  for(const change of [{a:[NaN,0]},{b:[Infinity,1]},{height:NaN},{bulge:Infinity},{baseOffset:NaN}]) {
   assert.throws(()=>m.change(changeWall(wall.guid,change)),/finite/);assert.deepEqual(snapshotBytes(m),before);
  }
  assert.equal(m.ed.changes.length,0);
+});
+for(const kind of ['assembly','dimension','materials'])test(kind+': missing or ambiguous payloads are refused without rewriting',async()=>{
+ for(const damage of ['missing-property','duplicate-property','duplicate-set']) {
+  const m=await read(cases[0]),w=m.w(),d=readWallDimensions(w)[0],a=readAssemblyRecords(w)[0];
+  const project=ids(w.api,w.mid,'IFCPROJECT')[0];
+  const [owner,name,field]=kind==='assembly'?[a.id,ASSEMBLY_PSET,'Recipe']:kind==='dimension'?[d.id,DIMENSION_PSET,'Spec']:[project,MATERIAL_PSET,'Library'];
+  const pset=kind==='assembly'?a.psetId:w.defNamed(owner,name).def;
+  w.run(w=>{
+   const ps=w.touch(pset),property=ps.HasProperties.find(h=>w.api.GetLine(w.mid,h.value,false).Name.value===field);
+   if(damage==='missing-property')ps.HasProperties=ps.HasProperties.filter(h=>h.value!==property.value);
+   // Put the unsupported value first: the old last-property-wins reader hid it.
+   if(damage==='duplicate-property')ps.HasProperties.unshift(...w.propLines([[field,'IFCTEXT','{"version":99}']]));
+   w.write(ps);
+   if(damage==='duplicate-set') {
+    const extra=w.pset(name,[[field,'IFCTEXT','{"version":99}']]);
+    if(kind==='assembly'){const type=w.touch(owner);type.HasPropertySets.push(w.H(extra));w.write(type);}
+    else w.relateDef(owner,extra);
+   }
+  });
+  const before=snapshotBytes(m);
+  if(kind==='materials')assert.throws(()=>readMaterials(m.w()),/preserved/);
+  if(kind==='assembly'){assert.ok(readAssemblyRecords(m.w()).some(a=>a.issue));assert.equal(resolved(m)[0].value,undefined);}
+  if(kind==='dimension'){assert.equal(readWallDimensions(m.w()).length,18);assert.equal(resolved(m)[0].value,undefined);}
+  assert.throws(()=>m.change(changeWall(readWalls(m.w())[0].guid,{height:2800})),/preserved/);
+  assert.deepEqual(snapshotBytes(m),before);assert.deepEqual(snapshotBytes(await model(m.ed.save())),before);
+ }
+});
+test('a dimension with its whole property set missing still suppresses stale geometry',async()=>{
+ const m=await read(cases[0]),w=m.w(),d=readWallDimensions(w)[0],def=w.defNamed(d.id,DIMENSION_PSET);
+ w.run(w=>{const rel=w.touch(def.rel);rel.RelatedObjects=rel.RelatedObjects.filter(h=>h.value!==d.id);w.write(rel);});
+ assert.equal(readWallDimensions(m.w()).length,18);assert.equal(resolved(m)[0].value,undefined);
+ const before=snapshotBytes(m);assert.throws(()=>m.change(changeWall(readWalls(m.w())[0].guid,{height:2800})),/preserved/);assert.deepEqual(snapshotBytes(m),before);
+});
+test('invalid thickness values cannot silently become zero membranes or material defaults',async()=>{
+ for(const value of [null,false,true,'',[],[1],'12.7']) {
+  const m=await read(cases[0]),before=snapshotBytes(m),material=readMaterials(m.w())[0];
+  assert.throws(()=>m.change(op(w=>saveMaterial(w,{...material,defaultThickness:value}))));
+  assert.throws(()=>validateAssembly({...recipe,layers:recipe.layers.map((l,i)=>i===2?{...l,t:value}:l)}));
+  assert.deepEqual(snapshotBytes(m),before);
+  const bad=structuredClone(recipe);bad.layers[2].t=value;setRecipe(m,JSON.stringify(bad));
+  assert.ok(readAssemblyRecords(m.w())[0].issue);assert.equal(resolved(m)[0].value,undefined);
+  const library=await read(cases[0]),materials=readMaterials(library.w());materials[0].defaultThickness=value;
+  library.w().run(w=>w.upsertPset(ids(w.api,w.mid,'IFCPROJECT')[0],MATERIAL_PSET,[['Library','IFCTEXT',JSON.stringify({version:1,materials})]]));
+  const saved=snapshotBytes(library);assert.throws(()=>readMaterials(library.w()),/preserved/);
+  assert.throws(()=>library.change(op(w=>saveMaterial(w,material))),/preserved/);assert.deepEqual(snapshotBytes(library),saved);
+ }
 });

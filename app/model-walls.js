@@ -340,6 +340,7 @@ export function readWalls(w, storey = null) {
     };
     wall.referenceIssue = records.find(r=>r.key===wall.typeKey && r.issue)?.issue || null;
     wall.assembly = wall.referenceIssue ? null : wallType(wall.typeKey, assemblies);
+    if(!wall.assembly) wall.referenceIssue ||= 'corrupt';
     wall.height = wallHeight(wall, levels, base);
     out.push(wall);
   }
