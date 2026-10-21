@@ -1,0 +1,226 @@
+npm notice run test
+npm notice run node devshell/test.mjs --oracles
+libredwg-web 0.7.17: fetching 4 file(s)…
+web-ifc 0.0.78: fetching 2 file(s)…
+libraries: 6 fetched, 110 already here
+npm install in tests/tools/bimcraft-test …
+
+added 1 package in 496ms
+npm install in tests/tools/library …
+
+added 1 package in 400ms
+npm install in tests/tools/markupcraft-test …
+
+added 3 packages in 664ms
+npm install in tests/tools/mcp …
+
+added 3 packages in 1s
+npm install in tests/tools/modelcraft-test …
+
+added 2 packages in 133ms
+npm install in tests/tools/takeoffcraft-test …
+
+added 4 packages in 267ms
+python venv in tests/tools/cadcraft-test …
+ERROR: Could not find a version that satisfies the requirement ezdxf==1.4.4 (from versions: 0.8.3, 0.8.4, 0.8.5, 0.8.6, 0.8.7, 0.8.8, 0.8.9, 0.8.10, 0.9, 0.10, 0.10.1, 0.10.2, 0.10.3, 0.10.4, 0.11, 0.11.1, 0.11.2, 0.12, 0.12.1, 0.12.2, 0.12.3, 0.12.4, 0.12.5, 0.13, 0.13.1, 0.14, 0.14.1, 0.14.2, 0.15, 0.15.1, 0.15.2, 0.16, 0.16.1, 0.16.2, 0.16.3, 0.16.4, 0.16.5, 0.16.6, 0.17, 0.17.1, 0.17.2, 0.18, 0.18.1, 1.0.0, 1.0.1, 1.0.2, 1.0.3, 1.1.0, 1.1.1, 1.1.2, 1.1.3, 1.1.4, 1.2.0, 1.3.0, 1.3.1, 1.3.2, 1.3.3, 1.3.4, 1.3.5, 1.4.0b0, 1.4.0b1, 1.4.0b2, 1.4.0b3, 1.4.0, 1.4.1b0, 1.4.1b1, 1.4.1b2, 1.4.1, 1.4.2b0, 1.4.2b1, 1.4.2, 1.4.3b0, 1.4.3b2, 1.4.3b3)
+ERROR: No matching distribution found for ezdxf==1.4.4
+WARNING: You are using pip version 21.2.4; however, version 26.0.1 is available.
+You should consider upgrading via the '/Users/austinhartt/Documents/ChatGPT/BimCraft Test/bimcraft-f01/.cc-test/tools/cadcraft-test/venv/bin/python3 -m pip install --upgrade pip' command.
+python venv in tests/tools/civilcraft-test …
+ERROR: Could not find a version that satisfies the requirement ezdxf==1.4.4 (from versions: 0.8.3, 0.8.4, 0.8.5, 0.8.6, 0.8.7, 0.8.8, 0.8.9, 0.8.10, 0.9, 0.10, 0.10.1, 0.10.2, 0.10.3, 0.10.4, 0.11, 0.11.1, 0.11.2, 0.12, 0.12.1, 0.12.2, 0.12.3, 0.12.4, 0.12.5, 0.13, 0.13.1, 0.14, 0.14.1, 0.14.2, 0.15, 0.15.1, 0.15.2, 0.16, 0.16.1, 0.16.2, 0.16.3, 0.16.4, 0.16.5, 0.16.6, 0.17, 0.17.1, 0.17.2, 0.18, 0.18.1, 1.0.0, 1.0.1, 1.0.2, 1.0.3, 1.1.0, 1.1.1, 1.1.2, 1.1.3, 1.1.4, 1.2.0, 1.3.0, 1.3.1, 1.3.2, 1.3.3, 1.3.4, 1.3.5, 1.4.0b0, 1.4.0b1, 1.4.0b2, 1.4.0b3, 1.4.0, 1.4.1b0, 1.4.1b1, 1.4.1b2, 1.4.1, 1.4.2b0, 1.4.2b1, 1.4.2, 1.4.3b0, 1.4.3b2, 1.4.3b3)
+ERROR: No matching distribution found for ezdxf==1.4.4
+WARNING: You are using pip version 21.2.4; however, version 26.0.1 is available.
+You should consider upgrading via the '/Users/austinhartt/Documents/ChatGPT/BimCraft Test/bimcraft-f01/.cc-test/tools/civilcraft-test/venv/bin/python3 -m pip install --upgrade pip' command.
+python venv in tests/tools/detailcraft-test …
+ERROR: Could not find a version that satisfies the requirement ifcopenshell==0.9.0 (from versions: 0.8.1, 0.8.1.post1, 0.8.2, 0.8.3, 0.8.3.post1, 0.8.3.post2, 0.8.4, 0.8.4.post1)
+ERROR: No matching distribution found for ifcopenshell==0.9.0
+WARNING: You are using pip version 21.2.4; however, version 26.0.1 is available.
+You should consider upgrading via the '/Users/austinhartt/Documents/ChatGPT/BimCraft Test/bimcraft-f01/.cc-test/tools/detailcraft-test/venv/bin/python3 -m pip install --upgrade pip' command.
+python venv in tests/tools/takeoffcraft-test …
+WARNING: You are using pip version 21.2.4; however, version 26.0.1 is available.
+You should consider upgrading via the '/Users/austinhartt/Documents/ChatGPT/BimCraft Test/bimcraft-f01/.cc-test/tools/takeoffcraft-test/venv/bin/python3 -m pip install --upgrade pip' command.
+
+▶ test-bimcraft-drafting.mjs
+Drafting regression checks passed: alignment, snap priority, face offsets, corners, egress well geometry and symbols.
+
+▶ test-bimcraft-revit-ifc.mjs
+no Revit IFC exports in /var/www/CADCRAFT/testfiles/samples (a clean clone): skipped
+
+▶ test-bimcraft.mjs
+ok   fixtures/dwg/base-plan.dwg  (25 ms)
+       kind        Drawing
+       size        0.0 MB
+       release     AutoCAD 2018 (AC1032)
+       units       inches
+       layers      3
+       entities    13
+       spaces      Model: 12 lines, 0 fills, 1 texts | Layout1 (sheet, 0 viewports): 0 lines, 0 fills, 0 texts
+       weights     0.25 mm × 12 | 1 non-printing layers
+ok   fixtures/dwg/base-plan.dxf  (4 ms)
+       kind        Drawing
+       size        0.1 MB
+       release     DXF
+       units       inches
+       layers      3
+       entities    13
+       spaces      Model: 12 lines, 0 fills, 1 texts | Layout1 (sheet, 0 viewports): 0 lines, 0 fills, 0 texts
+       weights     0.25 mm × 12 | 1 non-printing layers
+ok   fixtures/dwg/df1-ocs-blocks-r2000.dwg  (6 ms)
+       kind        Drawing
+       size        0.1 MB
+       release     AutoCAD 2000 (AC1015)
+       units       millimeters
+       layers      23
+       entities    28
+       spaces      Model: 123 lines, 8 fills, 3 texts | Layout1 (sheet, 0 viewports): 0 lines, 0 fills, 0 texts
+       weights     0.25 mm × 123 | 1 non-printing layers
+ok   fixtures/dwg/df1-ocs-blocks.dwg  (4 ms)
+       kind        Drawing
+       size        0.0 MB
+       release     AutoCAD 2018 (AC1032)
+       units       millimeters
+       layers      23
+       entities    28
+       spaces      Model: 123 lines, 8 fills, 3 texts | Layout1 (sheet, 0 viewports): 0 lines, 0 fills, 0 texts
+       weights     0.25 mm × 123 | 1 non-printing layers
+ok   fixtures/dwg/df1-ocs-blocks.dxf  (2 ms)
+       kind        Drawing
+       size        0.1 MB
+       release     DXF
+       units       millimeters
+       layers      23
+       entities    28
+       spaces      Model: 123 lines, 8 fills, 3 texts | Layout1 (sheet, 0 viewports): 0 lines, 0 fills, 0 texts
+       weights     0.25 mm × 123 | 1 non-printing layers
+ok   fixtures/dwg/kitchen-equipment-r2000.dwg  (37 ms)
+       kind        Drawing
+       size        0.5 MB
+       release     AutoCAD 2000 (AC1015)
+       units       inches
+       layers      15
+       entities    264
+       spaces      Model: 668 lines, 4 fills, 125 texts | K-101 EQUIPMENT (sheet, 2 viewports): 5 lines, 0 fills, 5 texts | K-102 ELECTRICAL (sheet, 1 viewports): 5 lines, 0 fills, 5 texts | K-501 DETAILS (sheet, 1 viewports): 5 lines, 0 fills, 5 texts
+       linked      base-plan (loaded) — 13 entities drawn from links
+       weights     0.25 mm × 683 | 2 non-printing layers
+       equipment   101 items on sheets (K-101 EQUIPMENT 101, K-102 ELECTRICAL 101), 12 off sheets, from 114 tags
+       images      example-logo.png ×1
+ok   fixtures/dwg/kitchen-equipment.dwg  (36 ms)
+       kind        Drawing
+       size        0.2 MB
+       release     AutoCAD 2018 (AC1032)
+       units       inches
+       layers      15
+       entities    264
+       spaces      Model: 668 lines, 4 fills, 125 texts | K-101 EQUIPMENT (sheet, 2 viewports): 5 lines, 0 fills, 5 texts | K-102 ELECTRICAL (sheet, 1 viewports): 5 lines, 0 fills, 5 texts | K-501 DETAILS (sheet, 1 viewports): 5 lines, 0 fills, 5 texts
+       linked      base-plan (loaded) — 13 entities drawn from links
+       weights     0.25 mm × 683 | 2 non-printing layers
+       equipment   101 items on sheets (K-101 EQUIPMENT 101, K-102 ELECTRICAL 101), 12 off sheets, from 114 tags — matches fixtures/facts.json
+       images      example-logo.png ×1
+ok   fixtures/dwg/kitchen-equipment.dxf  (36 ms)
+       kind        Drawing
+       size        1.3 MB
+       release     DXF
+       units       inches
+       layers      15
+       entities    264
+       spaces      Model: 668 lines, 4 fills, 125 texts | K-101 EQUIPMENT (sheet, 2 viewports): 5 lines, 0 fills, 5 texts | K-102 ELECTRICAL (sheet, 1 viewports): 5 lines, 0 fills, 5 texts | K-501 DETAILS (sheet, 1 viewports): 5 lines, 0 fills, 5 texts
+       linked      base-plan (loaded) — 13 entities drawn from links
+       weights     0.25 mm × 683 | 2 non-printing layers
+       equipment   101 items on sheets (K-101 EQUIPMENT 101, K-102 ELECTRICAL 101), 12 off sheets, from 114 tags
+       images      example-logo.png ×1
+ok   fixtures/electrical/electrical-sample.dwg  (6 ms)
+       kind        Drawing
+       size        0.0 MB
+       release     AutoCAD 2018 (AC1032)
+       units       millimeters
+       layers      16
+       entities    347
+       spaces      Model: 49 lines, 1 fills, 21 texts | Sheet 1 (sheet, 0 viewports): 111 lines, 4 fills, 84 texts | Sheet 2 (sheet, 0 viewports): 84 lines, 6 fills, 82 texts | Sheet 3 (sheet, 0 viewports): 51 lines, 2 fills, 58 texts | Sheet list (sheet, 0 viewports): 46 lines, 0 fills, 63 texts | Terminal plan (sheet, 0 viewports): 46 lines, 0 fills, 65 texts | Cable list (sheet, 0 viewports): 47 lines, 0 fills, 69 texts | Parts list (sheet, 0 viewports): 53 lines, 0 fills, 103 texts
+       weights     0.25 mm × 487
+ok   fixtures/electrical/electrical-sample.dxf  (4 ms)
+       kind        Drawing
+       size        0.2 MB
+       release     DXF
+       units       millimeters
+       layers      16
+       entities    347
+       spaces      Model: 49 lines, 1 fills, 21 texts | Sheet 1 (sheet, 0 viewports): 111 lines, 4 fills, 84 texts | Sheet 2 (sheet, 0 viewports): 84 lines, 6 fills, 82 texts | Sheet 3 (sheet, 0 viewports): 51 lines, 2 fills, 58 texts | Sheet list (sheet, 0 viewports): 46 lines, 0 fills, 63 texts | Terminal plan (sheet, 0 viewports): 46 lines, 0 fills, 65 texts | Cable list (sheet, 0 viewports): 47 lines, 0 fills, 69 texts | Parts list (sheet, 0 viewports): 53 lines, 0 fills, 103 texts
+       weights     0.25 mm × 487
+ok   fixtures/showcase/bimcraft-house-turned.ifc  (38 ms)
+       kind        IFC
+       size        0.7 MB
+       schema      IFC4
+       project     Maple Street house
+       from        BimCraft
+       storeys     2
+       elements    48
+       triangles   18026
+       batches     12
+       top         Slab 15, Wall 13, Window 9, Door 7
+       sample      IfcWall "Exterior 2×6" with 5 property sets
+ok   fixtures/showcase/bimcraft-house.ifc  (21 ms)
+       kind        IFC
+       size        0.7 MB
+       schema      IFC4
+       project     Maple Street house
+       from        BimCraft
+       storeys     2
+       elements    48
+       triangles   18026
+       batches     12
+       top         Slab 15, Wall 13, Window 9, Door 7
+       sample      IfcWall "Exterior 2×6" with 5 property sets
+ok   fixtures/showcase/cadcraft-sample-asbuilt.dwg  (3 ms)
+       kind        Drawing
+       size        0.0 MB
+       release     AutoCAD 2018 (AC1032)
+       units       millimeters
+       layers      10
+       entities    552
+       spaces      Model: 27 lines, 13 fills, 12 texts | AB-101 AS-BUILT PLAN (sheet, 1 viewports): 5 lines, 0 fills, 11 texts
+       weights     0.25 mm × 28, 0.50 mm × 4 | 1 non-printing layers
+ok   fixtures/showcase/cadcraft-sample-asbuilt.dxf  (2 ms)
+       kind        Drawing
+       size        0.1 MB
+       release     DXF
+       units       millimeters
+       layers      10
+       entities    552
+       spaces      Model: 27 lines, 13 fills, 12 texts | AB-101 AS-BUILT PLAN (sheet, 1 viewports): 5 lines, 0 fills, 11 texts
+       weights     0.25 mm × 28, 0.50 mm × 4 | 1 non-printing layers
+ok   fixtures/showcase/cadcraft-sample-house.dwg  (2 ms)
+       kind        Drawing
+       size        0.0 MB
+       release     AutoCAD 2018 (AC1032)
+       units       inches
+       layers      12
+       entities    84
+       spaces      Model: 85 lines, 13 fills, 28 texts | A-101 FLOOR PLAN (sheet, 1 viewports): 5 lines, 0 fills, 11 texts | A-201 ELEVATIONS (sheet, 1 viewports): 5 lines, 0 fills, 11 texts | A-301 SECTIONS (sheet, 1 viewports): 5 lines, 0 fills, 11 texts | A-501 DETAILS (sheet, 1 viewports): 5 lines, 0 fills, 11 texts
+       weights     0.25 mm × 90, 0.50 mm × 14, 0.70 mm × 1 | 1 non-printing layers
+ok   fixtures/showcase/cadcraft-sample-house.dxf  (1 ms)
+       kind        Drawing
+       size        0.0 MB
+       release     DXF
+       units       inches
+       layers      12
+       entities    84
+       spaces      Model: 85 lines, 13 fills, 28 texts | A-101 FLOOR PLAN (sheet, 1 viewports): 5 lines, 0 fills, 11 texts | A-201 ELEVATIONS (sheet, 1 viewports): 5 lines, 0 fills, 11 texts | A-301 SECTIONS (sheet, 1 viewports): 5 lines, 0 fills, 11 texts | A-501 DETAILS (sheet, 1 viewports): 5 lines, 0 fills, 11 texts
+       weights     0.25 mm × 90, 0.50 mm × 14, 0.70 mm × 1 | 1 non-printing layers
+
+16 of 16 files opened
+
+Partial mode (cut-off RVT/RFA)
+  11 complete Revit files checked: none reported partial
+  (skipped: MassWithBoxAndCone.rfa — the public samples are not in this checkout)
+  (skipped: Room_Properties.rvt — the public samples are not in this checkout)
+  (skipped: empty2013.rfa — the public samples are not in this checkout)
+  (skipped: cutWalls.rvt — the public samples are not in this checkout)
+  all 13 partial-mode checks passed
+
+pass  test-bimcraft-drafting.mjs  (0.1 s)
+pass  test-bimcraft-revit-ifc.mjs  (0.1 s)
+pass  test-bimcraft.mjs  (0.3 s)
+note  cadcraft-test: pip install -r requirements.txt failed
+note  civilcraft-test: pip install -r requirements.txt failed
+note  detailcraft-test: pip install -r requirements.txt failed
+3 of 3 test files passed

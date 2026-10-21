@@ -1,0 +1,210 @@
+[
+  {
+    "repository": "getcadcraft/civilcraft",
+    "revision": "b57d9a6bfb08881625c4b7361d0b7083d1bfd916",
+    "path": "app/tin.js",
+    "git_blob": "815e1cd3873124d0419c7dc087b181252b4d6680",
+    "sha256": "6815fab4f258bf8d4087914920e775e1b3d66e339c16cb6b1f851f7ed5786ad5",
+    "bytes": 36188
+  },
+  {
+    "repository": "getcadcraft/civilcraft",
+    "revision": "b57d9a6bfb08881625c4b7361d0b7083d1bfd916",
+    "path": "app/raster.js",
+    "git_blob": "3eba7f86fe20b316d43962e7b0322d199f193b3a",
+    "sha256": "cab88fe6a6e3e9f6ac70e618a5e71896e958246eea2d074a2dd4ceb801edc3f9",
+    "bytes": 18712
+  },
+  {
+    "repository": "getcadcraft/civilcraft",
+    "revision": "b57d9a6bfb08881625c4b7361d0b7083d1bfd916",
+    "path": "app/manifest.json",
+    "git_blob": "8ffe3c5f96c837eac8b83cce2ab0517ece79fb4a",
+    "sha256": "956eabc40e2677854308aba75133aa791f821a9a02d9b28671508df844dcdca1",
+    "bytes": 909
+  },
+  {
+    "repository": "getcadcraft/civilcraft",
+    "revision": "b57d9a6bfb08881625c4b7361d0b7083d1bfd916",
+    "path": "app/lang/en.json",
+    "git_blob": "3af31aa9ac0d7188ba08d04b06ac6f4e8cf97c60",
+    "sha256": "bf1e611eb8e62c40e2ac7e346b91068c9d84414e33f2ae3cd1c566d9086f7730",
+    "bytes": 252990
+  },
+  {
+    "repository": "getcadcraft/cadcraft",
+    "revision": "93b7f5eb58b94e726a5d5333dd792cca8f1d7a14",
+    "path": "app/addons/electrical/lib/install.js",
+    "git_blob": "ad8c091c1dbfae3ddf2eb13025949685321aec2b",
+    "sha256": "6d24372fbf255779ccc93537ab47ae982530d5a6f391699cd11c7d011e8969b0",
+    "bytes": 19254
+  },
+  {
+    "repository": "getcadcraft/takeoffcraft",
+    "revision": "0a334c467cd3f750afd818523fd48bb7715e736f",
+    "path": "app/model.js",
+    "git_blob": "f140d002b2f1d5bb4f5d60098dd3aaa6662658b2",
+    "sha256": "afe6254a61281b36f911beae1d1395974ae018e5120d6991ed96c760e07f75e5",
+    "bytes": 56906
+  },
+  {
+    "repository": "getcadcraft/takeoffcraft",
+    "revision": "0a334c467cd3f750afd818523fd48bb7715e736f",
+    "path": "app/embed.js",
+    "git_blob": "ded173f2f1266b5f67fee8e84ffcb0e440603069",
+    "sha256": "9a349ec16a5716e4da3c65a9b40674da7ccfdf63a596b99db2a25ed73ed1f943",
+    "bytes": 2866
+  },
+  {
+    "repository": "getcadcraft/cadcraft",
+    "revision": "93b7f5eb58b94e726a5d5333dd792cca8f1d7a14",
+    "path": "app/addons/electrical/lib/text.js",
+    "git_blob": "15b908ba2813fecf7fc311aed901825af5a4655d",
+    "sha256": "b9a6e549712ac97bebbcf3a0803909fd7b1a0682ae0d69bb67a386b68031af62",
+    "bytes": 1104
+  },
+  {
+    "repository": "getcadcraft/cadcraft",
+    "revision": "93b7f5eb58b94e726a5d5333dd792cca8f1d7a14",
+    "path": "app/addons/electrical/lib/symbols.js",
+    "git_blob": "9bda0a4d499ad44fab541603c222ce786579b9fd",
+    "sha256": "3a3f4cb618b0623fb45a0aa8ca1a3cbe058e529a8afd689c24354b12d5b45562",
+    "bytes": 26896
+  },
+  {
+    "repository": "getcadcraft/cadcraft",
+    "revision": "93b7f5eb58b94e726a5d5333dd792cca8f1d7a14",
+    "path": "app/addons/electrical/lib/wires.js",
+    "git_blob": "261bb06a98ad423a90fb6e0ab0b720847ad4bdb5",
+    "sha256": "bc7992c9b5853cc163ae452f1c5e5e28066c4dfef44272806bc917f8b8170cdc",
+    "bytes": 16267
+  },
+  {
+    "repository": "getcadcraft/cadcraft",
+    "revision": "93b7f5eb58b94e726a5d5333dd792cca8f1d7a14",
+    "path": "app/addons/electrical/lib/model.js",
+    "git_blob": "7d98086ed87aca2e2aa1a6bb2eb117afb4f162f3",
+    "sha256": "38a5be2e9e7601177fa0e1aff66bdfab98ed984b630c8686e13734c7cae4a1f6",
+    "bytes": 7866
+  },
+  {
+    "repository": "getcadcraft/takeoffcraft",
+    "revision": "0a334c467cd3f750afd818523fd48bb7715e736f",
+    "path": "app/addons.js",
+    "git_blob": "aa238e16091c17e19d85d6e431dd45cf27647dfc",
+    "sha256": "1cf7855b81216fdceda3a1f1949df564fcc704e723147079771d05e7d845ab82",
+    "bytes": 38489
+  },
+  {
+    "repository": "getcadcraft/takeoffcraft",
+    "revision": "0a334c467cd3f750afd818523fd48bb7715e736f",
+    "path": "app/geom.js",
+    "git_blob": "aa8faef37800772382563764368f892a4c810b32",
+    "sha256": "09ec4429a24b25a6bbfa5c0f265b9952aadf9a1029a4bf9094fa9a9856f1a3ee",
+    "bytes": 15573
+  },
+  {
+    "repository": "getcadcraft/takeoffcraft",
+    "revision": "0a334c467cd3f750afd818523fd48bb7715e736f",
+    "path": "app/bid.js",
+    "git_blob": "6d5b4585e516c0765476a82d9b1c3615ef358f73",
+    "sha256": "047c69ec3bd951a11c4539af6e533d0da098c943a5a5eeb09b423a3ff0fef646",
+    "bytes": 9818
+  },
+  {
+    "repository": "getcadcraft/takeoffcraft",
+    "revision": "0a334c467cd3f750afd818523fd48bb7715e736f",
+    "path": "app/level.js",
+    "git_blob": "4f42635044607c90e062254039f72243ec19eab3",
+    "sha256": "442bf887cbc6c2211ae2f7eb8c20bf6f3661952367b2299eb5cdc484b29d138d",
+    "bytes": 6894
+  },
+  {
+    "repository": "getcadcraft/takeoffcraft",
+    "revision": "0a334c467cd3f750afd818523fd48bb7715e736f",
+    "path": "app/units.js",
+    "git_blob": "8d681725e7aa88176ca4ae630f071173fd6908ec",
+    "sha256": "e5e9ae6abc119976236ab31fff5e5b135cc1eab895103cd3c6aa0fc07907e46a",
+    "bytes": 16349
+  },
+  {
+    "repository": "getcadcraft/takeoffcraft",
+    "revision": "0a334c467cd3f750afd818523fd48bb7715e736f",
+    "path": "app/formula.js",
+    "git_blob": "62ab5df8fadc96697040d3251be995c1db0369fb",
+    "sha256": "f8ea7d17e41dcc3d0cb9a33dd7cfc19c4f30851634361a055255b4238082a380",
+    "bytes": 7409
+  },
+  {
+    "repository": "getcadcraft/takeoffcraft",
+    "revision": "0a334c467cd3f750afd818523fd48bb7715e736f",
+    "path": "app/i18n.js",
+    "git_blob": "d39df9f66d85dcdf3393510782a475204c1c30a4",
+    "sha256": "343b2e0b9c7d6df4737a9bee81636d5bf97f230c21938da8cf46995ce0724d34",
+    "bytes": 6720
+  },
+  {
+    "repository": "getcadcraft/takeoffcraft",
+    "revision": "0a334c467cd3f750afd818523fd48bb7715e736f",
+    "path": "app/packs/concrete.ccpack.json",
+    "git_blob": "be270bfb7da9896234454b455ba312e41f25a1f4",
+    "sha256": "f6eafd61de0c5b1019f33a66d2a712e2db32633b3d160ee9aacc1d7134e311af",
+    "bytes": 38873
+  },
+  {
+    "repository": "getcadcraft/takeoffcraft",
+    "revision": "0a334c467cd3f750afd818523fd48bb7715e736f",
+    "path": "app/packs/general-contractor.ccpack.json",
+    "git_blob": "34c467326beee69ae4d8e8dc4e539828677cb6a1",
+    "sha256": "412dc997a988a8445b1b95e259359ef159852eedfb9a5e2958b380e14a42cb1b",
+    "bytes": 83791
+  },
+  {
+    "repository": "getcadcraft/takeoffcraft",
+    "revision": "0a334c467cd3f750afd818523fd48bb7715e736f",
+    "path": "app/packs/drywall-framing.ccpack.json",
+    "git_blob": "ee69540895e12579f4fc977d6ca4d8a34edda4a2",
+    "sha256": "57ac9d1668555bc299d6ff22874afcda05d53524a7ba2c7250cc59632252aaa6",
+    "bytes": 98611
+  },
+  {
+    "repository": "getcadcraft/takeoffcraft",
+    "revision": "0a334c467cd3f750afd818523fd48bb7715e736f",
+    "path": "app/packs/roofing-residential.ccpack.json",
+    "git_blob": "7c50c2084d941750ffe6b873822876d593ff595b",
+    "sha256": "8f8bfc5a6951e0ca29c288e92c44b41071e111a362b109ad5aaf7b0dea44c494",
+    "bytes": 16316
+  },
+  {
+    "repository": "getcadcraft/takeoffcraft",
+    "revision": "0a334c467cd3f750afd818523fd48bb7715e736f",
+    "path": "app/packs/finish-carpentry.ccpack.json",
+    "git_blob": "3e88683968ed29977a89cbe0dca86d9a3a43348f",
+    "sha256": "a668dd79d366e401a5b781f25dd353980fbaa1402a1a1a53040e3689555f4966",
+    "bytes": 14796
+  },
+  {
+    "repository": "getcadcraft/takeoffcraft",
+    "revision": "0a334c467cd3f750afd818523fd48bb7715e736f",
+    "path": "app/packs/electrical.ccpack.json",
+    "git_blob": "747a6658ab456d2380c27dea45e9ee1d9570d0fd",
+    "sha256": "1d0edab42d3fbfe13284ba0fe1d7cc3cdc0abb70ff1cfbd05ae3de3033a4675c",
+    "bytes": 29798
+  },
+  {
+    "repository": "getcadcraft/cadcraft",
+    "revision": "93b7f5eb58b94e726a5d5333dd792cca8f1d7a14",
+    "path": "app/addons/electrical/lib/project.js",
+    "git_blob": "49063fe34a8fece568326f28fd940b9c4bb0e6d7",
+    "sha256": "2b18d84c2423e05f43a224027e4f69f4af7e10137bca2f0447ad51216730fbbf",
+    "bytes": 8299
+  },
+  {
+    "repository": "getcadcraft/takeoffcraft",
+    "revision": "0a334c467cd3f750afd818523fd48bb7715e736f",
+    "path": "app/lencalc.js",
+    "git_blob": "c3c60ded5a545205eb09e202c386d1084848ee3f",
+    "sha256": "2aa5992925d13421965976763883c3a4e643af6de1b81ed7d18196b91b669397",
+    "bytes": 9182
+  }
+]

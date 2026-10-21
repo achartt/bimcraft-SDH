@@ -6,13 +6,17 @@
  * generated, never edited by hand. `--check` fails when the file is not what the add-on gives now. Run it after the add-on's
  * symbols change.
  */
+// Standalone --check first verifies the reviewed bundle pin; only absent source apps skip live parity.
+// See docs/features/F01-INTEGRATION-BASELINE.md for pin provenance and update procedure.
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { checkBundledAssets } from './source-sync-pins.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const SRC = path.join(ROOT, 'public_html/assets/apps/cadcraft/dev/addons/electrical/lib/install.js');
 const OUT = path.join(ROOT, 'public_html/assets/apps/bimcraft/dev/res-elec-symbols.js');
+if (process.argv.includes('--check') && checkBundledAssets(ROOT, 'electrical', 'cadcraft')) process.exit(0);
 
 const { INSTALL, INSTALL_GROUPS } = await import(pathToFileURL(SRC).href);
 const num = (v) => Math.round(v * 1e6) / 1e6;

@@ -9,18 +9,29 @@ errors. Used by tools/bimcraft-test/model-test.mjs when a venv with ifcopenshell
 import json
 import logging
 import sys
+import argparse
 
 import ifcopenshell
 import ifcopenshell.validate
 
 
-def main(paths):
+def is_error(statement):
+    # json_logger emits lowercase strings; older callers may use logging levels.
+    level = statement.get('level')
+    if isinstance(level, int):
+        return level >= logging.ERROR
+    # Unknown/missing severities must not silently turn findings into passes.
+    return str(level).upper() not in ('DEBUG', 'INFO', 'WARNING')
+
+
+def main(paths, rules=False):
     bad = 0
     for p in paths:
-        f = ifcopenshell.open(p)
         logger = ifcopenshell.validate.json_logger()
-        ifcopenshell.validate.validate(f, logger, express_rules=False)
-        msgs = [s.get('message', str(s)) for s in logger.statements if s.get('level', 'ERROR') in ('ERROR', logging.ERROR)]
+        # Passing the path also captures parser diagnostics, unlike a pre-opened model.
+        ifcopenshell.validate.validate(p, logger, express_rules=rules)
+        f = ifcopenshell.open(p)
+        msgs = [s.get('message', str(s)) for s in logger.statements if is_error(s)]
         if msgs:
             bad += 1
         print(json.dumps({'file': p, 'schema': f.schema, 'errors': len(msgs), 'first': [m[:300] for m in msgs[:8]]}))
@@ -28,4 +39,8 @@ def main(paths):
 
 
 if __name__ == '__main__':
-    sys.exit(main(sys.argv[1:]))
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--rules', action='store_true', help='Also validate EXPRESS rules')
+    parser.add_argument('paths', nargs='+')
+    args = parser.parse_args()
+    sys.exit(main(args.paths, args.rules))

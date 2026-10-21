@@ -1,0 +1,21 @@
+== RC.8 the trade packs (TakeoffCraft's) and the hand-off file
+  ok   res-takeoff-packs.js is what TakeoffCraft's trade packs give (takeoff-sync.mjs --check)
+  ok   the quantities gathered: 24 items on 2 plans (walls, doors, windows, roof, foundation, devices, floor), 9 cut-list rows
+  ok   one PDF: the plans and the cut list, the takeoff attached inside (3 sheets)
+  ok   TakeoffCraft embedded PDF reader returns the expected takeoff and page count
+  ok   TakeoffCraft's readProject loads it with no warnings: 24 items, 253 marks
+  ok   the exterior walls: TakeoffCraft measures 91.86 ft = their centrelines (91.86)
+  ok   with the trade pack's exterior wall assembly (5 components), the walls' own height 9.84 ft
+  ok   the roof: 703.0 sq ft sloped = its plan area × 1.118 at 6/12 (TakeoffCraft's pitch 6.0013 in 12)
+  ok   the hips along their slope: 66.02 ft = the roof's own hip lengths 66.02
+  ok   the inside door counted once, with the prehung-door assembly
+  ok   two duplex outlets with the receptacle assembly
+  ok   the slab by area and thickness (concrete by volume through the pack's formula)
+  ok   TakeoffCraft's estimate runs every assembly formula without an error (71 rows; rates left empty)
+  ok   the cut list counted on its sheet: 2x4 — 21 pieces
+  (kept /private/tmp/f01-independent-validation-20261021/repo/.cc-test/tmp/bimcraft-res-takeoff.pdf)
+  ok   poppler opens it too
+== IfcOpenShell schema validation (when a venv with it is on this machine)
+  --   no venv with ifcopenshell (or nothing saved): skipped
+
+15 passed, 0 failed

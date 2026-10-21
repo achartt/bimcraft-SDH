@@ -1,0 +1,129 @@
+TAP version 13
+# ▶ intentional-failure: node -e console.log('0 passed, 1 failed');process.exit(1)
+# FAIL intentional-failure: 0 passed, 1 failed; 0 skip/availability notices; Expected at least 1 executed passes
+# ▶ after-failure: node -e console.log('1 passed, 0 failed')
+# PASS after-failure: 1 passed, 0 failed; 0 skip/availability notices
+# Evidence: /var/folders/20/2b_pk2zx5r9_l0bvjqpszq7m0000gn/T/f01-runner-ICv7xv/summary.json (optional skips are not passes)
+# Subtest: baseline explicitly discovers the 15 prototype tests and all named modes
+ok 1 - baseline explicitly discovers the 15 prototype tests and all named modes
+  ---
+  duration_ms: 0.528375
+  type: 'test'
+  ...
+# Subtest: source-sync failure coverage is explicitly discovered
+ok 2 - source-sync failure coverage is explicitly discovered
+  ---
+  duration_ms: 0.403834
+  type: 'test'
+  ...
+# Subtest: zero discovery, failed checks, and a nonzero exit cannot be green
+ok 3 - zero discovery, failed checks, and a nonzero exit cannot be green
+  ---
+  duration_ms: 0.266083
+  type: 'test'
+  ...
+# Subtest: optional skips remain separate from executed passes
+ok 4 - optional skips remain separate from executed passes
+  ---
+  duration_ms: 0.043083
+  type: 'test'
+  ...
+# Subtest: isolated deliberate failing process propagates exit 1 and later checks still run
+ok 5 - isolated deliberate failing process propagates exit 1 and later checks still run
+  ---
+  duration_ms: 60.034625
+  type: 'test'
+  ...
+# Subtest: RC.8 absent dependency: only absence skips
+ok 6 - RC.8 absent dependency: only absence skips
+  ---
+  duration_ms: 174.858459
+  type: 'test'
+  ...
+# Subtest: RC.8 partial dependency: only absence skips
+ok 7 - RC.8 partial dependency: only absence skips
+  ---
+  duration_ms: 78.589791
+  type: 'test'
+  ...
+# Subtest: RC.8 broken dependency: only absence skips
+ok 8 - RC.8 broken dependency: only absence skips
+  ---
+  duration_ms: 83.273417
+  type: 'test'
+  ...
+# Subtest: RC.8 root-only dependency: only absence skips
+ok 9 - RC.8 root-only dependency: only absence skips
+  ---
+  duration_ms: 81.090708
+  type: 'test'
+  ...
+# Subtest: RC.8 dangling-root dependency: only absence skips
+ok 10 - RC.8 dangling-root dependency: only absence skips
+  ---
+  duration_ms: 75.111209
+  type: 'test'
+  ...
+# Subtest: RC.8 dangling-dev dependency: only absence skips
+ok 11 - RC.8 dangling-dev dependency: only absence skips
+  ---
+  duration_ms: 76.559125
+  type: 'test'
+  ...
+# Subtest: optional PDF reader absent: only missing package skips
+ok 12 - optional PDF reader absent: only missing package skips
+  ---
+  duration_ms: 0.361417
+  type: 'test'
+  ...
+# Subtest: optional PDF reader valid: only missing package skips
+ok 13 - optional PDF reader valid: only missing package skips
+  ---
+  duration_ms: 1.171417
+  type: 'test'
+  ...
+# Subtest: optional PDF reader partial: only missing package skips
+ok 14 - optional PDF reader partial: only missing package skips
+  ---
+  duration_ms: 0.487625
+  type: 'test'
+  ...
+# Subtest: optional PDF reader dangling-package: only missing package skips
+ok 15 - optional PDF reader dangling-package: only missing package skips
+  ---
+  duration_ms: 0.34775
+  type: 'test'
+  ...
+# Subtest: optional PDF reader dangling-parent: only missing package skips
+ok 16 - optional PDF reader dangling-parent: only missing package skips
+  ---
+  duration_ms: 0.187708
+  type: 'test'
+  ...
+# Subtest: optional PDF reader package-file: only missing package skips
+ok 17 - optional PDF reader package-file: only missing package skips
+  ---
+  duration_ms: 0.375333
+  type: 'test'
+  ...
+# Subtest: optional PDF reader transitive-error: only missing package skips
+ok 18 - optional PDF reader transitive-error: only missing package skips
+  ---
+  duration_ms: 1.072334
+  type: 'test'
+  ...
+# Subtest: optional PDF reader runtime-error: only missing package skips
+ok 19 - optional PDF reader runtime-error: only missing package skips
+  ---
+  duration_ms: 0.939541
+  type: 'test'
+  ...
+1..19
+# tests 19
+# suites 0
+# pass 19
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 672.035666

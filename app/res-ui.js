@@ -467,7 +467,7 @@ export function mountRes(modelUi) {
   }
   const frameOpts = () => ({ spacing: R.frame.spacing, corners: R.frame.corners, blocking: R.frame.blocking, roofMode: R.frame.roofMode, floorMode: R.frame.floorMode, floorDir: R.frame.floorDir });
   function frameAllWalls() {
-    const hosts = A.wallsHere().filter((w) => wallType(w.typeKey)?.layers.some((l) => l.mat === 'studs')).map((w) => w.guid);
+    const hosts = A.wallsHere().filter((w) => (w.assembly || wallType(w.typeKey))?.layers.some((l) => l.mat === 'studs')).map((w) => w.guid);
     if (!hosts.length) { A.host.status(t('res.err.noframe'), true); return; }
     A.commit(frameHosts({ hosts, ...frameOpts() }), { label: t('res.fr.walls', { n: hosts.length }), verb: t('res.verb.framed') });
   }
@@ -858,7 +858,7 @@ export function mountRes(modelUi) {
     const w = writer(), D = A.S.data;
     if (!w || !D) return null;
     const levels = D.levels || [];
-    const walls = (D.walls || []).map((x) => { const ty = wallType(x.typeKey); return { ...x, typeName: ty ? wallTypeName(ty) : (x.typeName || x.typeKey), exterior: ty?.exterior !== false }; });
+    const walls = (D.walls || []).map((x) => { const ty = (x.assembly || wallType(x.typeKey)); return { ...x, typeName: ty ? wallTypeName(ty) : (x.typeName || x.typeKey), exterior: ty?.exterior !== false }; });
     const openings = readOpenings(w, null, D.walls || []).map((o) => { const ty = openingType(o.typeKey); return { ...o, typeName: ty ? openingTypeName(ty) : o.typeName }; });
     const loops = new Map();
     const loopsFor = (id) => { if (!loops.has(id)) loops.set(id, A.loopsOf(id)); return loops.get(id); };
@@ -1094,7 +1094,7 @@ export function mountRes(modelUi) {
         for (const fr of R.frames) {
           fr.qty = w.readPset(fr.id, 'CadCraft_FramingQuantities') || {};
           fr.notes = w.readPset(fr.id, 'CadCraft_Framing')?.Notes || 'ok';
-          if (fr.kind === 'wall') { const wall = walls.find((x) => x.guid === fr.host); if (wall) { const r2 = frameWall(wall, { walls: walls.filter((x) => x.storey === wall.storey), openings: ops.filter((o) => o.wallGuid === wall.guid), spacing: fr.spacing, corners: fr.corners, blocking: fr.blocking, bearing: wallType(wall.typeKey)?.exterior !== false }); fr.wallPieces = r2.pieces ? r2 : null; } }
+          if (fr.kind === 'wall') { const wall = walls.find((x) => x.guid === fr.host); if (wall) { const r2 = frameWall(wall, { walls: walls.filter((x) => x.storey === wall.storey), openings: ops.filter((o) => o.wallGuid === wall.guid), spacing: fr.spacing, corners: fr.corners, blocking: fr.blocking, bearing: (wall.assembly || wallType(wall.typeKey))?.exterior !== false }); fr.wallPieces = r2.pieces ? r2 : null; } }
         }
       }
       queueMicrotask(() => applyFrameVis());

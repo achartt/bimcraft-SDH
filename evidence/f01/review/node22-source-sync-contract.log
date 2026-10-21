@@ -1,0 +1,274 @@
+TAP version 13
+# Subtest: pin provenance matches the recorded immutable Git revision
+ok 1 - pin provenance matches the recorded immutable Git revision
+  ---
+  duration_ms: 50.124708
+  type: 'test'
+  ...
+# Subtest: rehashed asset cannot claim unchanged provenance
+ok 2 - rehashed asset cannot claim unchanged provenance
+  ---
+  duration_ms: 9.253958
+  type: 'test'
+  ...
+# Subtest: missing provenance history fails instead of skipping
+ok 3 - missing provenance history fails instead of skipping
+  ---
+  duration_ms: 8.941
+  type: 'test'
+  ...
+# Subtest: terrain: absent source verifies bundled assets and explicitly skips live parity
+ok 4 - terrain: absent source verifies bundled assets and explicitly skips live parity
+  ---
+  duration_ms: 31.111416
+  type: 'test'
+  ...
+# Subtest: terrain: partial source app fails instead of skipping
+ok 5 - terrain: partial source app fails instead of skipping
+  ---
+  duration_ms: 31.200042
+  type: 'test'
+  ...
+# Subtest: terrain: file source app fails instead of skipping
+ok 6 - terrain: file source app fails instead of skipping
+  ---
+  duration_ms: 33.168708
+  type: 'test'
+  ...
+# Subtest: terrain: dangling source app fails instead of skipping
+ok 7 - terrain: dangling source app fails instead of skipping
+  ---
+  duration_ms: 31.106209
+  type: 'test'
+  ...
+# Subtest: terrain: write mode cannot substitute pins for absent source
+ok 8 - terrain: write mode cannot substitute pins for absent source
+  ---
+  duration_ms: 26.889792
+  type: 'test'
+  ...
+# Subtest: terrain: present matching source executes comparator/generator
+ok 9 - terrain: present matching source executes comparator/generator
+  ---
+  duration_ms: 35.646375
+  type: 'test'
+  ...
+# Subtest: terrain: present differing source fails comparison
+ok 10 - terrain: present differing source fails comparison
+  ---
+  duration_ms: 33.851292
+  type: 'test'
+  ...
+# Subtest: terrain: malformed source errors propagate
+ok 11 - terrain: malformed source errors propagate
+  ---
+  duration_ms: 32.490042
+  type: 'test'
+  ...
+# Subtest: terrain: changed bundled tin.js fails even without source
+ok 12 - terrain: changed bundled tin.js fails even without source
+  ---
+  duration_ms: 25.787708
+  type: 'test'
+  ...
+# Subtest: terrain: missing bundled tin.js fails even without source
+ok 13 - terrain: missing bundled tin.js fails even without source
+  ---
+  duration_ms: 25.896417
+  type: 'test'
+  ...
+# Subtest: terrain: changed bundled raster.js fails even without source
+ok 14 - terrain: changed bundled raster.js fails even without source
+  ---
+  duration_ms: 25.4675
+  type: 'test'
+  ...
+# Subtest: terrain: missing bundled raster.js fails even without source
+ok 15 - terrain: missing bundled raster.js fails even without source
+  ---
+  duration_ms: 25.851791
+  type: 'test'
+  ...
+# Subtest: electrical: absent source verifies bundled assets and explicitly skips live parity
+ok 16 - electrical: absent source verifies bundled assets and explicitly skips live parity
+  ---
+  duration_ms: 23.995084
+  type: 'test'
+  ...
+# Subtest: electrical: partial source app fails instead of skipping
+ok 17 - electrical: partial source app fails instead of skipping
+  ---
+  duration_ms: 26.80875
+  type: 'test'
+  ...
+# Subtest: electrical: file source app fails instead of skipping
+ok 18 - electrical: file source app fails instead of skipping
+  ---
+  duration_ms: 26.801041
+  type: 'test'
+  ...
+# Subtest: electrical: dangling source app fails instead of skipping
+ok 19 - electrical: dangling source app fails instead of skipping
+  ---
+  duration_ms: 27.087167
+  type: 'test'
+  ...
+# Subtest: electrical: write mode cannot substitute pins for absent source
+ok 20 - electrical: write mode cannot substitute pins for absent source
+  ---
+  duration_ms: 26.873
+  type: 'test'
+  ...
+# Subtest: electrical: present matching source executes comparator/generator
+ok 21 - electrical: present matching source executes comparator/generator
+  ---
+  duration_ms: 29.239833
+  type: 'test'
+  ...
+# Subtest: electrical: present differing source fails comparison
+ok 22 - electrical: present differing source fails comparison
+  ---
+  duration_ms: 27.83975
+  type: 'test'
+  ...
+# Subtest: electrical: malformed source errors propagate
+ok 23 - electrical: malformed source errors propagate
+  ---
+  duration_ms: 30.145375
+  type: 'test'
+  ...
+# Subtest: electrical: changed bundled res-elec-symbols.js fails even without source
+ok 24 - electrical: changed bundled res-elec-symbols.js fails even without source
+  ---
+  duration_ms: 27.458375
+  type: 'test'
+  ...
+# Subtest: electrical: missing bundled res-elec-symbols.js fails even without source
+ok 25 - electrical: missing bundled res-elec-symbols.js fails even without source
+  ---
+  duration_ms: 26.891709
+  type: 'test'
+  ...
+# Subtest: terrain: invalid bundled mapping fails
+ok 26 - terrain: invalid bundled mapping fails
+  ---
+  duration_ms: 25.323125
+  type: 'test'
+  ...
+# Subtest: terrain: invalid bundled missing-key fails
+ok 27 - terrain: invalid bundled missing-key fails
+  ---
+  duration_ms: 28.458167
+  type: 'test'
+  ...
+# Subtest: terrain: invalid bundled object-string fails
+ok 28 - terrain: invalid bundled object-string fails
+  ---
+  duration_ms: 28.477
+  type: 'test'
+  ...
+# Subtest: terrain: invalid bundled invalid-json fails
+ok 29 - terrain: invalid bundled invalid-json fails
+  ---
+  duration_ms: 26.867458
+  type: 'test'
+  ...
+# Subtest: terrain: incomplete pin or translation empty-files cannot disable checks
+ok 30 - terrain: incomplete pin or translation empty-files cannot disable checks
+  ---
+  duration_ms: 28.277958
+  type: 'test'
+  ...
+# Subtest: terrain: incomplete pin or translation missing-imports cannot disable checks
+ok 31 - terrain: incomplete pin or translation missing-imports cannot disable checks
+  ---
+  duration_ms: 28.156959
+  type: 'test'
+  ...
+# Subtest: terrain: incomplete pin or translation empty-imports cannot disable checks
+ok 32 - terrain: incomplete pin or translation empty-imports cannot disable checks
+  ---
+  duration_ms: 27.585792
+  type: 'test'
+  ...
+# Subtest: terrain: incomplete pin or translation empty-keys cannot disable checks
+ok 33 - terrain: incomplete pin or translation empty-keys cannot disable checks
+  ---
+  duration_ms: 27.869209
+  type: 'test'
+  ...
+# Subtest: terrain: incomplete pin or translation missing-key-pin cannot disable checks
+ok 34 - terrain: incomplete pin or translation missing-key-pin cannot disable checks
+  ---
+  duration_ms: 27.638708
+  type: 'test'
+  ...
+# Subtest: terrain: incomplete pin or translation null-translation cannot disable checks
+ok 35 - terrain: incomplete pin or translation null-translation cannot disable checks
+  ---
+  duration_ms: 29.648416
+  type: 'test'
+  ...
+# Subtest: terrain: incomplete pin or translation empty-plural cannot disable checks
+ok 36 - terrain: incomplete pin or translation empty-plural cannot disable checks
+  ---
+  duration_ms: 28.736833
+  type: 'test'
+  ...
+# Subtest: pins: electrical-file-omitted is rejected
+ok 37 - pins: electrical-file-omitted is rejected
+  ---
+  duration_ms: 27.259
+  type: 'test'
+  ...
+# Subtest: pins: terrain-file-omitted is rejected
+ok 38 - pins: terrain-file-omitted is rejected
+  ---
+  duration_ms: 26.134084
+  type: 'test'
+  ...
+# Subtest: pins: bad-hash is rejected
+ok 39 - pins: bad-hash is rejected
+  ---
+  duration_ms: 25.543709
+  type: 'test'
+  ...
+# Subtest: pins: bad-provenance is rejected
+ok 40 - pins: bad-provenance is rejected
+  ---
+  duration_ms: 28.442291
+  type: 'test'
+  ...
+# Subtest: pins: duplicate-language-key is rejected
+ok 41 - pins: duplicate-language-key is rejected
+  ---
+  duration_ms: 26.108708
+  type: 'test'
+  ...
+# Subtest: terrain: present source with missing-key translation fails live check
+ok 42 - terrain: present source with missing-key translation fails live check
+  ---
+  duration_ms: 34.463667
+  type: 'test'
+  ...
+# Subtest: terrain: present source with invalid-plural translation fails live check
+ok 43 - terrain: present source with invalid-plural translation fails live check
+  ---
+  duration_ms: 37.054
+  type: 'test'
+  ...
+# Subtest: terrain: present source with invalid-catalog translation fails live check
+ok 44 - terrain: present source with invalid-catalog translation fails live check
+  ---
+  duration_ms: 33.082791
+  type: 'test'
+  ...
+1..44
+# tests 44
+# suites 0
+# pass 44
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1287.866959

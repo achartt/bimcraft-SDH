@@ -1,0 +1,65 @@
+{
+  "schema": 1,
+  "provenance": {
+    "repository": "https://github.com/achartt/bimcraft-SDH",
+    "revision": "72664187a1cc2694d1f8972fd2e1aa5b46106bc3",
+    "path": "app/",
+    "description": "Bundled BimCraft assets inherited from the approved prototype base; this pin does not certify current CivilCraft/CadCraft source parity."
+  },
+  "terrain": {
+    "files": {
+      "tin.js": "6815fab4f258bf8d4087914920e775e1b3d66e339c16cb6b1f851f7ed5786ad5",
+      "raster.js": "cab88fe6a6e3e9f6ac70e618a5e71896e958246eea2d074a2dd4ceb801edc3f9"
+    },
+    "imports": {
+      "delaunator": "/assets/vendor/delaunator/current/index.js",
+      "robust-predicates": "/assets/vendor/robust-predicates/current/index.js",
+      "geotiff": "/assets/vendor/geotiff/current/geotiff.esm.min.js"
+    },
+    "languageKeys": [
+      "raster.area_big",
+      "raster.asc.no_cell",
+      "raster.asc.no_corner",
+      "raster.asc.no_prj",
+      "raster.asc.not_asc",
+      "raster.asc.prj_big",
+      "raster.asc.short",
+      "raster.bad_cells",
+      "raster.bad_size",
+      "raster.bands_n",
+      "raster.big.billion",
+      "raster.big.million",
+      "raster.image_reduced",
+      "raster.no_georef",
+      "raster.no_grid",
+      "raster.no_overlap",
+      "raster.not_tiff",
+      "raster.read_failed",
+      "raster.tie_points",
+      "raster.too_big",
+      "raster.unknown_unit",
+      "raster.zero_cell",
+      "raster.zfrom.band",
+      "raster.zfrom.key",
+      "tin.badfaces",
+      "tin.bndy.cut",
+      "tin.constraint",
+      "tin.err.bndy",
+      "tin.err.bndyz",
+      "tin.err.inside",
+      "tin.err.line",
+      "tin.err.nofaces",
+      "tin.err.nopts",
+      "tin.err.noz",
+      "tin.err.three",
+      "tin.merged",
+      "tin.noz",
+      "tin.zconflict"
+    ]
+  },
+  "electrical": {
+    "files": {
+      "res-elec-symbols.js": "279540569ac483a5d83a6d47a0b54f52f5d5ef6c8ea20b89880c61faf5ce39a4"
+    }
+  }
+}
