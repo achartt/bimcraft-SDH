@@ -5362,7 +5362,7 @@
   "materials.newName": "New material",
   "materials.duplicate": "Duplicate",
   "materials.cancel": "Close without saving",
-  "materials.defaults": "Material defaults apply to new layers. Existing layer thicknesses stay unchanged; use “Use default” to apply a saved thickness. Colors and fills appear in the assembly preview.",
+  "materials.defaults": "Selecting a material applies its default thickness to that layer. You can then override it. Editing the library does not resize existing assemblies. Colors and fills appear in the assembly preview.",
   "materials.unsaved": "Save or close this draft before selecting another material.",
   "materials.cavity": "Air cavity",
   "materials.material": "Material",
@@ -5373,5 +5373,8 @@
   "materials.ventilated": "Ventilated",
   "materials.useDefault": "Use default",
   "materials.addCavity": "Add cavity",
-  "materials.missing": "Missing material:"
+  "materials.missing": "Missing material:",
+  "assembly.exteriorSide": "Exterior side",
+  "assembly.interiorSide": "Interior side",
+  "materials.createFromPicker": "+ New material…"
 }

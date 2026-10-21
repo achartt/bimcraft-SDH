@@ -3,18 +3,24 @@ import { el } from './ui-util.js';
 import { ModelWriter } from './model-write.js';
 import { readMaterials, saveMaterial, FILLS, materialBackground } from './project-materials.js';
 import { fmtLen, parseLen } from './model-units.js';
-export function openMaterialLibrary(A,onClose=()=>{}) {
+export function openMaterialLibrary(A,onClose=()=>{}, {createNew=false}={}) {
   const editor=A.ed(); if(!editor) return;
   const writer=()=>new ModelWriter(editor.W,editor.api,editor.mid);
   const t=k=>A.t('materials.'+k);
   const button=(text,fn,props={})=>el('button',{type:'button',className:'btn-line btn-sm-cc',onClick:fn,...props},text);
   const error=el('p',{className:'bc-error',role:'alert'}), fields=el('div'), picker=el('select',{className:'bc-input','aria-label':t('select')});
   const dlg=el('dialog',{className:'bc-dialog bc-fam-dlg','aria-label':t('title'),'data-material-library':''});
-  let selected, draft, controls, dirty=false;
+  let selected, draft, controls, dirty=false, saved=null;
   function load(id) {
     const list=readMaterials(writer());selected=id || list[0]?.id;
     picker.replaceChildren(...list.map(m=>el('option',{value:m.id,selected:m.id===selected},m.name)));
     draft=structuredClone(list.find(m=>m.id===selected));dirty=false;draw();
+  }
+  function newMaterial() {
+    if(dirty) {error.textContent=t('unsaved');return;}
+    selected=null;picker.selectedIndex=-1;
+    draft={id:'material-'+crypto.randomUUID(),name:t('newName'),category:'',defaultThickness:12.7,color:'#d8d3c4',fill:'solid',fillColor:'#555555',notes:''};
+    draw();dirty=true;
   }
   function draw() {
     controls={};fields.replaceChildren();error.textContent='';
@@ -38,13 +44,13 @@ export function openMaterialLibrary(A,onClose=()=>{}) {
       if(A.ed()!==editor) throw new Error(A.t('assembly.changed'));
       const input={...draft,...Object.fromEntries(Object.entries(controls).map(([k,c])=>[k,k==='defaultThickness'?(c.value===fmtLen(draft[k],A.units())?draft[k]:parseLen(c.value,A.units())):c.value]))};
       save.disabled=true;
-      A.commit(ed=>{if(ed!==editor) throw new Error(A.t('assembly.changed'));const w=writer();const result=w.run(w=>{saveMaterial(w,input);return [];});dlg.close();return result;},{label:input.name,verb:A.t('model.verb.changed'),onError:e=>{save.disabled=false;error.textContent=e.message;}});
+      A.commit(ed=>{if(ed!==editor) throw new Error(A.t('assembly.changed'));const w=writer();let material;const result=w.run(w=>{material=saveMaterial(w,input);return [];});saved=material;dlg.close();return result;},{label:input.name,verb:A.t('model.verb.changed'),onError:e=>{save.disabled=false;error.textContent=e.message;}});
     }catch(e){save.disabled=false;error.textContent=e.message;}
   },{'data-material-save':''});
   dlg.append(el('h2',{className:'bc-h'},t('title')),el('p',{className:'bc-muted'},t('defaults')),picker,
-    el('p',{},button(t('new'),()=>{if(dirty){error.textContent=t('unsaved');return;}selected=null;picker.selectedIndex=-1;draft={id:'material-'+crypto.randomUUID(),name:t('newName'),category:'',defaultThickness:12.7,color:'#d8d3c4',fill:'solid',fillColor:'#555555',notes:''};draw();dirty=true;}),button(t('duplicate'),()=>{if(dirty){error.textContent=t('unsaved');return;}draft={...draft,id:'material-'+crypto.randomUUID(),name:draft.name+' copy'};selected=null;picker.selectedIndex=-1;draw();dirty=true;})),fields,error,
+    el('p',{},button(t('new'),newMaterial),button(t('duplicate'),()=>{if(dirty){error.textContent=t('unsaved');return;}draft={...draft,id:'material-'+crypto.randomUUID(),name:draft.name+' copy'};selected=null;picker.selectedIndex=-1;draw();dirty=true;})),fields,error,
     el('p',{className:'bc-lib-actions'},button(t('cancel'),()=>dlg.close()),save));
-  dlg.addEventListener('keydown',e=>e.stopPropagation());dlg.addEventListener('close',()=>{dlg.remove();onClose();});
-  try {load();} catch(e) {error.textContent=e.message;save.disabled=true;picker.disabled=true;fields.replaceChildren();for(const b of dlg.querySelectorAll('button')) if(b.textContent!==t('cancel')) b.disabled=true;}
+  dlg.addEventListener('keydown',e=>e.stopPropagation());dlg.addEventListener('close',()=>{dlg.remove();onClose(saved);});
+  try {load();if(createNew) newMaterial();} catch(e) {error.textContent=e.message;save.disabled=true;picker.disabled=true;fields.replaceChildren();for(const b of dlg.querySelectorAll('button')) if(b.textContent!==t('cancel')) b.disabled=true;}
   A.root.append(dlg);dlg.showModal();
 }
