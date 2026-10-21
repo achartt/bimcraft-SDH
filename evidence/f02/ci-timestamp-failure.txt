@@ -1,0 +1,36 @@
+  ...
+# Subtest: nonfinite wall edits fail without changing any geometry or history
+not ok 16 - nonfinite wall edits fail without changing any geometry or history
+  ---
+  duration_ms: 32.998898
+  type: 'test'
+  location: '/home/runner/work/bimcraft-SDH/bimcraft-SDH/tests/features/f02/contract.test.mjs:120:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly deep-equal:
+    + actual - expected
+    ... Skipped lines
+    
+      Uint8Array(45852) [
+        73,
+        83,
+        79,
+        45,
+    ...
+        51,
+    +   51,
+    -   50,
+        39,
+        44,
+        40,
+        39,
+        39,
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+
+Source: https://github.com/achartt/bimcraft-SDH/actions/runs/39674569339
+Head: 0dd89570256b8aec7f487bf006cfb55fafaf310b
+Only changed byte: ASCII 50 ('2') -> 51 ('3') in FILE_NAME seconds.
+The installed-reader repeat passed 16/16 before the fix, confirming timing dependence.
+Fix: explicit serializer timeStamp for atomicity snapshots; actual persistence saves unchanged.
