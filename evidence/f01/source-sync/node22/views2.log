@@ -1,0 +1,111 @@
+== DC.117 (a) crop region, scale and underlay per plan
+  ok   scale 1/4" and Level 1 as the underlay: one undo step
+  ok   the crop region kept in order (x0 y0 x1 y1), whichever corners came first
+  ok   the rest of the view range keeps its defaults
+  ok   written on the level's CadCraft_PlanView: Scale (IfcInteger), CropX0…CropY1 (lengths), Underlay (the level's GlobalId)
+  ok   a crop 50 mm wide: refused
+  ok   an underlay of the level itself, or of no level: refused
+  ok   a negative scale: refused
+  ok   after the refusals nothing changed (no undo step either)
+  ok   crop and underlay cleared; the scale stays
+  ok   undo: crop and underlay back
+  ok   cropOf: all 0 = none, under 100 mm or not four numbers = none, corners ordered
+  ok   a template's scale (1/8") wins; the crop and the underlay stay the view's own
+  ok   the template deleted: the view keeps its scale as its own
+  ok   a level with no settings: no scale (fit), no crop
+  ok   saved and reopened: scale, crop and underlay as they were
+  ok   underlaySegments: the walls' outline (4 edges), a cut element, a door leaf and its swing (12 chords); nothing below the cut
+  ok   each point moved into this level's plan (+1000, +2000)
+  ok   the swing ends where the arc does (90°, r 900)
+  ok   placed with "scale 0": the plan's own scale (1/4")
+  ok   its size on the sheet = the crop at that scale (not the 12 m wall square)
+  ok   the plan's items sit between a clip to the crop rectangle and its end
+  ok   the underlay drawn light grey (0.72) inside the clip
+  ok   a scale chosen on the sheet still wins over the view's
+  ok   the sheet's PDF clips with a rectangle path (re W n … Q)
+  ok   the preview SVG clips the same way (a clipPath, groups closed)
+  ok   the drawing set's plan sheet is cropped too
+  ok   Print: at the view's scale, clipped to the crop
+  ok   with no scale, a cropped plan fits at a larger scale than the whole level (3/4" = 1'-0" vs 1/8" = 1'-0")
+== DC.117 (b) reflected ceiling plans
+  ok   a ceiling plan's range: one undo step, cut 2200, 1:50, its own crop
+  ok   the floor plan of that level keeps its own (cut 1500, no crop)
+  ok   kept on the level as CadCraft_CeilingPlan, apart from CadCraft_PlanView
+  ok   a ceiling plan takes no view template
+  ok   a ceiling cut above the level's height (3000): refused
+  ok   no settings: a ceiling plan looks up from 2300 to the level's height
+  ok   with its own: cut 2200, top = the level's height, 1:50
+  ok   sheets take ceiling plans
+  ok   looking up from 2300: the wall is cut, nothing below the cut is drawn (the table left out)
+  ok   the ceiling and the light above the cut are drawn; what starts above the level is not
+  ok   a room and its ceiling (no pattern yet)
+  ok   pattern 2' × 4': one undo step; the height stays
+  ok   a pattern that is not on the list: refused
+  ok   the list: none, 600 × 600, 600 × 1200, 2' × 2', 2' × 4' (1219.2 mm)
+  ok   a 3 × 2.4 m ceiling, 600 grid: a tile centred (x lines 600…2400, y lines 300…2100)
+  ok   every line stays inside the outline
+  ok   an L-shaped ceiling: a line in the short leg stops at the notch (x 3500: y 0…2000)
+  ok   a hole (an opening in the ceiling): the line through it is cut in two
+  ok   no pattern, or no outline: no lines
+  ok   placed with z: its placement sits 1524.0 above the level (top at the ceiling, 2438.4)
+  ok   without z: on the floor, as before
+  ok   composeSheet: a ceiling plan placed like a plan, at its scale, with its title and the height tag
+  ok   a ceiling plan whose level is gone: missing, nothing drawn
+  ok   saved and reopened: the ceiling plan's range and the ceiling's pattern
+== DC.117 (c) callout views
+  ok   a callout of Level 1's floor plan: one undo step, id callout-1
+  ok   its rectangle kept in order, 1:20, its parent the floor plan
+  ok   kept on the project as CadCraft_CalloutViews: one IfcText per callout (JSON)
+  ok   a callout of a callout: drawn from Level 1's floor plan (chain callout-1 → callout-2)
+  ok   a callout of Level 2's ceiling plan: drawn as that ceiling plan
+  ok   calloutsInside: callout-1 holds callout-2
+  ok   a parent level that is not there: refused
+  ok   a callout inside itself (or inside its own callout): refused
+  ok   a rectangle 50 mm wide, a blank name: refused
+  ok   after the refusals nothing changed
+  ok   renamed and 1:25: its rectangle and parent stay
+  ok   Level 2 gone: its ceiling-plan callout has no root (missing); Level 1's still do
+  ok   a loop (a file edited by hand): missing, not an endless walk
+  ok   sheets take callouts
+  ok   composeSheet: the callout at its 1:25, as big as its rectangle, clipped to it, titled
+  ok   the callout not offered (parent gone) is listed as missing on the sheet
+  ok   a sheet saved with a callout on it reads back as kind callout
+  ok   delete callout-1: callout-2 inside it and its drafting go too, one undo step
+  ok   the floor plan's own drafting stays
+  ok   undo: both callouts and the drafting back
+  ok   saved and reopened: the three callouts, the nested one still inside callout-1
+== DC.117 (d) drafting lines and hatch regions
+  ok   a drafting polyline: one undo step
+  ok   read back: its points, open, in Level 1, drawn in Level 1's floor plan
+  ok   a rectangle: closed, four corners (the closing point not repeated)
+  ok   a hatch region: cross-hatch at scale 2, its outline and its hole read back
+  ok   a solid fill in Level 2's ceiling plan, contained in Level 2
+  ok   five IfcAnnotations, ObjectType "Drafting"
+  ok   lines as an IfcGeometricCurveSet, hatches as IfcAnnotationFillArea (Annotation2D)
+  ok   the cross-hatch style is shared by both regions using it: one IfcFillAreaStyle, two IfcFillAreaStyleHatching (45° and 135°)
+  ok   Solid: a fill area style with one colour
+  ok   CadCraft_Drafting: View, Kind, Pattern, PatternScale
+  ok   a line 5 mm long, a hatch of two corners or no area: refused
+  ok   a pattern not on the list, a view that is not a plan / ceiling plan / callout: refused
+  ok   nothing changed after the refusals
+  ok   Properties › Pattern earth, scale 1.5: one step; its hole kept
+  ok   moved 500, −250 (both picked, one step): the outline, its hole and the polyline
+  ok   undo: back where they were
+  ok   deleted
+  ok   undo: the rectangle back
+  ok   Diagonal in a 3 m square: about 28 lines 150 mm apart at 45°, all inside (29)
+  ok   Cross-hatch with a hole: no stroke crosses the hole
+  ok   scale 2: half as many lines
+  ok   the six patterns: solid (a fill, no strokes) and five that draw strokes solid 0, diagonal 29, cross 57, concrete 108, insulation 750, earth 27
+  ok   a 100 m square at scale 0.1: made coarser rather than millions of strokes (18857)
+  ok   clipSegment: a line across the square and its hole → 0–1000 and 2000–3000
+  ok   draftingItem: a hatch's rings and strokes; solid: a fill, no strokes
+  ok   on a sheet: the solid fill (grey 0.6), every hatch stroke, the outlines
+  ok   a view with only drafting in it is framed on the drafting
+  ok   Print: the plan's PDF draws the drafting (the solid fill, the strokes)
+  ok   saved and reopened: the five items, the hatch still earth
+  ok   IFC2X3: drafting written and read back; the style through an IfcPresentationStyleAssignment
+  ok   IFC4 in feet: the 10' square and line read back in mm; the hatch gap written in feet (150 mm = 0.492')
+  --   no venv with ifcopenshell: schema validation skipped
+
+104 passed, 0 failed
