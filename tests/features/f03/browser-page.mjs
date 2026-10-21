@@ -14,7 +14,7 @@ export async function install(){
  IfcModel.prototype.load=async function(...args){const start=performance.now();loadStart=start;try{return await original.apply(this,args);}finally{spans.push({name:'load-total',start,ms:performance.now()-start});loadStart=null;}};
  const adopt=core.W.IfcAPI.prototype.AdoptModel;
  core.W.IfcAPI.prototype.AdoptModel=function(...a){if(loadStart!==null)spans.push({name:'parse-worker-to-adopt',start:loadStart,ms:performance.now()-loadStart});return adopt.apply(this,a);};
- wrap(core.W.IfcAPI.prototype,'StreamAllMeshes','mesh-and-batch');wrap(core.W.IfcAPI.prototype,'SaveModel','ifc-serialize');wrap(core.IfcEditor.prototype,'modelChange','model-edit-and-dependencies');wrap(PlanView.prototype,'render','plan-canvas-render');
+ wrap(core.W.IfcAPI.prototype,'StreamAllMeshes','mesh-and-batch');wrap(core.W.IfcAPI.prototype,'SaveModel','ifc-serialize');wrap(core.IfcEditor.prototype,'modelChange','model-edit-and-dependencies');wrap(PlanView.prototype,'render','plan-render-request');wrap(PlanView.prototype,'draw','plan-canvas-draw');
  const frame=()=>new Promise(resolve=>requestAnimationFrame(resolve));
  const paint=async()=>{await frame();await frame();};
  const idle=async()=>{const deadline=performance.now()+120000;while(window.bimcraftPlan?.state.busy||window.bimcraftPlan?.state.reloading){if(performance.now()>deadline)throw new Error('Rebuild timeout');await frame();}await paint();};

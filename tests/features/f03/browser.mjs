@@ -6,15 +6,25 @@ const count=Number(arg('--reps','30')),warmups=Number(arg('--warmups','5')),dir=
 if(!Number.isInteger(count)||count<1||!Number.isInteger(warmups)||warmups<0)throw new Error('Invalid sample counts');
 // Resolve an explicitly supplied existing installation, or the project's test dependency.
 const pw=process.env.F03_PLAYWRIGHT?await import(pathToFileURL(path.resolve(process.env.F03_PLAYWRIGHT,'index.mjs')).href):await import('playwright');
+// The packed dev shell omits its Bootstrap icon font. Serve the official pinned
+// test dependency in this harness only; never edit the application or swallow errors.
+const iconPackage=path.resolve(process.env.F03_ICON_PACKAGE||'.cc-test/f03-browser/node_modules/bootstrap-icons');
+const iconVersion=JSON.parse(fs.readFileSync(path.join(iconPackage,'package.json'))).version;
+if(iconVersion!==JSON.parse(fs.readFileSync('devshell/edition/kit.json')).shell['bootstrap-icons'].version)throw new Error('Icon font version differs from packed shell');
 fs.mkdirSync(dir,{recursive:true});
 const browser=await pw.chromium.launch({headless:!args.includes('--headed'),...(process.env.F03_CHROMIUM?{executablePath:process.env.F03_CHROMIUM}:{})});
-const samples=[],errors=[],env={...environment(),browser:browser.version(),viewport:{width:1440,height:1000},deviceScaleFactor:1,headless:!args.includes('--headed'),renderer:'See gpu.json; no GPU equivalence inferred'};
+const samples=[],errors=[],env={...environment(),browser:browser.version(),viewport:{width:1440,height:1000},deviceScaleFactor:1,headless:!args.includes('--headed'),renderer:'See gpu.json; no GPU equivalence inferred',iconFont:{version:iconVersion,source:'Official npm bootstrap-icons package; harness-only route for omitted devshell asset'}};
 let active;
 async function context(){const ctx=await browser.newContext({viewport:env.viewport,deviceScaleFactor:1,acceptDownloads:true});const page=await ctx.newPage();active=ctx;
  page.on('pageerror',e=>errors.push(String(e)));page.on('console',m=>{if(m.type()==='error')errors.push(m.text());});
  await page.route('**/__f03/core.mjs',r=>r.fulfill({contentType:'text/javascript',body:fs.readFileSync('tests/features/f03/core.mjs','utf8').replaceAll('../../../app/','/assets/apps/bimcraft/dev/')}));
+ await page.route('**/assets/vendor/bootstrap-icons/current/**',route=>{
+  const relative=new URL(route.request().url()).pathname.split('/current/')[1];
+  if(!['bootstrap-icons.min.css','fonts/bootstrap-icons.woff2','fonts/bootstrap-icons.woff'].includes(relative))throw new Error('Unexpected icon asset '+relative);
+  return route.fulfill({path:path.join(iconPackage,'font',relative),contentType:relative.endsWith('.css')?'text/css':relative.endsWith('.woff2')?'font/woff2':'font/woff'});
+ });
  const cdp=await ctx.newCDPSession(page);await cdp.send('Network.enable');await cdp.send('Network.setCacheDisabled',{cacheDisabled:true});await cdp.send('Performance.enable');
- await page.goto(url,{waitUntil:'networkidle'});await page.waitForFunction(()=>!!window.bimcraftLive&&!!window.bimcraftVis);
+ await page.goto(url,{waitUntil:'networkidle'});await page.waitForFunction(()=>!!window.bimcraftLive&&!!window.bimcraftVis);await page.evaluate(()=>document.fonts.ready);
  const install=fs.readFileSync('tests/features/f03/browser-page.mjs','utf8').replace('export async function install','async function install');await page.evaluate(install+'\ninstall()');
  return {ctx,page,cdp};}
 const heap=async cdp=>(await cdp.send('Runtime.getHeapUsage')).usedSize;
@@ -33,13 +43,16 @@ try{
   const {ctx,page,cdp}=await context();
   for(let i=-warmups;i<count;i++){const before=await heap(cdp),r=await page.evaluate(({bytes,size})=>f03.open(bytes,size+'.ifc'),{bytes,size}),after=await heap(cdp);await page.evaluate(n=>f03.validate(n),n);add(size,'warm-open',i,r,before,after);}
   await page.locator('[data-model-toggle]').click();await page.evaluate(()=>f03.idle());
-  for(let i=-warmups;i<count;i++){await page.evaluate(()=>bimcraftVis.pick([]));const p=await page.evaluate(()=>f03.wallPoint());const before=await heap(cdp);await page.evaluate(()=>f03.arm('pointerup','[data-plan-canvas]','props'));await page.mouse.click(p.x,p.y);const r=await page.evaluate(()=>f03.take()),after=await heap(cdp);await page.waitForSelector('[data-mp-height]');add(size,'selection-properties-feedback',i,r,before,after,100);}
+  for(let i=-warmups;i<count;i++){await page.evaluate(()=>bimcraftVis.pick([]));const p=await page.evaluate(()=>f03.wallPoint());const before=await heap(cdp);await page.evaluate(()=>f03.arm('pointerup','[data-plan-canvas]','props'));await page.mouse.click(p.x,p.y);const r=await page.evaluate(()=>f03.take()),after=await heap(cdp);await page.waitForSelector('[data-mp-height]');if(!await page.evaluate(key=>bimcraftPlan.view.selection.has(key),p.key))throw new Error('Clicked wall not selected');add(size,'selection-properties-feedback',i,r,before,after,100);}
   for(const kind of ['pan','zoom'])for(let i=-warmups;i<count;i++){
+   // Fit outside the timer so repeated pans do not move the fixture offscreen.
+   await page.evaluate(async()=>{bimcraftPlan.view.fit();await f03.paint();});
+   const viewBefore=await page.evaluate(()=>({cx:bimcraftPlan.view.cx,cy:bimcraftPlan.view.cy,scale:bimcraftPlan.view.scale}));
    // A short trusted-input gesture per sample; collect every rAF interval during the gesture.
    const before=await heap(cdp);await page.evaluate(()=>{f03.frames=[];f03.running=true;let last=performance.now();function tick(t){if(!f03.running)return;f03.frames.push(t-last);last=t;requestAnimationFrame(tick);}requestAnimationFrame(tick);});
    const box=await page.locator('[data-plan-canvas]').boundingBox(),x=box.x+box.width*.6,y=box.y+box.height*.6;await page.mouse.move(x,y);
-   if(kind==='pan'){await page.mouse.down({button:'middle'});await page.mouse.move(x+40,y+20,{steps:12});await page.mouse.up({button:'middle'});}else for(let j=0;j<12;j++){await page.mouse.wheel(0,j%2?30:-30);await page.evaluate(()=>new Promise(requestAnimationFrame));}
-   await page.evaluate(()=>f03.paint());const frames=await page.evaluate(()=>{f03.running=false;return f03.frames.slice(1);}),after=await heap(cdp);if(!frames.length)throw new Error('No animation frames');
+   if(kind==='pan'){await page.mouse.down({button:'middle'});await page.mouse.move(x+40,y+20,{steps:12});await page.mouse.up({button:'middle'});}else for(let j=0;j<12;j++){await page.mouse.wheel(0,j%2?30:-30);await page.evaluate(()=>new Promise(requestAnimationFrame));if(j===0&&await page.evaluate(()=>bimcraftPlan.view.scale)===viewBefore.scale)throw new Error('Zoom did not change view');}
+   await page.evaluate(()=>f03.paint());const frames=await page.evaluate(()=>{f03.running=false;return f03.frames.slice(1);}),after=await heap(cdp);if(!frames.length)throw new Error('No animation frames');if(kind==='pan'&&await page.evaluate(({cx,cy})=>bimcraftPlan.view.cx===cx&&bimcraftPlan.view.cy===cy,viewBefore))throw new Error('Pan did not change view');
    // One observation = maximum frame interval in a gesture. Raw per-frame values retained.
    add(size,kind+'-gesture-max-frame',i,{ms:Math.max(...frames)},before,after,33);if(i>=0)samples.at(-1).frames=frames;
   }
@@ -55,5 +68,5 @@ try{
   await ctx.close();console.log('Measured browser '+size);
   fs.writeFileSync(path.join(dir,'browser-raw.json'),JSON.stringify({schema:1,environment:env,config:{count,warmups,cold:'fresh context/page, HTTP cache disabled; app imports loaded before open; browser process and OS caches shared',warm:'same initialized page and IFC worker; new file open each sample',feedback:'trusted event capture through completed rebuild/Properties and double rAF paint opportunity; not hardware presentation',frames:'max rAF interval per 12-step gesture; per-frame samples retained; no GC forcing'},fixtures:JSON.parse(fs.readFileSync('.cc-test/f03/fixtures/manifest.json')),samples,errors},null,2)+'\n');
  }
- if(errors.length)throw new Error('Browser errors: '+errors.join('\n'));report(dir);
+ report(dir);if(errors.length)throw new Error('Browser errors: '+[...new Set(errors)].join('\n'));
 }finally{await active?.close().catch(()=>{});await browser.close();}

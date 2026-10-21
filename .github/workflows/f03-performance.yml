@@ -26,7 +26,7 @@ jobs:
         run: npm run test:f03
       - name: Install pinned test browser
         run: |
-          npm install --prefix .cc-test/f03-browser --no-save playwright@1.62.1
+          npm install --prefix .cc-test/f03-browser --no-save playwright@1.62.1 bootstrap-icons@1.13.2
           node .cc-test/f03-browser/node_modules/playwright/cli.js install --with-deps chromium
       - name: Measure browser (no wall-clock gates)
         env:
@@ -39,6 +39,7 @@ jobs:
           for attempt in $(seq 1 30); do curl --fail --silent http://127.0.0.1:8018/ > /dev/null && break; sleep 1; done
           node tests/features/f03/browser.mjs --out .cc-test/f03-ci
           node tests/features/f03/profile-report.mjs .cc-test/f03-ci
+          node tests/features/f03/phase-report.mjs .cc-test/f03-ci
       - name: Retain raw evidence even on failure
         if: always()
         uses: actions/upload-artifact@v4
