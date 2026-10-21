@@ -13,7 +13,8 @@
  * Every op ends by bringing the walls it may have changed up to date (model-walls.js regenWalls): joins, heights that
  * follow a level, quantities.
  */
-import { writeAssembly, validateAssembly } from './wall-assemblies.js';
+import { writeAssembly, validateAssembly, assertAssembliesEditable } from './wall-assemblies.js';
+import { readMaterials } from './project-materials.js';
 import { syncWallDimensions } from './wall-dimensions.js';
 import { ModelWriter } from './model-write.js';
 import { readLevels, addLevel, setLevel } from './model-levels.js';
@@ -28,7 +29,7 @@ import { syncResidential } from './res-follow.js';   // 0.5 part 4 track RC: wal
 export function op(fn) {
   return (ed) => {
     const w = new ModelWriter(ed.W, ed.api, ed.mid);
-    return w.run(writer => { const result = fn(writer); syncWallDimensions(writer); return result; });
+    return w.run(writer => { assertAssembliesEditable(writer); readMaterials(writer); const result = fn(writer); syncWallDimensions(writer); return result; });
   };
 }
 const storeyId = (w, guid) => {

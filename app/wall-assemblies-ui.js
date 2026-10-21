@@ -3,7 +3,7 @@ import { assemblyDimensionLayout, drawAssemblyDimensions } from './assembly-prev
 import { el } from './ui-util.js';
 import { ModelWriter } from './model-write.js';
 import { wallType, typeName, typeThickness } from './model-walls.js';
-import { validateAssembly, LAYER_FUNCTIONS } from './wall-assemblies.js';
+import { validateAssembly, LAYER_FUNCTIONS, assertAssembliesEditable } from './wall-assemblies.js';
 import { saveWallAssembly } from './model-ops.js';
 import { readMaterials, normalizeLayer, VENTILATION, materialBackground } from './project-materials.js';
 import { openMaterialLibrary } from './project-materials-ui.js';
@@ -14,7 +14,14 @@ export function mountWallAssemblies(modelUi) {
   const t=k=>A.t('assembly.'+k), L=n=>fmtLen(n,A.units());
   const button=(text,fn,props={})=>el('button',{type:'button',className:'btn-line btn-sm-cc',onClick:fn,...props},text);
   function openAssembly(key=A.S.wall.typeKey,assign=[]) {
-    const editor=A.ed(), source=wallType(key,W()); if(!editor || !source) return;
+    let source;
+    const editor=A.ed(); if(!editor) return;
+    try { assertAssembliesEditable(W()); readMaterials(W()); source=wallType(key,W()); }
+    catch(e) {
+      const dlg=el('dialog',{className:'bc-dialog','aria-label':t('title')},el('h2',{},t('title')),el('p',{role:'alert'},e.message),button(t('cancel'),()=>dlg.close()));
+      dlg.addEventListener('close',()=>dlg.remove());A.root.append(dlg);dlg.showModal();return;
+    }
+    if(!source) return;
     const recipe=structuredClone(source), editing=!!recipe.custom;
     let duplicate=!editing, materials=readMaterials(W(),recipe.layers);
     recipe.layers=recipe.layers.map(normalizeLayer);

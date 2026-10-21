@@ -48,6 +48,7 @@ export function mountWallDimensions(modelUi) {
     const ds=selected.map(s=>items.find(d=>d.guid===s.guid)).filter(Boolean);if(!ds.length)return null;
     if(ds.length===1){const d=ds[0],r=resolveDimension(d,walls());
       k.field(t('value'),el('span',{},r.status==='ok'?L(r.value):t('status.'+r.status)));
+      if(d.issue || ['unsupported','corrupt'].includes(r.status)){k.field('',el('p',{role:'alert'},A.t('contract.recovery')));return {title:t('title')};}
       for(let i=0;i<2;i++)k.field(t(i?'second':'first'),el('span',{},label(d.refs[i].reference)+' · '+(walls().find(w=>w.guid===d.refs[i].wall)?.typeName || t('missingwall'))));
       k.field(t('offset'),k.lenInput(d.offset,'data-mp-dimoffset',mm=>A.commit(saveWallDimension({...d,offset:mm,level:level().guid}),k.one(t('title'))),{any:true}));
       k.field('',k.button(t('rebind'),'data-mp-dimrebind',()=>startEdit(d)));
@@ -92,9 +93,11 @@ export function mountWallDimensions(modelUi) {
   modelUi.extend({}); // Bind the newly inserted tool button through the normal tool dispatcher.
   function showList(){
     const dlg=el('dialog',{className:'bc-dialog','aria-label':t('list')},el('h2',{},t('list')));
-    const list=items.filter(d=>d.view===view());
+    const list=items.filter(d=>d.issue || d.view===view());
     if(!list.length)dlg.append(el('p',{},t('empty')));
-    for(const d of list){const r=resolveDimension(d,walls());dlg.append(el('p',{},el('span',{},label(d.refs[0].reference)+' → '+label(d.refs[1].reference)+' · '+(r.status==='ok'?L(r.value):t('status.'+r.status))+' '),
+    for(const d of list){const r=resolveDimension(d,walls());
+      if(d.issue || ['unsupported','corrupt'].includes(r.status)){dlg.append(el('p',{role:'alert'},d.guid+' · '+t('status.'+r.status)+' '+A.t('contract.recovery')));continue;}
+      dlg.append(el('p',{},el('span',{},label(d.refs[0].reference)+' → '+label(d.refs[1].reference)+' · '+(r.status==='ok'?L(r.value):t('status.'+r.status))+' '),
       el('button',{type:'button',className:'btn-line btn-sm-cc',onClick:()=>{dlg.close();A.setTool('select');A.host.select([A.kb()+d.id]);}},t('properties')),
       el('button',{type:'button',className:'btn-line btn-sm-cc',onClick:()=>{dlg.close();startEdit(d);}},t('rebind')),
       el('button',{type:'button',className:'btn-line btn-sm-cc',onClick:()=>{A.commit(removeWallDimensions([d.guid]),{label:t('title'),verb:A.t('model.verb.changed')});dlg.close();}},t('delete'))));}

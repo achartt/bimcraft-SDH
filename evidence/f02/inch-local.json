@@ -1,0 +1,7 @@
+{
+  "case": "inch-local",
+  "cycles": 10,
+  "maxGeometryMm": 0.00014901232084111817,
+  "maxDimensionMm": 0.00003175148958689533,
+  "maxCoreAnchorMm": 0.00014901232084111817
+}
