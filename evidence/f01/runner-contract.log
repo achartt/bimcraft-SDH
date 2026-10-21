@@ -1,0 +1,20 @@
+▶ intentional-failure: node -e console.log('0 passed, 1 failed');process.exit(1)
+FAIL intentional-failure: 0 passed, 1 failed; 0 skip/availability notices; Expected at least 1 executed passes
+▶ after-failure: node -e console.log('1 passed, 0 failed')
+PASS after-failure: 1 passed, 0 failed; 0 skip/availability notices
+Evidence: /var/folders/20/2b_pk2zx5r9_l0bvjqpszq7m0000gn/T/f01-runner-pJHqVA/summary.json (optional skips are not passes)
+✔ baseline explicitly discovers the 15 prototype tests and all named modes (0.535791ms)
+✔ zero discovery, failed checks, and a nonzero exit cannot be green (0.380292ms)
+✔ optional skips remain separate from executed passes (0.080667ms)
+✔ isolated deliberate failing process propagates exit 1 and later checks still run (162.082875ms)
+✔ RC.8 absent dependency: only absence skips (243.489875ms)
+✔ RC.8 partial dependency: only absence skips (140.451167ms)
+✔ RC.8 broken dependency: only absence skips (140.110334ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 780.121875

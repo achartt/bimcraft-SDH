@@ -943,12 +943,17 @@ export async function resMode({ APP, ROOT, WebIFC, IfcModel, quiet, require, arg
     const MR = await import(path.join(APP, 'model-rooms.js'));
     const { ModelWriter } = await import(path.join(APP, 'model-write.js'));
     const TC = path.join(ROOT, 'public_html/assets/apps/takeoffcraft/dev');
-    const TM = await import(path.join(TC, 'model.js'));
-    const EMB = await import(path.join(TC, 'embed.js'));
+    // Only an absent application directory is optional. A partial/broken installation must fail.
+    const hasTakeoff = fs.existsSync(TC);
+    const TM = hasTakeoff ? await import(path.join(TC, 'model.js')) : null;
+    const EMB = hasTakeoff ? await import(path.join(TC, 'embed.js')) : null;
+    if (!hasTakeoff) console.log('  SKIP RC.8 cross-app reader, quantities, estimate and pack sync: TakeoffCraft directory absent at ' + TC);
     console.log('== RC.8 the trade packs (TakeoffCraft\'s) and the hand-off file');
     const { execFileSync } = await import('node:child_process');
-    let syncOk = true; try { execFileSync(process.execPath, [path.join(ROOT, 'tools/bimcraft-test/takeoff-sync.mjs'), '--check'], { encoding: 'utf8' }); } catch (e) { syncOk = false; }
-    ok(syncOk, 'res-takeoff-packs.js is what TakeoffCraft\'s trade packs give (takeoff-sync.mjs --check)');
+    if (hasTakeoff) {
+      let syncOk = true; try { execFileSync(process.execPath, [path.join(ROOT, 'tools/bimcraft-test/takeoff-sync.mjs'), '--check'], { encoding: 'utf8' }); } catch (e) { syncOk = false; }
+      ok(syncOk, 'res-takeoff-packs.js is what TakeoffCraft\'s trade packs give (takeoff-sync.mjs --check)');
+    }
     // a house: 8 × 6 m of 2×6, an inside 2×4 wall with a door, a window, a hip roof, a stem-wall foundation, devices, framing
     const B = [[0, 0], [8000, 0], [8000, 6000], [0, 6000]];
     const { ed, levels } = await building({ loops: [B] });
@@ -990,43 +995,46 @@ export async function resMode({ APP, ROOT, WebIFC, IfcModel, quiet, require, arg
     const txt = new TextDecoder('latin1').decode(res.pdf);
     ok(res.pdf && /\/EmbeddedFiles << \/Names \[\(takeoff\.takeoffcraft\.json\) \d+ 0 R\]/.test(txt) && /\/Type \/EmbeddedFile \/Subtype \/application#2Fjson/.test(txt), 'one PDF: the plans and the cut list, the takeoff attached inside (' + res.sheets.length + ' sheets)');
     // TakeoffCraft's own reader: pdf.js finds the attachment, embed.js reads it, model.js loads the takeoff
-    let emb = null, pages = 0;
-    try {
-      const pdfjs = await import(path.join(ROOT, 'tools/takeoffcraft-test/node_modules/pdfjs-dist/legacy/build/pdf.mjs'));
-      const doc = await pdfjs.getDocument({ data: res.pdf.slice(), isEvalSupported: false, verbosity: 0 }).promise;
-      pages = doc.numPages;
-      emb = await EMB.readEmbedded(doc);
-      await (doc.destroy?.() ?? doc.cleanup?.());
-    } catch (e) { console.log('  --   pdf.js for Node not installed (tools/takeoffcraft-test): ' + e.message.split('\n')[0]); }
-    if (emb) ok(emb.standsFor === res.standsFor && pages === res.sheets.length, 'TakeoffCraft\'s embed.js reads the takeoff out of it (pdf.js: ' + pages + ' pages)');
-    const loaded = TM.readProject(emb ? emb.takeoff : res.takeoff);
-    ok(loaded.ok && !loaded.warnings.length && loaded.state.marks.length === res.takeoff.marks.length, 'TakeoffCraft\'s readProject loads it with no warnings: ' + loaded.state.items.length + ' items, ' + loaded.state.marks.length + ' marks');
-    const Q = TM.quantities(loaded.state);
-    const qOf = (name) => { const it = loaded.state.items.find((x) => x.name === name); return it ? Q.get(it.id) : null; };
-    const FT = 304.8;
-    const ext = snap.walls.filter((x) => x.typeKey === 'ext-2x6');
-    const extName = loaded.state.items.find((x) => /^ext-2x6 walls/.test(x.name));
-    const extQ = extName && Q.get(extName.id);
-    ok(extQ && near(extQ.lengthFt, ext.reduce((s, x) => s + x.len, 0) / FT, 0.02) && extQ.unscaled === 0, 'the exterior walls: TakeoffCraft measures ' + (extQ?.lengthFt || 0).toFixed(2) + ' ft = their centrelines (' + (ext.reduce((s, x) => s + x.len, 0) / FT).toFixed(2) + ')');
-    ok(extName && extName.components.length >= 4 && extName.heightFt > 9.8 && extName.csi, 'with the trade pack\'s exterior wall assembly (' + extName.components.length + ' components), the walls\' own height ' + extName.heightFt + ' ft');
-    const roofIt = loaded.state.items.find((x) => /^Roof at/.test(x.name));
-    const plan = roofs[0].plan, planArea = plan.faces.reduce((s, f) => s + Math.abs(RR.heightAt ? f.poly.reduce((a, p, i) => { const q = f.poly[(i + 1) % f.poly.length]; return a + p[0] * q[1] - q[0] * p[1]; }, 0) / 2 : 0), 0);
-    const roofQ = roofIt && Q.get(roofIt.id);
-    ok(roofQ && near(roofQ.areaSqft, planArea / (FT * FT) * Math.sqrt(1 + 0.25), 0.5), 'the roof: ' + (roofQ?.areaSqft || 0).toFixed(1) + ' sq ft sloped = its plan area × 1.118 at 6/12 (TakeoffCraft\'s pitch ' + roofIt?.pitch + ' in 12)');
-    const hips = loaded.state.items.find((x) => x.slope === 'hip' && x.components.length);
-    const hipLen = plan.lines.filter((l) => l.kind === 'hip').reduce((s, l) => s + l.len, 0) / FT;
-    ok(hips && near(Q.get(hips.id).lengthFt, hipLen, 0.05), 'the hips along their slope: ' + (hips ? Q.get(hips.id).lengthFt.toFixed(2) : '?') + ' ft = the roof\'s own hip lengths ' + hipLen.toFixed(2));
-    const doorIt = loaded.state.items.find((x) => /door-single/.test(x.name));
-    ok(doorIt && Q.get(doorIt.id).count === 1 && doorIt.components.length >= 3, 'the inside door counted once, with the prehung-door assembly');
-    const rec = loaded.state.items.find((x) => /Duplex/.test(x.name));
-    ok(rec && Q.get(rec.id).count === 2 && rec.components.some((c) => /receptacle/i.test(c.name)), 'two duplex outlets with the receptacle assembly');
-    const slabIt = loaded.state.items.find((x) => x.type === 'area' && /lab/i.test(x.name));
-    ok(slabIt && slabIt.heightFt > 0.3 && Q.get(slabIt.id).areaSqft > 400 && slabIt.components.some((c) => /Concrete/.test(c.name)), 'the slab by area and thickness (concrete by volume through the pack\'s formula)');
-    const est = TM.estimate(loaded.state);
-    ok(!est.errors?.length && est.rows.length > loaded.state.items.length, 'TakeoffCraft\'s estimate runs every assembly formula without an error (' + est.rows.length + ' rows; rates left empty)');
-    const studRow = lumber[0];
-    const lumIt = loaded.state.items.find((x) => x.name.startsWith(studRow.size));
-    ok(lumIt && Q.get(lumIt.id).count === studRow.count, 'the cut list counted on its sheet: ' + studRow.size + ' — ' + studRow.count + ' pieces');
+    if (hasTakeoff) {
+      let emb = null, pages = 0;
+      const pdfjsPath = path.join(ROOT, 'tools/takeoffcraft-test/node_modules/pdfjs-dist/legacy/build/pdf.mjs');
+      if (fs.existsSync(pdfjsPath)) {
+        const pdfjs = await import(pdfjsPath);
+        const doc = await pdfjs.getDocument({ data: res.pdf.slice(), isEvalSupported: false, verbosity: 0 }).promise;
+        pages = doc.numPages;
+        emb = await EMB.readEmbedded(doc);
+        await (doc.destroy?.() ?? doc.cleanup?.());
+        ok(emb && emb.standsFor === res.standsFor && pages === res.sheets.length, 'TakeoffCraft embedded PDF reader returns the expected takeoff and page count');
+      } else console.log('  SKIP RC.8 embedded PDF reader: pdf.js for Node absent (tools/takeoffcraft-test)');
+      const loaded = TM.readProject(emb ? emb.takeoff : res.takeoff);
+      ok(loaded.ok && !loaded.warnings.length && loaded.state.marks.length === res.takeoff.marks.length, 'TakeoffCraft\'s readProject loads it with no warnings: ' + loaded.state.items.length + ' items, ' + loaded.state.marks.length + ' marks');
+      const Q = TM.quantities(loaded.state);
+      const qOf = (name) => { const it = loaded.state.items.find((x) => x.name === name); return it ? Q.get(it.id) : null; };
+      const FT = 304.8;
+      const ext = snap.walls.filter((x) => x.typeKey === 'ext-2x6');
+      const extName = loaded.state.items.find((x) => /^ext-2x6 walls/.test(x.name));
+      const extQ = extName && Q.get(extName.id);
+      ok(extQ && near(extQ.lengthFt, ext.reduce((s, x) => s + x.len, 0) / FT, 0.02) && extQ.unscaled === 0, 'the exterior walls: TakeoffCraft measures ' + (extQ?.lengthFt || 0).toFixed(2) + ' ft = their centrelines (' + (ext.reduce((s, x) => s + x.len, 0) / FT).toFixed(2) + ')');
+      ok(extName && extName.components.length >= 4 && extName.heightFt > 9.8 && extName.csi, 'with the trade pack\'s exterior wall assembly (' + extName.components.length + ' components), the walls\' own height ' + extName.heightFt + ' ft');
+      const roofIt = loaded.state.items.find((x) => /^Roof at/.test(x.name));
+      const plan = roofs[0].plan, planArea = plan.faces.reduce((s, f) => s + Math.abs(RR.heightAt ? f.poly.reduce((a, p, i) => { const q = f.poly[(i + 1) % f.poly.length]; return a + p[0] * q[1] - q[0] * p[1]; }, 0) / 2 : 0), 0);
+      const roofQ = roofIt && Q.get(roofIt.id);
+      ok(roofQ && near(roofQ.areaSqft, planArea / (FT * FT) * Math.sqrt(1 + 0.25), 0.5), 'the roof: ' + (roofQ?.areaSqft || 0).toFixed(1) + ' sq ft sloped = its plan area × 1.118 at 6/12 (TakeoffCraft\'s pitch ' + roofIt?.pitch + ' in 12)');
+      const hips = loaded.state.items.find((x) => x.slope === 'hip' && x.components.length);
+      const hipLen = plan.lines.filter((l) => l.kind === 'hip').reduce((s, l) => s + l.len, 0) / FT;
+      ok(hips && near(Q.get(hips.id).lengthFt, hipLen, 0.05), 'the hips along their slope: ' + (hips ? Q.get(hips.id).lengthFt.toFixed(2) : '?') + ' ft = the roof\'s own hip lengths ' + hipLen.toFixed(2));
+      const doorIt = loaded.state.items.find((x) => /door-single/.test(x.name));
+      ok(doorIt && Q.get(doorIt.id).count === 1 && doorIt.components.length >= 3, 'the inside door counted once, with the prehung-door assembly');
+      const rec = loaded.state.items.find((x) => /Duplex/.test(x.name));
+      ok(rec && Q.get(rec.id).count === 2 && rec.components.some((c) => /receptacle/i.test(c.name)), 'two duplex outlets with the receptacle assembly');
+      const slabIt = loaded.state.items.find((x) => x.type === 'area' && /lab/i.test(x.name));
+      ok(slabIt && slabIt.heightFt > 0.3 && Q.get(slabIt.id).areaSqft > 400 && slabIt.components.some((c) => /Concrete/.test(c.name)), 'the slab by area and thickness (concrete by volume through the pack\'s formula)');
+      const est = TM.estimate(loaded.state);
+      ok(!est.errors?.length && est.rows.length > loaded.state.items.length, 'TakeoffCraft\'s estimate runs every assembly formula without an error (' + est.rows.length + ' rows; rates left empty)');
+      const studRow = lumber[0];
+      const lumIt = loaded.state.items.find((x) => x.name.startsWith(studRow.size));
+      ok(lumIt && Q.get(lumIt.id).count === studRow.count, 'the cut list counted on its sheet: ' + studRow.size + ' — ' + studRow.count + ' pieces');
+    }
     if (args.includes('--keep')) { const k = path.join(ROOT, 'tmp/bimcraft-res-takeoff.pdf'); fs.writeFileSync(k, res.pdf); console.log('  (kept ' + k + ')'); }
     try { const f = path.join(ROOT, 'tmp/bimcraft-res-takeoff-check.pdf'); fs.writeFileSync(f, res.pdf); const info = execFileSync('pdfinfo', [f], { encoding: 'utf8' }); ok(new RegExp('Pages:\\s+' + res.sheets.length).test(info), 'poppler opens it too'); fs.rmSync(f); } catch (e) { console.log('  --   poppler: ' + e.message.split('\n')[0]); }
   }
