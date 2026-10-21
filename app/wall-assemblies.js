@@ -3,7 +3,7 @@
 // no global registry (two open documents may use the same key differently).
 import { ids, val } from './ifc-util.js';
 import { normalizeLayer, VENTILATION, writeMaterialLayers } from './project-materials.js';
-import { checkRecordVersion, parseRecord, recordError } from './record-contract.js';
+import { checkRecordVersion, parseRecord, recordError, recordProperties } from './record-contract.js';
 export const ASSEMBLY_PSET = 'CadCraft_WallType';
 export const LAYER_FUNCTIONS = ['finish', 'substrate', 'structure', 'insulation', 'membrane'];
 const fail = (message) => { throw new Error(message); };
@@ -14,7 +14,7 @@ export function validateAssembly(input) {
   if (!name || name.length > 100) fail('Enter a wall type name (up to 100 characters).');
   if (!Array.isArray(input.layers) || !input.layers.length || input.layers.length > 32) fail('An assembly needs 1–32 layers.');
   const layers = input.layers.map(l => {
-    const mat = String(l.mat || '').trim(), t = Number(l.t);
+    const mat = String(l.mat || '').trim(), t = l.t;
     if (!mat || mat.length > 100) fail('Each layer needs a material name (up to 100 characters).');
     if (!Number.isFinite(t) || t < 0 || t > 2000) fail('Layer thickness must be between 0 and 2000 mm.');
     if (!LAYER_FUNCTIONS.includes(l.function)) fail('Choose a function for each layer.');
@@ -36,13 +36,16 @@ export function readAssemblyRecords(w) {
   const out=[];
   for (const id of ids(w.api,w.mid,'IFCWALLTYPE')) {
     const line=w.api.GetLine(w.mid,id,false);
-    for (const h of line.HasPropertySets || []) {
+    const sets=(line.HasPropertySets || []).filter(h=>val(w.api.GetLine(w.mid,h.value,false)?.Name)===ASSEMBLY_PSET);
+    for (const h of sets) {
       const ps=w.api.GetLine(w.mid,h.value,false);
-      if(val(ps?.Name)!==ASSEMBLY_PSET) continue;
-      const props=Object.fromEntries((ps.HasProperties || []).map(h=>{const p=w.api.GetLine(w.mid,h.value,false);return [val(p.Name),val(p.NominalValue)];}));
-      if (!Object.hasOwn(props, 'Recipe')) continue;
+      const props=Object.fromEntries((ps.HasProperties || []).map(h=>{const p=w.api.GetLine(w.mid,h.value,false);return [val(p?.Name),val(p?.NominalValue)];}));
       const identity={id,guid:val(line.GlobalId),psetId:h.value,key:props.Key,raw:props.Recipe};
-      try { const raw=parseRecord(props.Recipe,'assembly'); const recipe=validateAssembly(raw);
+      try { if(sets.length!==1) throw recordError('assembly','corrupt');
+        recordProperties(w,ps,'assembly');
+        // Legacy starter types have no Recipe. Custom wall-* types require it.
+        if (!Object.hasOwn(props, 'Recipe') && typeof props.Key==='string' && !props.Key.startsWith('wall-')) continue;
+        const raw=parseRecord(props.Recipe,'assembly'); const recipe=validateAssembly(raw);
         if (recipe.key !== props.Key) throw recordError('assembly','corrupt');
         out.push({...recipe,...identity});
       } catch(e) { out.push({...identity,issue:e.recordIssue || 'corrupt',message:recordError('assembly',e.recordIssue || 'corrupt').message}); }

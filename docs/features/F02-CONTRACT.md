@@ -22,11 +22,20 @@ unknown dependencies, atomically. Recovery is opening the original in a compatib
 restoring a known-good file, or explicitly rebinding a supported dimension whose hosts
 are missing/invalid. Never infer a replacement host from its name, position or STEP ID.
 
-Demonstrated defect: annotations are missing from the writer's GUID index, so an existing
-dimension edit can create a duplicate GlobalId. Add annotations to that index and reject
-ambiguous identities. Add validation at reference resolution so NaN/degenerate hosts and
+Dimension updates resolve the unique existing annotation record directly and reject
+ambiguous identities. Review corrected the initial proposal's GUID-index explanation:
+the pinned base already indexes annotations; no additional index entry is needed.
+Add validation at reference resolution so NaN/degenerate hosts and
 coincident points have no numeric measurement. Unknown recipes cannot overwrite existing
 records by reusing their keys. Preserve physical layer semantics and material defaults.
+
+Recognized record containers with missing payloads are corrupt, not absent defaults:
+custom `wall-*` types need Recipe, the material-library pset needs Library, and a
+wall-dimension pset or ObjectType marker needs Spec. Legacy starter types legitimately
+have no Recipe. Duplicate named psets or properties are ambiguous and refused; neither
+first-set nor last-property lookup may hide an unsupported payload. JSON layer/default
+thicknesses must be finite numbers; null, booleans, arrays and numeric strings cannot
+be silently converted to physical widths. Existing valid legacy numeric data is retained.
 
 ## Numeric contract and evidence plan
 

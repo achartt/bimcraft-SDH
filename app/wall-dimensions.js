@@ -4,7 +4,7 @@ import { ids, val } from './ifc-util.js';
 import { readWalls, locationOffset } from './model-walls.js';
 import { wallGeom, BULGE_MAX } from './model-arcs.js';
 import { ModelWriter } from './model-write.js';
-import { checkRecordVersion, parseRecord, recordError } from './record-contract.js';
+import { checkRecordVersion, parseRecord, recordError, readRecordPset } from './record-contract.js';
 export const DIMENSION_PSET = 'CadCraft_WallDimension';
 export const WALL_REFERENCES = ['exterior', 'interior', 'center', 'coreExterior', 'coreInterior', 'coreCenter'];
 export function referencePoint(ref, walls, level = null) {
@@ -40,11 +40,13 @@ export function resolveDimension(d, walls) {
 export function readWallDimensions(w) {
   const out = [];
   for (const id of ids(w.api,w.mid,'IFCANNOTATION')) {
-    const ps = w.readPset(id,DIMENSION_PSET);
-    if (!ps || !Object.hasOwn(ps,'Spec')) continue;
-    const identity={id,guid:w.guidOf(id),storey:w.storeyOfId(id),geometry:ps.Geometry || '',raw:ps.Spec};
+    const identity={id,guid:w.guidOf(id),storey:w.storeyOfId(id)};
     let d;
     try {
+      const ps=readRecordPset(w,id,DIMENSION_PSET,'dimension');
+      if(!ps && val(w.api.GetLine(w.mid,id,false).ObjectType)!=='CadCraft_WallDimension') continue;
+      if(!ps) throw recordError('dimension','corrupt');
+      Object.assign(identity,{geometry:ps.Geometry || '',raw:ps.Spec});
       d=parseRecord(ps.Spec,'dimension'); validateSpec(d);
       out.push({...d,...identity});
     } catch(e) {

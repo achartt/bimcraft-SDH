@@ -16,3 +16,11 @@ illustrations. Their short-label limitation remains INT-02.
 The first oracle log and enriched-baseline JSON retain Python 3.9 environment failures.
 Final logs follow a Python 3.12 environment repair; failed environment directories were
 kept outside Git. No proprietary models or other checkouts' working changes are included.
+
+PR review evidence: `review-before.log` retains the four missing-record failures before
+correction. `review-focused.log`, `review-baseline.log` and `review-baseline.json` are
+fresh checks of the corrected working tree (642 baseline checks, no failures).
+`review-independent-ifc.jsonl` and `review-f01-independent-ifc.jsonl` retain fresh
+independent readback. `review-missing-*.png` shows missing-payload refusal in the actual
+browser; regenerate its synthetic fixture with `tests/features/f02/review-fixtures.mjs`.
+Final committed-head CI results are linked from draft PR #4.
