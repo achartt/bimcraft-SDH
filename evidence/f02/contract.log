@@ -1,0 +1,114 @@
+TAP version 13
+# {"case":"mm-local","cycles":10,"maxGeometryMm":0.000004372376354199997,"maxDimensionMm":0.000003838060820271494,"maxCoreAnchorMm":0.000004372373968209113}
+# {"case":"mm-translated","cycles":10,"maxGeometryMm":0.0000043730877539702166,"maxDimensionMm":0.000003838213160634041,"maxCoreAnchorMm":0.000004373009450489388}
+# {"case":"m-local","cycles":10,"maxGeometryMm":0.0018953062746975254,"maxDimensionMm":0.0007805431250744732,"maxCoreAnchorMm":0.0018934362144174233}
+# {"case":"m-translated","cycles":10,"maxGeometryMm":0.0018953054481503804,"maxDimensionMm":0.0007805430795997381,"maxCoreAnchorMm":0.0018934354027859192}
+# {"case":"inch-local","cycles":10,"maxGeometryMm":0.00014901232084111817,"maxDimensionMm":0.00003175148958689533,"maxCoreAnchorMm":0.00014901232084111817}
+# {"case":"inch-translated","cycles":10,"maxGeometryMm":0.00014337485115733495,"maxDimensionMm":0.00003175158053636551,"maxCoreAnchorMm":0.00014337485115733495}
+# {"case":"foot-local","cycles":10,"maxGeometryMm":0.0009182093334970703,"maxDimensionMm":0.0004199843597234576,"maxCoreAnchorMm":0.0009182093318628468}
+# {"case":"foot-translated","cycles":10,"maxGeometryMm":0.0009235836166065517,"maxDimensionMm":0.0004199844552204013,"maxCoreAnchorMm":0.0009235835641114618}
+# Subtest: mm-local: ten edit/undo/redo/save/reopen cycles
+ok 1 - mm-local: ten edit/undo/redo/save/reopen cycles
+  ---
+  duration_ms: 223.306917
+  type: 'test'
+  ...
+# Subtest: mm-translated: ten edit/undo/redo/save/reopen cycles
+ok 2 - mm-translated: ten edit/undo/redo/save/reopen cycles
+  ---
+  duration_ms: 153.42275
+  type: 'test'
+  ...
+# Subtest: m-local: ten edit/undo/redo/save/reopen cycles
+ok 3 - m-local: ten edit/undo/redo/save/reopen cycles
+  ---
+  duration_ms: 143.702458
+  type: 'test'
+  ...
+# Subtest: m-translated: ten edit/undo/redo/save/reopen cycles
+ok 4 - m-translated: ten edit/undo/redo/save/reopen cycles
+  ---
+  duration_ms: 143.31975
+  type: 'test'
+  ...
+# Subtest: inch-local: ten edit/undo/redo/save/reopen cycles
+ok 5 - inch-local: ten edit/undo/redo/save/reopen cycles
+  ---
+  duration_ms: 156.035792
+  type: 'test'
+  ...
+# Subtest: inch-translated: ten edit/undo/redo/save/reopen cycles
+ok 6 - inch-translated: ten edit/undo/redo/save/reopen cycles
+  ---
+  duration_ms: 146.407666
+  type: 'test'
+  ...
+# Subtest: foot-local: ten edit/undo/redo/save/reopen cycles
+ok 7 - foot-local: ten edit/undo/redo/save/reopen cycles
+  ---
+  duration_ms: 146.446042
+  type: 'test'
+  ...
+# Subtest: foot-translated: ten edit/undo/redo/save/reopen cycles
+ok 8 - foot-translated: ten edit/undo/redo/save/reopen cycles
+  ---
+  duration_ms: 145.766917
+  type: 'test'
+  ...
+# Subtest: dimension editing/rebind preserves exactly one annotation through undo/redo/reopen
+ok 9 - dimension editing/rebind preserves exactly one annotation through undo/redo/reopen
+  ---
+  duration_ms: 12.420584
+  type: 'test'
+  ...
+# Subtest: invalid, duplicate, missing and coincident references never retain a numeric value
+ok 10 - invalid, duplicate, missing and coincident references never retain a numeric value
+  ---
+  duration_ms: 0.700666
+  type: 'test'
+  ...
+# Subtest: assembly: unsupported/corrupt versions preserved and edits refused atomically
+ok 11 - assembly: unsupported/corrupt versions preserved and edits refused atomically
+  ---
+  duration_ms: 6.632
+  type: 'test'
+  ...
+# Subtest: dimension: unsupported/corrupt versions preserved and edits refused atomically
+ok 12 - dimension: unsupported/corrupt versions preserved and edits refused atomically
+  ---
+  duration_ms: 20.715916
+  type: 'test'
+  ...
+# Subtest: materials: unsupported/corrupt versions preserved and edits refused atomically
+ok 13 - materials: unsupported/corrupt versions preserved and edits refused atomically
+  ---
+  duration_ms: 7.816833
+  type: 'test'
+  ...
+# Subtest: legacy migration only on explicit save, reversible through journal
+ok 14 - legacy migration only on explicit save, reversible through journal
+  ---
+  duration_ms: 4.996583
+  type: 'test'
+  ...
+# Subtest: F02 behavior suite is wired into the executed baseline
+ok 15 - F02 behavior suite is wired into the executed baseline
+  ---
+  duration_ms: 0.081375
+  type: 'test'
+  ...
+# Subtest: nonfinite wall edits fail without changing any geometry or history
+ok 16 - nonfinite wall edits fail without changing any geometry or history
+  ---
+  duration_ms: 1.609292
+  type: 'test'
+  ...
+1..16
+# tests 16
+# suites 0
+# pass 16
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1385.216292

@@ -1,0 +1,106 @@
+{
+  "runtime": "v22.23.3",
+  "dirty": true,
+  "head": "1c35f47d69af2214b4747f541703224d0a4a4742",
+  "results": [
+    {
+      "name": "precision",
+      "status": "PASS",
+      "exitCode": 0,
+      "passed": 7,
+      "failed": 0,
+      "skipped": [],
+      "error": null
+    },
+    {
+      "name": "materials",
+      "status": "PASS",
+      "exitCode": 0,
+      "passed": 8,
+      "failed": 0,
+      "skipped": [],
+      "error": null
+    },
+    {
+      "name": "model",
+      "status": "PASS",
+      "exitCode": 0,
+      "passed": 127,
+      "failed": 0,
+      "skipped": [
+        "  --   poppler not installed: PDF checks skipped (spawnSync pdftotext ENOENT)"
+      ],
+      "error": null
+    },
+    {
+      "name": "comforts",
+      "status": "PASS",
+      "exitCode": 0,
+      "passed": 106,
+      "failed": 0,
+      "skipped": [],
+      "error": null
+    },
+    {
+      "name": "views2",
+      "status": "PASS",
+      "exitCode": 0,
+      "passed": 105,
+      "failed": 0,
+      "skipped": [],
+      "error": null
+    },
+    {
+      "name": "res",
+      "status": "PASS",
+      "exitCode": 0,
+      "passed": 204,
+      "failed": 0,
+      "skipped": [
+        "  --   no library repo at /Users/austinhartt/Documents/ChatGPT/BimCraft Test/bimcraft-f02/repos/library: item checks skipped",
+        "SKIP terrain live source comparison: civilcraft app absent at /Users/austinhartt/Documents/ChatGPT/BimCraft Test/bimcraft-f02/.cc-test/public_html/assets/apps/civilcraft; bundled integrity checked separately",
+        "  --   poppler not installed: PDF reader checks skipped (spawnSync pdftotext ENOENT)",
+        "SKIP electrical live source comparison: cadcraft app absent at /Users/austinhartt/Documents/ChatGPT/BimCraft Test/bimcraft-f02/.cc-test/public_html/assets/apps/cadcraft; bundled integrity checked separately",
+        "  SKIP RC.8 cross-app reader, quantities, estimate and pack sync: TakeoffCraft directory absent at /Users/austinhartt/Documents/ChatGPT/BimCraft Test/bimcraft-f02/.cc-test/public_html/assets/apps/takeoffcraft/dev"
+      ],
+      "error": null
+    },
+    {
+      "name": "f02-contract",
+      "status": "PASS",
+      "exitCode": 0,
+      "passed": 16,
+      "failed": 0,
+      "skipped": [],
+      "error": null
+    },
+    {
+      "name": "fixture",
+      "status": "PASS",
+      "exitCode": 0,
+      "passed": 1,
+      "failed": 0,
+      "skipped": [],
+      "error": null
+    },
+    {
+      "name": "source-sync-contract",
+      "status": "PASS",
+      "exitCode": 0,
+      "passed": 44,
+      "failed": 0,
+      "skipped": [],
+      "error": null
+    },
+    {
+      "name": "runner-contract",
+      "status": "PASS",
+      "exitCode": 0,
+      "passed": 19,
+      "failed": 0,
+      "skipped": [],
+      "error": null
+    }
+  ],
+  "exitCode": 0
+}
