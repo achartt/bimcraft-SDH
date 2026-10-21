@@ -18,7 +18,7 @@ import { readRuns, placeRun, changeRun, removeRuns, addValve, removeValve, mepLa
   PIPE_SYSTEMS, DUCT_SYSTEMS, VALVE_KINDS, DUCT_SHAPES, systemLabel, pipeForFlow, ductForFlow, ductLoss, runSchedules } from './mep-model.js';
 import { MATERIALS, CLASSES, DEFAULT_CLASS, sizesFor, pipeSize } from './mep/tables.js';
 import { ModelWriter } from './model-write.js';
-import { fmtLen, parseLen } from './model-units.js';
+import { fmtLen, parseLen, isMetric } from './model-units.js';
 import { el } from './ui-util.js';
 
 const IN = 25.4;
@@ -27,7 +27,7 @@ const SINGLE_UNDER = 150;   // pipes narrower than this draw as one line
 /** A slope as people write it: imperial rise per foot ('1/4"/ft'), metric per cent. */
 export function fmtSlope(s, units) {
   if (!(s > 0)) return '0';
-  if (units === 'mm') return (Math.round(s * 1000) / 10) + ' %';
+  if (isMetric(units)) return (Math.round(s * 1000) / 10) + ' %';
   const inPerFt = s * 12, den = [2, 4, 8, 16, 32].find((d) => Math.abs(inPerFt * d - Math.round(inPerFt * d)) < 1e-6);
   return (den ? (Math.round(inPerFt * den) / den === Math.floor(inPerFt) ? String(Math.floor(inPerFt)) : (Math.floor(inPerFt) ? Math.floor(inPerFt) + '-' : '') + Math.round((inPerFt % 1) * den) + '/' + den) : inPerFt.toFixed(3)) + '"/ft';   // i18n-ignore: unit mark
 }
