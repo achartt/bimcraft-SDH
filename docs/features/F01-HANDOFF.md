@@ -1,7 +1,7 @@
 # F01 feature handoff
 
 Feature: F01 — Integration baseline and standalone test workflow.
-State: **ready for review; standalone baseline and CI pass**. Draft review only; neither F01 nor the prototype is merged.
+State: **review fixes implemented; renewed clean baseline and CI validation pending**. Draft review only; neither F01 nor the prototype is merged.
 
 ## Ownership and exact state
 
@@ -12,6 +12,17 @@ State: **ready for review; standalone baseline and CI pass**. Draft review only;
 - Source-sync implementation: `e5da3321cd52150530d00b3123c7f5234dedccd3`. This handoff/evidence follow-up changes documentation only. Exact final delivery head and its CI status are recorded in [draft PR #2](https://github.com/achartt/bimcraft-SDH/pull/2).
 - PR target: `feature/wall-assemblies-dimensions`. PR #1 reverified open/draft/unmerged at the approved base; main remains `5d0e2b1cb59e3f28e72fed8c5fc6004d44564832`.
 - Fresh source-sync validation clone: `/private/tmp/bimcraft-f01-sync-20261021`, created using `git clone --no-local`, with no copied vendor cache, `.cc-test` or sibling apps. Vendor setup fetched and verified all 110 files. Both local runtime reports have `dirty: false`.
+
+## Review follow-up
+
+Review of PR head `b2724e786a8f397037936ce6d6a38b7388fe7598` found four defects in the new test boundaries:
+
+1. **P2 — Incomplete pin metadata could disable checks.** An empty file map or omitted import/key list could report bundled integrity without checking required assets. Validation now requires complete file/import sets, valid hashes/provenance and language keys matching the hash-verified source literals. Existing hashes were independently rechecked against the recorded immutable base; none changed.
+2. **P2 — Unusable translations could pass.** Null values and empty plural objects passed the presence check; a partial live source catalog could also escape validation. Both local and live catalogs now require usable strings/plural forms.
+3. **P2 — Broken TakeoffCraft could be skipped.** An empty app root or dangling root/`dev` link was treated as absent. Only actual app-root absence now skips; path errors and partial checkouts fail.
+4. **P2 — Incomplete PDF-reader packages could be skipped.** Testing the entry file's existence classified a present package without that entry as absent. Only package absence now skips; partial packages, broken parent links and import/runtime errors fail.
+
+Regression reproduction before fixes: **34 passed, 10 failed** (new tests exposed ten false-green cases in the old implementation). After fixes and expanded PDF/schema/source tests: **60 contract tests pass** (41 source-sync, 19 runner/dependency). The previous validation table below remains historical until clean validation of this review revision completes. No application code, source-sync pin hash, other app or merge is included.
 
 ## Source-sync resolution
 

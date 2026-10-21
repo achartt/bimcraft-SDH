@@ -17,7 +17,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { checkBundledAssets } from './source-sync-pins.mjs';
+import { checkBundledAssets, terrainLanguageKeys, validateTerrainLanguage } from './source-sync-pins.mjs';
 
 const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const dev = (app, f = '') => path.join(REPO, 'public_html/assets/apps', app, 'dev', f);
@@ -44,6 +44,7 @@ if (lack.length) {
 }
 // language keys
 const civ = JSON.parse(fs.readFileSync(dev('civilcraft', 'lang/en.json'), 'utf8'));
+validateTerrainLanguage(civ, terrainLanguageKeys(FILES.map(f => fs.readFileSync(dev('civilcraft', f), 'utf8'))), 'civilcraft/dev/lang/en.json');
 const file = dev('bimcraft', 'lang/en.json');
 let text = fs.readFileSync(file, 'utf8');
 const have = JSON.parse(text);

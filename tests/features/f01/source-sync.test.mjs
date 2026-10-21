@@ -22,7 +22,7 @@ function harness(group, fn) {
     const source = path.join(apps, group.source);
     fs.mkdirSync(tool, { recursive: true });
     fs.mkdirSync(path.join(app, 'lang'), { recursive: true });
-    for (const f of [group.script, 'source-sync-pins.mjs', 'source-sync-pins.json']) {
+    for (const f of [group.script, 'source-sync-pins.mjs', 'source-sync-pins.json', 'optional-dependency.mjs']) {
       fs.copyFileSync(path.join(root, 'tests/tools/bimcraft-test', f), path.join(tool, f));
     }
     for (const f of [...group.files, 'manifest.json', 'lang/en.json']) {
@@ -46,7 +46,7 @@ export const INSTALL = ${JSON.stringify(SYMBOLS)}.map(({ents, ...s}) => ({...s, 
       }
       return dev;
     };
-    fn({ app, source, run, installSource });
+    fn({ app, source, run, installSource, pinFile: path.join(tool, 'source-sync-pins.json') });
   } finally { fs.rmSync(dir, { recursive: true, force: true }); }
 }
 function fail(result, reason) {
@@ -109,6 +109,47 @@ for (const state of ['mapping', 'missing-key', 'object-string', 'invalid-json'])
     if (state === 'missing-key') delete value['tin.badfaces'];
     if (state === 'object-string') value['tin.badfaces'] = '[object Object]';
     fs.writeFileSync(file, state === 'invalid-json' ? '{invalid' : JSON.stringify(value));
-    fail(run(), /mapping differs|language key missing|object Object|SyntaxError/);
+    fail(run(), /mapping differs|language key missing|Invalid terrain translation|object Object|SyntaxError/);
+  }));
+}
+
+for (const state of ['empty-files', 'missing-imports', 'empty-imports', 'empty-keys', 'missing-key-pin', 'null-translation', 'empty-plural']) {
+  test(`terrain: incomplete pin or translation ${state} cannot disable checks`, () => harness(groups[0], ({ app, pinFile, run }) => {
+    const pins = JSON.parse(fs.readFileSync(pinFile, 'utf8'));
+    const langFile = path.join(app, 'lang/en.json');
+    const lang = JSON.parse(fs.readFileSync(langFile, 'utf8'));
+    if (state === 'empty-files') { pins.terrain.files = {}; fs.appendFileSync(path.join(app, 'tin.js'), '\n// drift\n'); }
+    if (state === 'missing-imports') delete pins.terrain.imports;
+    if (state === 'empty-imports') pins.terrain.imports = {};
+    if (state === 'empty-keys') pins.terrain.languageKeys = [];
+    if (state === 'missing-key-pin') { pins.terrain.languageKeys = pins.terrain.languageKeys.filter(k => k !== 'tin.badfaces'); delete lang['tin.badfaces']; }
+    if (state === 'null-translation') lang['tin.badfaces'] = null;
+    if (state === 'empty-plural') lang['tin.badfaces'] = {};
+    fs.writeFileSync(pinFile, JSON.stringify(pins));
+    fs.writeFileSync(langFile, JSON.stringify(lang));
+    fail(run(), /Invalid source-sync pins|Invalid terrain translation/);
+  }));
+}
+
+for (const state of ['electrical-file-omitted', 'terrain-file-omitted', 'bad-hash', 'bad-provenance', 'duplicate-language-key']) {
+  test(`pins: ${state} is rejected`, () => harness(groups[0], ({ pinFile, run }) => {
+    const pins = JSON.parse(fs.readFileSync(pinFile, 'utf8'));
+    if (state === 'electrical-file-omitted') pins.electrical.files = {};
+    if (state === 'terrain-file-omitted') delete pins.terrain.files['raster.js'];
+    if (state === 'bad-hash') pins.terrain.files['tin.js'] = 'not-a-hash';
+    if (state === 'bad-provenance') pins.provenance.revision = [pins.provenance.revision];
+    if (state === 'duplicate-language-key') pins.terrain.languageKeys[0] = pins.terrain.languageKeys[1];
+    fs.writeFileSync(pinFile, JSON.stringify(pins));
+    fail(run(), /Invalid source-sync pins/);
+  }));
+}
+for (const state of ['missing-key', 'invalid-plural', 'invalid-catalog']) {
+  test(`terrain: present source with ${state} translation fails live check`, () => harness(groups[0], ({ run, installSource }) => {
+    const dev = installSource(), file = path.join(dev, 'lang/en.json');
+    const lang = JSON.parse(fs.readFileSync(file, 'utf8'));
+    if (state === 'missing-key') delete lang['tin.badfaces'];
+    if (state === 'invalid-plural') lang['tin.badfaces'] = { other: 'ok', one: null };
+    fs.writeFileSync(file, JSON.stringify(state === 'invalid-catalog' ? [] : lang));
+    fail(run(), /language key missing|Invalid terrain translation/);
   }));
 }
