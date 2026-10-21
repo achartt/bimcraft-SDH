@@ -1,0 +1,128 @@
+[WEB-IFC][error][GetRefArgument()] unexpected token type, expected REF 40
+[WEB-IFC][error][GetLineType()] Attempt to Access Invalid ExpressID 0
+[WEB-IFC][error][GetColor()] unexpected style type 0
+[WEB-IFC][error][GetRefArgument()] unexpected token type, expected REF 40
+[WEB-IFC][error][GetLineType()] Attempt to Access Invalid ExpressID 0
+[WEB-IFC][error][GetColor()] unexpected style type 0
+[WEB-IFC][error][GetRefArgument()] unexpected token type, expected REF 40
+[WEB-IFC][error][GetLineType()] Attempt to Access Invalid ExpressID 0
+[WEB-IFC][error][GetColor()] unexpected style type 0
+[WEB-IFC][error][GetRefArgument()] unexpected token type, expected REF 40
+[WEB-IFC][error][GetLineType()] Attempt to Access Invalid ExpressID 0
+[WEB-IFC][error][GetColor()] unexpected style type 0
+[WEB-IFC][error][GetRefArgument()] unexpected token type, expected REF 890
+[WEB-IFC][error][GetLineType()] Attempt to Access Invalid ExpressID 0
+[WEB-IFC][error][GetColor()] unexpected style type 0
+[WEB-IFC][error][GetRefArgument()] unexpected token type, expected REF 890
+[WEB-IFC][error][GetLineType()] Attempt to Access Invalid ExpressID 0
+[WEB-IFC][error][GetColor()] unexpected style type 0
+[WEB-IFC][error][GetRefArgument()] unexpected token type, expected REF 890
+[WEB-IFC][error][GetLineType()] Attempt to Access Invalid ExpressID 0
+[WEB-IFC][error][GetColor()] unexpected style type 0
+[WEB-IFC][error][GetRefArgument()] unexpected token type, expected REF 890
+[WEB-IFC][error][GetLineType()] Attempt to Access Invalid ExpressID 0
+[WEB-IFC][error][GetColor()] unexpected style type 0
+[WEB-IFC][error][GetRefArgument()] unexpected token type, expected REF 890
+[WEB-IFC][error][GetLineType()] Attempt to Access Invalid ExpressID 0
+[WEB-IFC][error][GetColor()] unexpected style type 0
+[WEB-IFC][error][GetRefArgument()] unexpected token type, expected REF 890
+[WEB-IFC][error][GetLineType()] Attempt to Access Invalid ExpressID 0
+[WEB-IFC][error][GetColor()] unexpected style type 0
+[WEB-IFC][error][GetRefArgument()] unexpected token type, expected REF 890
+[WEB-IFC][error][GetLineType()] Attempt to Access Invalid ExpressID 0
+[WEB-IFC][error][GetColor()] unexpected style type 0
+[WEB-IFC][error][GetRefArgument()] unexpected token type, expected REF 40
+[WEB-IFC][error][GetLineType()] Attempt to Access Invalid ExpressID 0
+[WEB-IFC][error][GetColor()] unexpected style type 0
+[WEB-IFC][error][GetRefArgument()] unexpected token type, expected REF 40
+[WEB-IFC][error][GetLineType()] Attempt to Access Invalid ExpressID 0
+[WEB-IFC][error][GetColor()] unexpected style type 0
+[WEB-IFC][error][GetRefArgument()] unexpected token type, expected REF 40
+[WEB-IFC][error][GetLineType()] Attempt to Access Invalid ExpressID 0
+[WEB-IFC][error][GetColor()] unexpected style type 0
+[WEB-IFC][error][GetRefArgument()] unexpected token type, expected REF 40
+[WEB-IFC][error][GetLineType()] Attempt to Access Invalid ExpressID 0
+[WEB-IFC][error][GetColor()] unexpected style type 0
+[WEB-IFC][error][GetRefArgument()] unexpected token type, expected REF 890
+[WEB-IFC][error][GetLineType()] Attempt to Access Invalid ExpressID 0
+[WEB-IFC][error][GetColor()] unexpected style type 0
+[WEB-IFC][error][GetRefArgument()] unexpected token type, expected REF 890
+[WEB-IFC][error][GetLineType()] Attempt to Access Invalid ExpressID 0
+[WEB-IFC][error][GetColor()] unexpected style type 0
+[WEB-IFC][error][GetRefArgument()] unexpected token type, expected REF 890
+[WEB-IFC][error][GetLineType()] Attempt to Access Invalid ExpressID 0
+[WEB-IFC][error][GetColor()] unexpected style type 0
+[WEB-IFC][error][GetRefArgument()] unexpected token type, expected REF 890
+[WEB-IFC][error][GetLineType()] Attempt to Access Invalid ExpressID 0
+[WEB-IFC][error][GetColor()] unexpected style type 0
+[WEB-IFC][error][GetRefArgument()] unexpected token type, expected REF 890
+[WEB-IFC][error][GetLineType()] Attempt to Access Invalid ExpressID 0
+[WEB-IFC][error][GetColor()] unexpected style type 0
+[WEB-IFC][error][GetRefArgument()] unexpected token type, expected REF 890
+[WEB-IFC][error][GetLineType()] Attempt to Access Invalid ExpressID 0
+[WEB-IFC][error][GetColor()] unexpected style type 0
+[WEB-IFC][error][GetRefArgument()] unexpected token type, expected REF 890
+[WEB-IFC][error][GetLineType()] Attempt to Access Invalid ExpressID 0
+[WEB-IFC][error][GetColor()] unexpected style type 0
+{
+  "reader": "web-ifc",
+  "version": "0.0.78",
+  "files": [
+    {
+      "file": "fixtures/f01/house.ifc",
+      "walls": 5,
+      "windows": 1,
+      "dimensions": 2,
+      "meshed": 6,
+      "triangles": 140,
+      "status": "PASS"
+    },
+    {
+      "file": "fixtures/f01/edited-reopened.ifc",
+      "walls": 5,
+      "windows": 1,
+      "dimensions": 2,
+      "meshed": 6,
+      "triangles": 140,
+      "status": "PASS"
+    },
+    {
+      "file": "fixtures/f01/missing-host.ifc",
+      "walls": 4,
+      "windows": 0,
+      "dimensions": 2,
+      "meshed": 4,
+      "triangles": 48,
+      "status": "PASS"
+    },
+    {
+      "file": ".cc-test/f01-generated/house.ifc",
+      "walls": 5,
+      "windows": 1,
+      "dimensions": 2,
+      "meshed": 6,
+      "triangles": 140,
+      "status": "PASS"
+    },
+    {
+      "file": ".cc-test/f01-generated/edited-reopened.ifc",
+      "walls": 5,
+      "windows": 1,
+      "dimensions": 2,
+      "meshed": 6,
+      "triangles": 140,
+      "status": "PASS"
+    },
+    {
+      "file": ".cc-test/f01-generated/missing-host.ifc",
+      "walls": 4,
+      "windows": 0,
+      "dimensions": 2,
+      "meshed": 4,
+      "triangles": 48,
+      "status": "PASS"
+    }
+  ],
+  "status": "geometry-and-identity-pass",
+  "scope": "Counts, triangulation and IDs only. Reader diagnostics above remain visible; this is not material/color acceptance."
+}

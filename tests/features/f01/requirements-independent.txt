@@ -1,0 +1,4 @@
+# Test-only black-box reader; never shipped. Python 3.12, see PROVENANCE.md.
+ifcopenshell==0.9.0
+# Required by the IfcOpenShell EXPRESS-rule executor.
+pytest==9.1.1

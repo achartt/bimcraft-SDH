@@ -1,0 +1,630 @@
+﻿2026-10-21T17:29:32.0075140Z Current runner version: '2.338.0'
+2026-10-21T17:29:32.0111776Z ##[group]Runner Image Provisioner
+2026-10-21T17:29:32.0113156Z Hosted Compute Agent
+2026-10-21T17:29:32.0114145Z Version: 20261012.601
+2026-10-21T17:29:32.0115248Z Commit: f3dc54e1fb89da6852db922499a0233137369e1d
+2026-10-21T17:29:32.0116363Z Build Date: 2026-10-12T17:48:21Z
+2026-10-21T17:29:32.0117765Z Worker ID: {1436712d-82a8-4b20-a28b-432fb6878e5e}
+2026-10-21T17:29:32.0118955Z Region: westcentralus
+2026-10-21T17:29:32.0119939Z Cloud: Azure
+2026-10-21T17:29:32.0120816Z ##[endgroup]
+2026-10-21T17:29:32.0123008Z ##[group]Operating System
+2026-10-21T17:29:32.0124194Z Ubuntu
+2026-10-21T17:29:32.0125111Z 24.04.5
+2026-10-21T17:29:32.0125885Z LTS
+2026-10-21T17:29:32.0127116Z ##[endgroup]
+2026-10-21T17:29:32.0127990Z ##[group]Runner Image
+2026-10-21T17:29:32.0129087Z Image: ubuntu-24.04
+2026-10-21T17:29:32.0130027Z Version: 20261012.334.1
+2026-10-21T17:29:32.0132122Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261012.334/images/ubuntu/Ubuntu2404-Readme.md
+2026-10-21T17:29:32.0134706Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261012.334
+2026-10-21T17:29:32.0136667Z ##[endgroup]
+2026-10-21T17:29:32.0138384Z ##[group]GITHUB_TOKEN Permissions
+2026-10-21T17:29:32.0141596Z Contents: read
+2026-10-21T17:29:32.0142517Z Metadata: read
+2026-10-21T17:29:32.0143369Z ##[endgroup]
+2026-10-21T17:29:32.0146912Z Secret source: Actions
+2026-10-21T17:29:32.0148449Z Cache mode: write
+2026-10-21T17:29:32.0150029Z Prepare workflow directory
+2026-10-21T17:29:32.0525003Z Prepare all required actions
+2026-10-21T17:29:32.0574061Z Getting action download info
+2026-10-21T17:29:32.3738042Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+2026-10-21T17:29:32.4759500Z Download action repository 'actions/setup-node@v4' (SHA:49933ea5288caeca8642d1e84afbd3f7d6820020)
+2026-10-21T17:29:32.5830166Z Download action repository 'actions/setup-python@v5' (SHA:a26af69be951a213d495a4c3e4e4022e16d87065)
+2026-10-21T17:29:32.6659600Z Download action repository 'actions/cache@v4' (SHA:0057852bfaa89a56745cba8c7296529d2fc39830)
+2026-10-21T17:29:32.7651615Z Download action repository 'actions/upload-artifact@v4' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+2026-10-21T17:29:33.0160078Z Complete job name: test
+2026-10-21T17:29:33.1102581Z ##[group]Run actions/checkout@v4
+2026-10-21T17:29:33.1103927Z with:
+2026-10-21T17:29:33.1104774Z   repository: achartt/bimcraft-SDH
+2026-10-21T17:29:33.1113667Z   token: ***
+2026-10-21T17:29:33.1114497Z   ssh-strict: true
+2026-10-21T17:29:33.1115352Z   ssh-user: git
+2026-10-21T17:29:33.1116201Z   persist-credentials: true
+2026-10-21T17:29:33.1117262Z   clean: true
+2026-10-21T17:29:33.1118119Z   sparse-checkout-cone-mode: true
+2026-10-21T17:29:33.1119119Z   fetch-depth: 1
+2026-10-21T17:29:33.1119934Z   fetch-tags: false
+2026-10-21T17:29:33.1120772Z   show-progress: true
+2026-10-21T17:29:33.1121631Z   lfs: false
+2026-10-21T17:29:33.1122432Z   submodules: false
+2026-10-21T17:29:33.1123342Z   set-safe-directory: true
+2026-10-21T17:29:33.1124317Z   allow-unsafe-pr-checkout: false
+2026-10-21T17:29:33.1125566Z ##[endgroup]
+2026-10-21T17:29:33.2303576Z Syncing repository: achartt/bimcraft-SDH
+2026-10-21T17:29:33.2307185Z ##[group]Getting Git version info
+2026-10-21T17:29:33.2308818Z Working directory is '/home/runner/work/bimcraft-SDH/bimcraft-SDH'
+2026-10-21T17:29:33.2311515Z [command]/usr/bin/git version
+2026-10-21T17:29:33.2312589Z git version 2.55.0
+2026-10-21T17:29:33.2338553Z ##[endgroup]
+2026-10-21T17:29:33.2359771Z Temporarily overriding HOME='/home/runner/work/_temp/ab51610c-688d-42ff-b96f-642278aa94da' before making global git config changes
+2026-10-21T17:29:33.2363547Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-21T17:29:33.2366933Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/bimcraft-SDH/bimcraft-SDH
+2026-10-21T17:29:33.2423528Z Deleting the contents of '/home/runner/work/bimcraft-SDH/bimcraft-SDH'
+2026-10-21T17:29:33.2428705Z ##[group]Initializing the repository
+2026-10-21T17:29:33.2434001Z [command]/usr/bin/git init /home/runner/work/bimcraft-SDH/bimcraft-SDH
+2026-10-21T17:29:33.2521983Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-10-21T17:29:33.2524908Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-10-21T17:29:33.2530016Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-10-21T17:29:33.2531509Z hint: call:
+2026-10-21T17:29:33.2532654Z hint:
+2026-10-21T17:29:33.2533634Z hint: 	git config --global init.defaultBranch <name>
+2026-10-21T17:29:33.2534915Z hint:
+2026-10-21T17:29:33.2536370Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-10-21T17:29:33.2538874Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-10-21T17:29:33.2540294Z hint:
+2026-10-21T17:29:33.2541072Z hint: 	git branch -m <name>
+2026-10-21T17:29:33.2542002Z hint:
+2026-10-21T17:29:33.2543252Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-10-21T17:29:33.2546396Z Initialized empty Git repository in /home/runner/work/bimcraft-SDH/bimcraft-SDH/.git/
+2026-10-21T17:29:33.2551266Z [command]/usr/bin/git remote add origin https://github.com/achartt/bimcraft-SDH
+2026-10-21T17:29:33.2592655Z ##[endgroup]
+2026-10-21T17:29:33.2594097Z ##[group]Disabling automatic garbage collection
+2026-10-21T17:29:33.2597146Z [command]/usr/bin/git config --local gc.auto 0
+2026-10-21T17:29:33.2634260Z ##[endgroup]
+2026-10-21T17:29:33.2635655Z ##[group]Setting up auth
+2026-10-21T17:29:33.2643751Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-21T17:29:33.2687051Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-21T17:29:33.3087317Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-21T17:29:33.3141697Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-21T17:29:33.3400961Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-21T17:29:33.3445465Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-21T17:29:33.3699595Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-10-21T17:29:33.3743746Z ##[endgroup]
+2026-10-21T17:29:33.3753150Z ##[group]Fetching the repository
+2026-10-21T17:29:33.3755989Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +68a22535d9fc8a4138f0a42d560ca57460f4d43d:refs/remotes/pull/2/merge
+2026-10-21T17:29:35.4038577Z From https://github.com/achartt/bimcraft-SDH
+2026-10-21T17:29:35.4039586Z  * [new ref]         68a22535d9fc8a4138f0a42d560ca57460f4d43d -> pull/2/merge
+2026-10-21T17:29:35.4042339Z ##[endgroup]
+2026-10-21T17:29:35.4042829Z ##[group]Determining the checkout info
+2026-10-21T17:29:35.4044935Z ##[endgroup]
+2026-10-21T17:29:35.4053186Z [command]/usr/bin/git sparse-checkout disable
+2026-10-21T17:29:35.4118329Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-10-21T17:29:35.4159046Z ##[group]Checking out the ref
+2026-10-21T17:29:35.4166136Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/2/merge
+2026-10-21T17:29:35.5543754Z Note: switching to 'refs/remotes/pull/2/merge'.
+2026-10-21T17:29:35.5544223Z 
+2026-10-21T17:29:35.5544594Z You are in 'detached HEAD' state. You can look around, make experimental
+2026-10-21T17:29:35.5545306Z changes and commit them, and you can discard any commits you make in this
+2026-10-21T17:29:35.5546028Z state without impacting any branches by switching back to a branch.
+2026-10-21T17:29:35.5547291Z 
+2026-10-21T17:29:35.5547665Z If you want to create a new branch to retain commits you create, you may
+2026-10-21T17:29:35.5548338Z do so (now or later) by using -c with the switch command. Example:
+2026-10-21T17:29:35.5548708Z 
+2026-10-21T17:29:35.5548896Z   git switch -c <new-branch-name>
+2026-10-21T17:29:35.5549175Z 
+2026-10-21T17:29:35.5549339Z Or undo this operation with:
+2026-10-21T17:29:35.5549567Z 
+2026-10-21T17:29:35.5549690Z   git switch -
+2026-10-21T17:29:35.5549902Z 
+2026-10-21T17:29:35.5550188Z Turn off this advice by setting config variable advice.detachedHead to false
+2026-10-21T17:29:35.5550705Z 
+2026-10-21T17:29:35.5551359Z HEAD is now at 68a2253 Merge e5da3321cd52150530d00b3123c7f5234dedccd3 into 72664187a1cc2694d1f8972fd2e1aa5b46106bc3
+2026-10-21T17:29:35.5561946Z ##[endgroup]
+2026-10-21T17:29:35.5617482Z [command]/usr/bin/git log -1 --format=%H
+2026-10-21T17:29:35.5650138Z 68a22535d9fc8a4138f0a42d560ca57460f4d43d
+2026-10-21T17:29:35.5951315Z ##[group]Run actions/setup-node@v4
+2026-10-21T17:29:35.5951630Z with:
+2026-10-21T17:29:35.5951862Z   node-version: 22
+2026-10-21T17:29:35.5952086Z   always-auth: false
+2026-10-21T17:29:35.5952310Z   check-latest: false
+2026-10-21T17:29:35.5954891Z   token: ***
+2026-10-21T17:29:35.5955110Z ##[endgroup]
+2026-10-21T17:29:35.7419423Z Found in cache @ /opt/hostedtoolcache/node/22.23.3/x64
+2026-10-21T17:29:35.7424504Z (node:2369) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-21T17:29:35.7425382Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-21T17:29:35.7427521Z ##[group]Environment details
+2026-10-21T17:29:36.1439577Z node: v22.23.3
+2026-10-21T17:29:36.1440549Z npm: 10.9.9
+2026-10-21T17:29:36.1440868Z yarn: 1.22.22
+2026-10-21T17:29:36.1441736Z ##[endgroup]
+2026-10-21T17:29:36.1621146Z ##[group]Run actions/setup-python@v5
+2026-10-21T17:29:36.1621443Z with:
+2026-10-21T17:29:36.1621674Z   python-version: 3.12
+2026-10-21T17:29:36.1621906Z   check-latest: false
+2026-10-21T17:29:36.1624411Z   token: ***
+2026-10-21T17:29:36.1624640Z   update-environment: true
+2026-10-21T17:29:36.1624914Z   allow-prereleases: false
+2026-10-21T17:29:36.1625152Z   freethreaded: false
+2026-10-21T17:29:36.1625379Z ##[endgroup]
+2026-10-21T17:29:36.2981552Z ##[group]Installed versions
+2026-10-21T17:29:36.3078390Z (node:2400) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-21T17:29:36.3079753Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-21T17:29:36.3080603Z Successfully set up CPython (3.12.15)
+2026-10-21T17:29:36.3081300Z ##[endgroup]
+2026-10-21T17:29:36.3261507Z ##[group]Run sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils
+2026-10-21T17:29:36.3262483Z [36;1msudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils[0m
+2026-10-21T17:29:36.3593635Z shell: /usr/bin/bash -e {0}
+2026-10-21T17:29:36.3593962Z env:
+2026-10-21T17:29:36.3594278Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-21T17:29:36.3594745Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib/pkgconfig
+2026-10-21T17:29:36.3595187Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-21T17:29:36.3595578Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-21T17:29:36.3595976Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-21T17:29:36.3596365Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib
+2026-10-21T17:29:36.3597026Z ##[endgroup]
+2026-10-21T17:29:42.6011929Z Selecting previously unselected package poppler-data.
+2026-10-21T17:29:42.6280683Z (Reading database ... 
+2026-10-21T17:29:42.6281258Z (Reading database ... 5%
+2026-10-21T17:29:42.6281783Z (Reading database ... 10%
+2026-10-21T17:29:42.6282783Z (Reading database ... 15%
+2026-10-21T17:29:42.6283400Z (Reading database ... 20%
+2026-10-21T17:29:42.6283866Z (Reading database ... 25%
+2026-10-21T17:29:42.6284640Z (Reading database ... 30%
+2026-10-21T17:29:42.6285019Z (Reading database ... 35%
+2026-10-21T17:29:42.6285402Z (Reading database ... 40%
+2026-10-21T17:29:42.6285842Z (Reading database ... 45%
+2026-10-21T17:29:42.6286293Z (Reading database ... 50%
+2026-10-21T17:29:42.6319369Z (Reading database ... 55%
+2026-10-21T17:29:42.7590355Z (Reading database ... 60%
+2026-10-21T17:29:42.9668083Z (Reading database ... 65%
+2026-10-21T17:29:43.1571300Z (Reading database ... 70%
+2026-10-21T17:29:43.3206844Z (Reading database ... 75%
+2026-10-21T17:29:43.5224928Z (Reading database ... 80%
+2026-10-21T17:29:43.7135048Z (Reading database ... 85%
+2026-10-21T17:29:43.8976979Z (Reading database ... 90%
+2026-10-21T17:29:44.0703864Z (Reading database ... 95%
+2026-10-21T17:29:44.0704371Z (Reading database ... 100%
+2026-10-21T17:29:44.0705049Z (Reading database ... 203540 files and directories currently installed.)
+2026-10-21T17:29:44.0764235Z Preparing to unpack .../poppler-data_0.4.12-1_all.deb ...
+2026-10-21T17:29:44.0792692Z Unpacking poppler-data (0.4.12-1) ...
+2026-10-21T17:29:44.2032552Z Selecting previously unselected package libpoppler134:amd64.
+2026-10-21T17:29:44.2171713Z Preparing to unpack .../libpoppler134_24.02.0-1ubuntu9.10_amd64.deb ...
+2026-10-21T17:29:44.2188884Z Unpacking libpoppler134:amd64 (24.02.0-1ubuntu9.10) ...
+2026-10-21T17:29:44.2542211Z Selecting previously unselected package poppler-utils.
+2026-10-21T17:29:44.2678687Z Preparing to unpack .../poppler-utils_24.02.0-1ubuntu9.10_amd64.deb ...
+2026-10-21T17:29:44.2686820Z Unpacking poppler-utils (24.02.0-1ubuntu9.10) ...
+2026-10-21T17:29:44.3218963Z Setting up libpoppler134:amd64 (24.02.0-1ubuntu9.10) ...
+2026-10-21T17:29:44.3236998Z Setting up poppler-data (0.4.12-1) ...
+2026-10-21T17:29:44.3294320Z Setting up poppler-utils (24.02.0-1ubuntu9.10) ...
+2026-10-21T17:29:44.3314431Z Processing triggers for libc-bin (2.39-0ubuntu8.9) ...
+2026-10-21T17:29:44.3631001Z Processing triggers for man-db (2.12.0-4build2) ...
+2026-10-21T17:29:44.3652422Z Not building database; man-db/auto-update is not 'true'.
+2026-10-21T17:29:44.3667541Z Processing triggers for fontconfig (2.15.0-1.1ubuntu2) ...
+2026-10-21T17:29:45.0449254Z 
+2026-10-21T17:29:45.0450010Z Running kernel seems to be up-to-date.
+2026-10-21T17:29:45.0450369Z 
+2026-10-21T17:29:45.0450595Z No services need to be restarted.
+2026-10-21T17:29:45.0450868Z 
+2026-10-21T17:29:45.0451084Z No containers need to be restarted.
+2026-10-21T17:29:45.0451350Z 
+2026-10-21T17:29:45.0451628Z No user sessions are running outdated binaries.
+2026-10-21T17:29:45.0451935Z 
+2026-10-21T17:29:45.0452353Z No VM guests are running outdated hypervisor (qemu) binaries on this host.
+2026-10-21T17:29:46.3850914Z ##[group]Run actions/cache@v4
+2026-10-21T17:29:46.3851183Z with:
+2026-10-21T17:29:46.3851392Z   path: devshell/vendor
+2026-10-21T17:29:46.3851765Z   key: vendor-82f8075e4b3ca49bbbf86914608d9676db0803982e8a3a3c8206145257989d31
+2026-10-21T17:29:46.3852195Z   enableCrossOsArchive: false
+2026-10-21T17:29:46.3852471Z   fail-on-cache-miss: false
+2026-10-21T17:29:46.3852709Z   lookup-only: false
+2026-10-21T17:29:46.3852925Z   save-always: false
+2026-10-21T17:29:46.3853139Z env:
+2026-10-21T17:29:46.3853399Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-21T17:29:46.3853826Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib/pkgconfig
+2026-10-21T17:29:46.3854239Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-21T17:29:46.3854613Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-21T17:29:46.3854988Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-21T17:29:46.3855414Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib
+2026-10-21T17:29:46.3855738Z ##[endgroup]
+2026-10-21T17:29:46.5000152Z (node:2866) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-21T17:29:46.5001392Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-21T17:29:46.7135159Z Cache not found for input keys: vendor-82f8075e4b3ca49bbbf86914608d9676db0803982e8a3a3c8206145257989d31
+2026-10-21T17:29:46.7246049Z ##[group]Run npm run test:baseline
+2026-10-21T17:29:46.7246388Z [36;1mnpm run test:baseline[0m
+2026-10-21T17:29:46.7318966Z shell: /usr/bin/bash -e {0}
+2026-10-21T17:29:46.7319235Z env:
+2026-10-21T17:29:46.7319527Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-21T17:29:46.7319977Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib/pkgconfig
+2026-10-21T17:29:46.7320397Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-21T17:29:46.7320771Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-21T17:29:46.7321164Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-21T17:29:46.7321537Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib
+2026-10-21T17:29:46.7321863Z ##[endgroup]
+2026-10-21T17:29:46.8467783Z 
+2026-10-21T17:29:46.8468426Z > test:baseline
+2026-10-21T17:29:46.8468990Z > node devshell/baseline.mjs
+2026-10-21T17:29:46.8469282Z 
+2026-10-21T17:29:46.8867219Z delaunator 5.1.0: fetching 3 file(s)…
+2026-10-21T17:29:47.2354568Z geotiff 3.0.5: fetching 3 file(s)…
+2026-10-21T17:29:47.5858032Z laz-perf 0.0.7: fetching 4 file(s)…
+2026-10-21T17:29:47.6627487Z manifold-3d 3.5.4: fetching 7 file(s)…
+2026-10-21T17:29:47.9702205Z noble-ciphers 2.4.0: fetching 13 file(s)…
+2026-10-21T17:29:48.0848446Z noble-curves 2.4.0: fetching 26 file(s)…
+2026-10-21T17:29:48.2779943Z noble-hashes 2.4.0: fetching 22 file(s)…
+2026-10-21T17:29:48.4387102Z pdf-lib 1.17.1: fetching 3 file(s)…
+2026-10-21T17:29:48.6308216Z proj4 2.22.0: fetching 2 file(s)…
+2026-10-21T17:29:48.6760139Z robust-predicates 3.0.3: fetching 8 file(s)…
+2026-10-21T17:29:48.7549806Z three 0.186.1: fetching 6 file(s)…
+2026-10-21T17:29:48.9521521Z three-gpu-pathtracer 0.0.26: fetching 5 file(s)…
+2026-10-21T17:29:49.0002290Z three-mesh-bvh 0.9.15: fetching 3 file(s)…
+2026-10-21T17:29:49.0510875Z web-e57 1.2.0: fetching 5 file(s)…
+2026-10-21T17:29:49.2648773Z ▶ precision: node --test --test-reporter=tap tests/unit/wall-precision.test.mjs
+2026-10-21T17:29:49.6538729Z PASS precision: 7 passed, 0 failed; 0 skip/availability notices
+2026-10-21T17:29:49.6540133Z ▶ materials: node --test --test-reporter=tap tests/unit/material-library.test.mjs
+2026-10-21T17:29:49.9886202Z PASS materials: 8 passed, 0 failed; 0 skip/availability notices
+2026-10-21T17:29:49.9887553Z ▶ model: node .cc-test/bin/test-bimcraft.mjs --model
+2026-10-21T17:29:51.0784414Z PASS model: 124 passed, 0 failed; 4 skip/availability notices
+2026-10-21T17:29:51.0785012Z   --   web-ifc not installed: oracle check skipped
+2026-10-21T17:29:51.0785448Z   --   web-ifc not installed: oracle check skipped
+2026-10-21T17:29:51.0785846Z   --   web-ifc not installed: oracle check skipped
+2026-10-21T17:29:51.0786185Z   --   no venv with ifcopenshell: skipped
+2026-10-21T17:29:51.0787153Z ▶ comforts: node .cc-test/bin/test-bimcraft.mjs --comforts
+2026-10-21T17:29:52.4448428Z PASS comforts: 103 passed, 0 failed; 3 skip/availability notices
+2026-10-21T17:29:52.4449053Z   --   web-ifc not installed: oracle check skipped
+2026-10-21T17:29:52.4449437Z   --   web-ifc not installed: oracle check skipped
+2026-10-21T17:29:52.4449803Z   --   no venv with ifcopenshell: skipped
+2026-10-21T17:29:52.4450541Z ▶ views2: node .cc-test/bin/test-bimcraft.mjs --views2
+2026-10-21T17:29:53.0721190Z PASS views2: 104 passed, 0 failed; 1 skip/availability notices
+2026-10-21T17:29:53.0721959Z   --   no venv with ifcopenshell: schema validation skipped
+2026-10-21T17:29:53.0722980Z ▶ res: node .cc-test/bin/test-bimcraft.mjs --res
+2026-10-21T17:29:56.3529146Z PASS res: 197 passed, 0 failed; 13 skip/availability notices
+2026-10-21T17:29:56.3529845Z   --   web-ifc not installed: oracle check skipped
+2026-10-21T17:29:56.3530418Z   --   web-ifc not installed: oracle check skipped
+2026-10-21T17:29:56.3531279Z   --   no library repo at /home/runner/work/bimcraft-SDH/bimcraft-SDH/repos/library: item checks skipped
+2026-10-21T17:29:56.3532488Z   --   web-ifc not installed: oracle check skipped
+2026-10-21T17:29:56.3533287Z   --   web-ifc not installed: oracle check skipped
+2026-10-21T17:29:56.3533839Z   --   web-ifc not installed: oracle check skipped
+2026-10-21T17:29:56.3535433Z SKIP terrain live source comparison: civilcraft app absent at /home/runner/work/bimcraft-SDH/bimcraft-SDH/.cc-test/public_html/assets/apps/civilcraft; bundled integrity checked separately
+2026-10-21T17:29:56.3537189Z   --   web-ifc not installed: oracle check skipped
+2026-10-21T17:29:56.3537762Z   --   web-ifc not installed: oracle check skipped
+2026-10-21T17:29:56.3539216Z SKIP electrical live source comparison: cadcraft app absent at /home/runner/work/bimcraft-SDH/bimcraft-SDH/.cc-test/public_html/assets/apps/cadcraft; bundled integrity checked separately
+2026-10-21T17:29:56.3540373Z   --   web-ifc not installed: oracle check skipped
+2026-10-21T17:29:56.3541646Z   SKIP RC.8 cross-app reader, quantities, estimate and pack sync: TakeoffCraft directory absent at /home/runner/work/bimcraft-SDH/bimcraft-SDH/.cc-test/public_html/assets/apps/takeoffcraft/dev
+2026-10-21T17:29:56.3542941Z   --   no venv with ifcopenshell (or nothing saved): skipped
+2026-10-21T17:29:56.3543949Z ▶ fixture: node tests/features/f01/fixture.mjs --verify
+2026-10-21T17:29:56.6049861Z PASS fixture: 1 passed, 0 failed; 0 skip/availability notices
+2026-10-21T17:29:56.6051370Z ▶ source-sync-contract: node --test --test-reporter=tap tests/features/f01/source-sync.test.mjs
+2026-10-21T17:29:57.8795984Z PASS source-sync-contract: 26 passed, 0 failed; 0 skip/availability notices
+2026-10-21T17:29:57.8797250Z ▶ runner-contract: node --test --test-reporter=tap tests/features/f01/runner.test.mjs
+2026-10-21T17:29:58.9973295Z PASS runner-contract: 8 passed, 0 failed; 0 skip/availability notices
+2026-10-21T17:29:59.0125224Z Evidence: /home/runner/work/bimcraft-SDH/bimcraft-SDH/.cc-test/baseline/summary.json (optional skips are not passes)
+2026-10-21T17:29:59.0435741Z ##[group]Run npm test -- --oracles
+2026-10-21T17:29:59.0436095Z [36;1mnpm test -- --oracles[0m
+2026-10-21T17:29:59.0508594Z shell: /usr/bin/bash -e {0}
+2026-10-21T17:29:59.0508863Z env:
+2026-10-21T17:29:59.0509151Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-21T17:29:59.0509598Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib/pkgconfig
+2026-10-21T17:29:59.0510029Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-21T17:29:59.0510404Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-21T17:29:59.0510780Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-21T17:29:59.0511157Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib
+2026-10-21T17:29:59.0511508Z ##[endgroup]
+2026-10-21T17:29:59.1660542Z 
+2026-10-21T17:29:59.1660773Z > test
+2026-10-21T17:29:59.1661265Z > node devshell/test.mjs --oracles
+2026-10-21T17:29:59.1661556Z 
+2026-10-21T17:29:59.2201902Z libredwg-web 0.7.17: fetching 4 file(s)…
+2026-10-21T17:30:00.0639597Z web-ifc 0.0.78: fetching 2 file(s)…
+2026-10-21T17:30:00.3807779Z libraries: 6 fetched, 110 already here
+2026-10-21T17:30:00.4795532Z npm install in tests/tools/bimcraft-test …
+2026-10-21T17:30:01.3790872Z 
+2026-10-21T17:30:01.3791440Z added 1 package in 844ms
+2026-10-21T17:30:01.4200741Z npm install in tests/tools/library …
+2026-10-21T17:30:02.0361809Z 
+2026-10-21T17:30:02.0362504Z added 1 package in 561ms
+2026-10-21T17:30:02.0472123Z npm install in tests/tools/markupcraft-test …
+2026-10-21T17:30:03.2198593Z 
+2026-10-21T17:30:03.2199133Z added 3 packages in 1s
+2026-10-21T17:30:03.2321252Z npm install in tests/tools/mcp …
+2026-10-21T17:30:04.9759382Z 
+2026-10-21T17:30:04.9760035Z added 3 packages in 2s
+2026-10-21T17:30:04.9912144Z npm install in tests/tools/modelcraft-test …
+2026-10-21T17:30:05.5023933Z 
+2026-10-21T17:30:05.5024549Z added 2 packages in 454ms
+2026-10-21T17:30:05.5118830Z npm install in tests/tools/takeoffcraft-test …
+2026-10-21T17:30:06.3683078Z 
+2026-10-21T17:30:06.3683791Z added 4 packages in 800ms
+2026-10-21T17:30:06.3830004Z python venv in tests/tools/cadcraft-test …
+2026-10-21T17:30:15.6858879Z 
+2026-10-21T17:30:15.7740943Z [notice] A new release of pip is available: 25.0.1 -> 26.2.2
+2026-10-21T17:30:15.7741767Z [notice] To update, run: python3 -m pip install --upgrade pip
+2026-10-21T17:30:15.7742827Z python venv in tests/tools/civilcraft-test …
+2026-10-21T17:30:28.2111307Z 
+2026-10-21T17:30:28.2112138Z [notice] A new release of pip is available: 25.0.1 -> 26.2.2
+2026-10-21T17:30:28.2112964Z [notice] To update, run: python3 -m pip install --upgrade pip
+2026-10-21T17:30:28.3257188Z python venv in tests/tools/detailcraft-test …
+2026-10-21T17:30:41.5673193Z 
+2026-10-21T17:30:41.5674153Z [notice] A new release of pip is available: 25.0.1 -> 26.2.2
+2026-10-21T17:30:41.5674957Z [notice] To update, run: python3 -m pip install --upgrade pip
+2026-10-21T17:30:41.6730622Z python venv in tests/tools/takeoffcraft-test …
+2026-10-21T17:30:45.3973184Z 
+2026-10-21T17:30:45.3974097Z [notice] A new release of pip is available: 25.0.1 -> 26.2.2
+2026-10-21T17:30:45.3974898Z [notice] To update, run: python3 -m pip install --upgrade pip
+2026-10-21T17:30:45.4671678Z 
+2026-10-21T17:30:45.4672870Z ▶ test-bimcraft-drafting.mjs
+2026-10-21T17:30:45.5256731Z Drafting regression checks passed: alignment, snap priority, face offsets, corners, egress well geometry and symbols.
+2026-10-21T17:30:45.5301423Z 
+2026-10-21T17:30:45.5302154Z ▶ test-bimcraft-revit-ifc.mjs
+2026-10-21T17:30:45.6578708Z no Revit IFC exports in /var/www/CADCRAFT/testfiles/samples (a clean clone): skipped
+2026-10-21T17:30:45.6639766Z 
+2026-10-21T17:30:45.6640662Z ▶ test-bimcraft.mjs
+2026-10-21T17:30:45.8612280Z ok   fixtures/dwg/base-plan.dwg  (70 ms)
+2026-10-21T17:30:45.8613183Z        kind        Drawing
+2026-10-21T17:30:45.8613565Z        size        0.0 MB
+2026-10-21T17:30:45.8613943Z        release     AutoCAD 2018 (AC1032)
+2026-10-21T17:30:45.8616993Z        units       inches
+2026-10-21T17:30:45.8618015Z        layers      3
+2026-10-21T17:30:45.8618369Z        entities    13
+2026-10-21T17:30:45.8619140Z        spaces      Model: 12 lines, 0 fills, 1 texts | Layout1 (sheet, 0 viewports): 0 lines, 0 fills, 0 texts
+2026-10-21T17:30:45.8620312Z        weights     0.25 mm × 12 | 1 non-printing layers
+2026-10-21T17:30:45.8747848Z ok   fixtures/dwg/base-plan.dxf  (13 ms)
+2026-10-21T17:30:45.8748400Z        kind        Drawing
+2026-10-21T17:30:45.8748773Z        size        0.1 MB
+2026-10-21T17:30:45.8749143Z        release     DXF
+2026-10-21T17:30:45.8749494Z        units       inches
+2026-10-21T17:30:45.8749856Z        layers      3
+2026-10-21T17:30:45.8750183Z        entities    13
+2026-10-21T17:30:45.8750922Z        spaces      Model: 12 lines, 0 fills, 1 texts | Layout1 (sheet, 0 viewports): 0 lines, 0 fills, 0 texts
+2026-10-21T17:30:45.8751969Z        weights     0.25 mm × 12 | 1 non-printing layers
+2026-10-21T17:30:45.9104609Z ok   fixtures/dwg/df1-ocs-blocks-r2000.dwg  (36 ms)
+2026-10-21T17:30:45.9105254Z        kind        Drawing
+2026-10-21T17:30:45.9105634Z        size        0.1 MB
+2026-10-21T17:30:45.9106064Z        release     AutoCAD 2000 (AC1015)
+2026-10-21T17:30:45.9106671Z        units       millimeters
+2026-10-21T17:30:45.9107047Z        layers      23
+2026-10-21T17:30:45.9107382Z        entities    28
+2026-10-21T17:30:45.9108116Z        spaces      Model: 123 lines, 8 fills, 3 texts | Layout1 (sheet, 0 viewports): 0 lines, 0 fills, 0 texts
+2026-10-21T17:30:45.9109102Z        weights     0.25 mm × 123 | 1 non-printing layers
+2026-10-21T17:30:45.9256727Z ok   fixtures/dwg/df1-ocs-blocks.dwg  (15 ms)
+2026-10-21T17:30:45.9257313Z        kind        Drawing
+2026-10-21T17:30:45.9257691Z        size        0.0 MB
+2026-10-21T17:30:45.9258122Z        release     AutoCAD 2018 (AC1032)
+2026-10-21T17:30:45.9258581Z        units       millimeters
+2026-10-21T17:30:45.9258959Z        layers      23
+2026-10-21T17:30:45.9259300Z        entities    28
+2026-10-21T17:30:45.9260079Z        spaces      Model: 123 lines, 8 fills, 3 texts | Layout1 (sheet, 0 viewports): 0 lines, 0 fills, 0 texts
+2026-10-21T17:30:45.9261527Z        weights     0.25 mm × 123 | 1 non-printing layers
+2026-10-21T17:30:45.9382578Z ok   fixtures/dwg/df1-ocs-blocks.dxf  (13 ms)
+2026-10-21T17:30:45.9383132Z        kind        Drawing
+2026-10-21T17:30:45.9383532Z        size        0.1 MB
+2026-10-21T17:30:45.9383898Z        release     DXF
+2026-10-21T17:30:45.9384293Z        units       millimeters
+2026-10-21T17:30:45.9384663Z        layers      23
+2026-10-21T17:30:45.9384994Z        entities    28
+2026-10-21T17:30:45.9385734Z        spaces      Model: 123 lines, 8 fills, 3 texts | Layout1 (sheet, 0 viewports): 0 lines, 0 fills, 0 texts
+2026-10-21T17:30:45.9387041Z        weights     0.25 mm × 123 | 1 non-printing layers
+2026-10-21T17:30:46.1043493Z ok   fixtures/dwg/kitchen-equipment-r2000.dwg  (165 ms)
+2026-10-21T17:30:46.1044463Z        kind        Drawing
+2026-10-21T17:30:46.1045106Z        size        0.5 MB
+2026-10-21T17:30:46.1045796Z        release     AutoCAD 2000 (AC1015)
+2026-10-21T17:30:46.1046381Z        units       inches
+2026-10-21T17:30:46.1047172Z        layers      15
+2026-10-21T17:30:46.1047650Z        entities    264
+2026-10-21T17:30:46.1049225Z        spaces      Model: 668 lines, 4 fills, 125 texts | K-101 EQUIPMENT (sheet, 2 viewports): 5 lines, 0 fills, 5 texts | K-102 ELECTRICAL (sheet, 1 viewports): 5 lines, 0 fills, 5 texts | K-501 DETAILS (sheet, 1 viewports): 5 lines, 0 fills, 5 texts
+2026-10-21T17:30:46.1051088Z        linked      base-plan (loaded) — 13 entities drawn from links
+2026-10-21T17:30:46.1051707Z        weights     0.25 mm × 683 | 2 non-printing layers
+2026-10-21T17:30:46.1052418Z        equipment   101 items on sheets (K-101 EQUIPMENT 101, K-102 ELECTRICAL 101), 12 off sheets, from 114 tags
+2026-10-21T17:30:46.1053141Z        images      example-logo.png ×1
+2026-10-21T17:30:46.3719105Z ok   fixtures/dwg/kitchen-equipment.dwg  (267 ms)
+2026-10-21T17:30:46.3719711Z        kind        Drawing
+2026-10-21T17:30:46.3720648Z        size        0.2 MB
+2026-10-21T17:30:46.3721087Z        release     AutoCAD 2018 (AC1032)
+2026-10-21T17:30:46.3721543Z        units       inches
+2026-10-21T17:30:46.3721898Z        layers      15
+2026-10-21T17:30:46.3722243Z        entities    264
+2026-10-21T17:30:46.3723844Z        spaces      Model: 668 lines, 4 fills, 125 texts | K-101 EQUIPMENT (sheet, 2 viewports): 5 lines, 0 fills, 5 texts | K-102 ELECTRICAL (sheet, 1 viewports): 5 lines, 0 fills, 5 texts | K-501 DETAILS (sheet, 1 viewports): 5 lines, 0 fills, 5 texts
+2026-10-21T17:30:46.3725864Z        linked      base-plan (loaded) — 13 entities drawn from links
+2026-10-21T17:30:46.3726817Z        weights     0.25 mm × 683 | 2 non-printing layers
+2026-10-21T17:30:46.3728115Z        equipment   101 items on sheets (K-101 EQUIPMENT 101, K-102 ELECTRICAL 101), 12 off sheets, from 114 tags — matches fixtures/facts.json
+2026-10-21T17:30:46.3729160Z        images      example-logo.png ×1
+2026-10-21T17:30:46.5358311Z ok   fixtures/dwg/kitchen-equipment.dxf  (162 ms)
+2026-10-21T17:30:46.5358920Z        kind        Drawing
+2026-10-21T17:30:46.5359330Z        size        1.3 MB
+2026-10-21T17:30:46.5359709Z        release     DXF
+2026-10-21T17:30:46.5360068Z        units       inches
+2026-10-21T17:30:46.5360442Z        layers      15
+2026-10-21T17:30:46.5360788Z        entities    264
+2026-10-21T17:30:46.5362340Z        spaces      Model: 668 lines, 4 fills, 125 texts | K-101 EQUIPMENT (sheet, 2 viewports): 5 lines, 0 fills, 5 texts | K-102 ELECTRICAL (sheet, 1 viewports): 5 lines, 0 fills, 5 texts | K-501 DETAILS (sheet, 1 viewports): 5 lines, 0 fills, 5 texts
+2026-10-21T17:30:46.5364304Z        linked      base-plan (loaded) — 13 entities drawn from links
+2026-10-21T17:30:46.5365077Z        weights     0.25 mm × 683 | 2 non-printing layers
+2026-10-21T17:30:46.5365981Z        equipment   101 items on sheets (K-101 EQUIPMENT 101, K-102 ELECTRICAL 101), 12 off sheets, from 114 tags
+2026-10-21T17:30:46.5367054Z        images      example-logo.png ×1
+2026-10-21T17:30:46.5763355Z ok   fixtures/electrical/electrical-sample.dwg  (40 ms)
+2026-10-21T17:30:46.5764449Z        kind        Drawing
+2026-10-21T17:30:46.5764811Z        size        0.0 MB
+2026-10-21T17:30:46.5765199Z        release     AutoCAD 2018 (AC1032)
+2026-10-21T17:30:46.5765632Z        units       millimeters
+2026-10-21T17:30:46.5765991Z        layers      16
+2026-10-21T17:30:46.5766314Z        entities    347
+2026-10-21T17:30:46.5769110Z        spaces      Model: 49 lines, 1 fills, 21 texts | Sheet 1 (sheet, 0 viewports): 111 lines, 4 fills, 84 texts | Sheet 2 (sheet, 0 viewports): 84 lines, 6 fills, 82 texts | Sheet 3 (sheet, 0 viewports): 51 lines, 2 fills, 58 texts | Sheet list (sheet, 0 viewports): 46 lines, 0 fills, 63 texts | Terminal plan (sheet, 0 viewports): 46 lines, 0 fills, 65 texts | Cable list (sheet, 0 viewports): 47 lines, 0 fills, 69 texts | Parts list (sheet, 0 viewports): 53 lines, 0 fills, 103 texts
+2026-10-21T17:30:46.5771726Z        weights     0.25 mm × 487
+2026-10-21T17:30:46.5946780Z ok   fixtures/electrical/electrical-sample.dxf  (18 ms)
+2026-10-21T17:30:46.5977279Z        kind        Drawing
+2026-10-21T17:30:46.5977623Z        size        0.2 MB
+2026-10-21T17:30:46.5977891Z        release     DXF
+2026-10-21T17:30:46.5978166Z        units       millimeters
+2026-10-21T17:30:46.5978431Z        layers      16
+2026-10-21T17:30:46.5978667Z        entities    347
+2026-10-21T17:30:46.5980319Z        spaces      Model: 49 lines, 1 fills, 21 texts | Sheet 1 (sheet, 0 viewports): 111 lines, 4 fills, 84 texts | Sheet 2 (sheet, 0 viewports): 84 lines, 6 fills, 82 texts | Sheet 3 (sheet, 0 viewports): 51 lines, 2 fills, 58 texts | Sheet list (sheet, 0 viewports): 46 lines, 0 fills, 63 texts | Terminal plan (sheet, 0 viewports): 46 lines, 0 fills, 65 texts | Cable list (sheet, 0 viewports): 47 lines, 0 fills, 69 texts | Parts list (sheet, 0 viewports): 53 lines, 0 fills, 103 texts
+2026-10-21T17:30:46.5982106Z        weights     0.25 mm × 487
+2026-10-21T17:30:46.6477342Z ok   fixtures/f01/edited-reopened.ifc  (53 ms)
+2026-10-21T17:30:46.6477944Z        kind        IFC
+2026-10-21T17:30:46.6478338Z        size        0.0 MB
+2026-10-21T17:30:46.6478712Z        schema      IFC4
+2026-10-21T17:30:46.6479176Z        project     F01 synthetic residential
+2026-10-21T17:30:46.6479655Z        from        BimCraft
+2026-10-21T17:30:46.6480053Z        storeys     1
+2026-10-21T17:30:46.6480401Z        elements    6
+2026-10-21T17:30:46.6480742Z        triangles   164
+2026-10-21T17:30:46.6481093Z        batches     4
+2026-10-21T17:30:46.6481497Z        top         Wall 5, Space 2, Window 1
+2026-10-21T17:30:46.6482169Z        sample      IfcWall "F01 exterior cavity wall" with 4 property sets
+2026-10-21T17:30:46.6565154Z ok   fixtures/f01/house.ifc  (9 ms)
+2026-10-21T17:30:46.6565787Z        kind        IFC
+2026-10-21T17:30:46.6595823Z        size        0.0 MB
+2026-10-21T17:30:46.6596291Z        schema      IFC4
+2026-10-21T17:30:46.6608663Z        project     F01 synthetic residential
+2026-10-21T17:30:46.6609263Z        from        BimCraft
+2026-10-21T17:30:46.6609625Z        storeys     1
+2026-10-21T17:30:46.6609981Z        elements    6
+2026-10-21T17:30:46.6610316Z        triangles   164
+2026-10-21T17:30:46.6610659Z        batches     4
+2026-10-21T17:30:46.6611054Z        top         Wall 5, Space 2, Window 1
+2026-10-21T17:30:46.6611827Z        sample      IfcWall "F01 exterior cavity wall" with 4 property sets
+2026-10-21T17:30:46.6612559Z ok   fixtures/f01/missing-host.ifc  (4 ms)
+2026-10-21T17:30:46.6613005Z        kind        IFC
+2026-10-21T17:30:46.6613344Z        size        0.0 MB
+2026-10-21T17:30:46.6613694Z        schema      IFC4
+2026-10-21T17:30:46.6614104Z        project     F01 synthetic residential
+2026-10-21T17:30:46.6614529Z        from        BimCraft
+2026-10-21T17:30:46.6614883Z        storeys     1
+2026-10-21T17:30:46.6615224Z        elements    4
+2026-10-21T17:30:46.6615552Z        triangles   48
+2026-10-21T17:30:46.6615893Z        batches     1
+2026-10-21T17:30:46.6616236Z        top         Wall 4
+2026-10-21T17:30:46.6617052Z        sample      IfcWall "F01 exterior cavity wall" with 4 property sets
+2026-10-21T17:30:46.7792935Z ok   fixtures/showcase/bimcraft-house-turned.ifc  (118 ms)
+2026-10-21T17:30:46.7793603Z        kind        IFC
+2026-10-21T17:30:46.7793970Z        size        0.7 MB
+2026-10-21T17:30:46.7794338Z        schema      IFC4
+2026-10-21T17:30:46.7794629Z        project     Maple Street house
+2026-10-21T17:30:46.7794917Z        from        BimCraft
+2026-10-21T17:30:46.7795167Z        storeys     2
+2026-10-21T17:30:46.7795393Z        elements    48
+2026-10-21T17:30:46.7795622Z        triangles   18026
+2026-10-21T17:30:46.7795861Z        batches     12
+2026-10-21T17:30:46.7796146Z        top         Slab 15, Wall 13, Window 9, Door 7
+2026-10-21T17:30:46.7797033Z        sample      IfcWall "Exterior 2×6" with 5 property sets
+2026-10-21T17:30:46.8653328Z ok   fixtures/showcase/bimcraft-house.ifc  (86 ms)
+2026-10-21T17:30:46.8653757Z        kind        IFC
+2026-10-21T17:30:46.8654064Z        size        0.7 MB
+2026-10-21T17:30:46.8654316Z        schema      IFC4
+2026-10-21T17:30:46.8654617Z        project     Maple Street house
+2026-10-21T17:30:46.8655036Z        from        BimCraft
+2026-10-21T17:30:46.8655362Z        storeys     2
+2026-10-21T17:30:46.8655676Z        elements    48
+2026-10-21T17:30:46.8655989Z        triangles   18026
+2026-10-21T17:30:46.8656312Z        batches     12
+2026-10-21T17:30:46.8656913Z        top         Slab 15, Wall 13, Window 9, Door 7
+2026-10-21T17:30:46.8657838Z        sample      IfcWall "Exterior 2×6" with 5 property sets
+2026-10-21T17:30:46.8763373Z ok   fixtures/showcase/cadcraft-sample-asbuilt.dwg  (11 ms)
+2026-10-21T17:30:46.8763841Z        kind        Drawing
+2026-10-21T17:30:46.8764116Z        size        0.0 MB
+2026-10-21T17:30:46.8764403Z        release     AutoCAD 2018 (AC1032)
+2026-10-21T17:30:46.8764717Z        units       millimeters
+2026-10-21T17:30:46.8764975Z        layers      10
+2026-10-21T17:30:46.8765203Z        entities    552
+2026-10-21T17:30:46.8766413Z        spaces      Model: 27 lines, 13 fills, 12 texts | AB-101 AS-BUILT PLAN (sheet, 1 viewports): 5 lines, 0 fills, 11 texts
+2026-10-21T17:30:46.8767946Z        weights     0.25 mm × 28, 0.50 mm × 4 | 1 non-printing layers
+2026-10-21T17:30:46.8821565Z ok   fixtures/showcase/cadcraft-sample-asbuilt.dxf  (5 ms)
+2026-10-21T17:30:46.8822123Z        kind        Drawing
+2026-10-21T17:30:46.8822486Z        size        0.1 MB
+2026-10-21T17:30:46.8822840Z        release     DXF
+2026-10-21T17:30:46.8823219Z        units       millimeters
+2026-10-21T17:30:46.8823608Z        layers      10
+2026-10-21T17:30:46.8823975Z        entities    552
+2026-10-21T17:30:46.8824816Z        spaces      Model: 27 lines, 13 fills, 12 texts | AB-101 AS-BUILT PLAN (sheet, 1 viewports): 5 lines, 0 fills, 11 texts
+2026-10-21T17:30:46.8826014Z        weights     0.25 mm × 28, 0.50 mm × 4 | 1 non-printing layers
+2026-10-21T17:30:46.9234614Z ok   fixtures/showcase/cadcraft-sample-house.dwg  (41 ms)
+2026-10-21T17:30:46.9235291Z        kind        Drawing
+2026-10-21T17:30:46.9235649Z        size        0.0 MB
+2026-10-21T17:30:46.9236049Z        release     AutoCAD 2018 (AC1032)
+2026-10-21T17:30:46.9236328Z        units       inches
+2026-10-21T17:30:46.9236794Z        layers      12
+2026-10-21T17:30:46.9237017Z        entities    84
+2026-10-21T17:30:46.9238531Z        spaces      Model: 85 lines, 13 fills, 28 texts | A-101 FLOOR PLAN (sheet, 1 viewports): 5 lines, 0 fills, 11 texts | A-201 ELEVATIONS (sheet, 1 viewports): 5 lines, 0 fills, 11 texts | A-301 SECTIONS (sheet, 1 viewports): 5 lines, 0 fills, 11 texts | A-501 DETAILS (sheet, 1 viewports): 5 lines, 0 fills, 11 texts
+2026-10-21T17:30:46.9240331Z        weights     0.25 mm × 90, 0.50 mm × 14, 0.70 mm × 1 | 1 non-printing layers
+2026-10-21T17:30:46.9270212Z ok   fixtures/showcase/cadcraft-sample-house.dxf  (3 ms)
+2026-10-21T17:30:46.9270751Z        kind        Drawing
+2026-10-21T17:30:46.9271113Z        size        0.0 MB
+2026-10-21T17:30:46.9271472Z        release     DXF
+2026-10-21T17:30:46.9271852Z        units       inches
+2026-10-21T17:30:46.9272698Z        layers      12
+2026-10-21T17:30:46.9289190Z        entities    84
+2026-10-21T17:30:46.9291136Z        spaces      Model: 85 lines, 13 fills, 28 texts | A-101 FLOOR PLAN (sheet, 1 viewports): 5 lines, 0 fills, 11 texts | A-201 ELEVATIONS (sheet, 1 viewports): 5 lines, 0 fills, 11 texts | A-301 SECTIONS (sheet, 1 viewports): 5 lines, 0 fills, 11 texts | A-501 DETAILS (sheet, 1 viewports): 5 lines, 0 fills, 11 texts
+2026-10-21T17:30:46.9293334Z        weights     0.25 mm × 90, 0.50 mm × 14, 0.70 mm × 1 | 1 non-printing layers
+2026-10-21T17:30:46.9293808Z 
+2026-10-21T17:30:46.9293982Z 19 of 19 files opened
+2026-10-21T17:30:46.9294216Z 
+2026-10-21T17:30:46.9294463Z Partial mode (cut-off RVT/RFA)
+2026-10-21T17:30:46.9497821Z   11 complete Revit files checked: none reported partial
+2026-10-21T17:30:46.9499479Z   (skipped: MassWithBoxAndCone.rfa — the public samples are not in this checkout)
+2026-10-21T17:30:46.9500814Z   (skipped: Room_Properties.rvt — the public samples are not in this checkout)
+2026-10-21T17:30:46.9502152Z   (skipped: empty2013.rfa — the public samples are not in this checkout)
+2026-10-21T17:30:46.9503297Z   (skipped: cutWalls.rvt — the public samples are not in this checkout)
+2026-10-21T17:30:46.9504158Z   all 13 partial-mode checks passed
+2026-10-21T17:30:46.9720313Z 
+2026-10-21T17:30:46.9721199Z pass  test-bimcraft-drafting.mjs  (0.1 s)
+2026-10-21T17:30:46.9722102Z pass  test-bimcraft-revit-ifc.mjs  (0.1 s)
+2026-10-21T17:30:46.9722875Z pass  test-bimcraft.mjs  (1.3 s)
+2026-10-21T17:30:46.9723544Z 3 of 3 test files passed
+2026-10-21T17:30:46.9945310Z ##[group]Run actions/upload-artifact@v4
+2026-10-21T17:30:46.9945614Z with:
+2026-10-21T17:30:46.9945821Z   name: f01-baseline
+2026-10-21T17:30:46.9946067Z   path: .cc-test/baseline/
+2026-10-21T17:30:46.9946310Z   if-no-files-found: warn
+2026-10-21T17:30:46.9946931Z   compression-level: 6
+2026-10-21T17:30:46.9947246Z   overwrite: false
+2026-10-21T17:30:46.9947535Z   include-hidden-files: false
+2026-10-21T17:30:46.9947888Z env:
+2026-10-21T17:30:46.9948190Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-21T17:30:46.9948619Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib/pkgconfig
+2026-10-21T17:30:46.9949040Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-21T17:30:46.9949601Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-21T17:30:46.9950197Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-21T17:30:46.9950787Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib
+2026-10-21T17:30:46.9951336Z ##[endgroup]
+2026-10-21T17:30:47.1631795Z (node:3575) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-21T17:30:47.1632622Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-21T17:30:47.1737823Z With the provided path, there will be 10 files uploaded
+2026-10-21T17:30:47.1738912Z Artifact name is valid!
+2026-10-21T17:30:47.1739444Z Root directory input is valid!
+2026-10-21T17:30:47.4771907Z Beginning upload of artifact content to blob storage
+2026-10-21T17:30:47.5115556Z (node:3575) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-10-21T17:30:47.7260471Z Uploaded bytes 21373
+2026-10-21T17:30:47.7779649Z Finished uploading artifact content to blob storage!
+2026-10-21T17:30:47.7780693Z SHA256 digest of uploaded artifact zip is cff11fe3748ff577642614e80e55e23bc73a5eee438c6dcb9df90c2d0452ec2f
+2026-10-21T17:30:47.7781651Z Finalizing artifact upload
+2026-10-21T17:30:48.0689152Z Artifact f01-baseline.zip successfully finalized. Artifact ID 12365993449
+2026-10-21T17:30:48.0690338Z Artifact f01-baseline has been successfully uploaded! Final size is 21373 bytes. Artifact ID is 12365993449
+2026-10-21T17:30:48.0697455Z Artifact download URL: https://github.com/achartt/bimcraft-SDH/actions/runs/39644245908/artifacts/12365993449
+2026-10-21T17:30:48.1474061Z Post job cleanup.
+2026-10-21T17:30:48.2596380Z (node:3599) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-21T17:30:48.2597835Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-21T17:30:48.2783456Z [command]/usr/bin/tar --posix -cf cache.tzst --exclude cache.tzst -P -C /home/runner/work/bimcraft-SDH/bimcraft-SDH --files-from manifest.txt --use-compress-program zstdmt
+2026-10-21T17:30:48.6313409Z (node:3599) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-10-21T17:30:49.4994806Z Sent 4730340 of 4730340 (100.0%), 5.1 MBs/sec
+2026-10-21T17:30:49.6255951Z Cache saved with key: vendor-82f8075e4b3ca49bbbf86914608d9676db0803982e8a3a3c8206145257989d31
+2026-10-21T17:30:49.6387230Z Post job cleanup.
+2026-10-21T17:30:49.7711659Z (node:3619) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-21T17:30:49.7712881Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-21T17:30:49.7880231Z Post job cleanup.
+2026-10-21T17:30:49.9167862Z (node:3627) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-21T17:30:49.9168752Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-21T17:30:49.9466397Z Post job cleanup.
+2026-10-21T17:30:50.0394147Z [command]/usr/bin/git version
+2026-10-21T17:30:50.0442568Z git version 2.55.0
+2026-10-21T17:30:50.0482503Z Temporarily overriding HOME='/home/runner/work/_temp/3456abbc-b59b-4cb9-967b-4d10966fbbe2' before making global git config changes
+2026-10-21T17:30:50.0483963Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-21T17:30:50.0489469Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/bimcraft-SDH/bimcraft-SDH
+2026-10-21T17:30:50.0539173Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-21T17:30:50.0581026Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-21T17:30:50.0865546Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-21T17:30:50.0896091Z http.https://github.com/.extraheader
+2026-10-21T17:30:50.0915916Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-10-21T17:30:50.0953627Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-21T17:30:50.1247409Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-21T17:30:50.1293106Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-21T17:30:50.1731963Z Cleaning up orphan processes
+2026-10-21T17:30:50.2072311Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/cache@v4, actions/checkout@v4, actions/setup-node@v4, actions/setup-python@v5, actions/upload-artifact@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

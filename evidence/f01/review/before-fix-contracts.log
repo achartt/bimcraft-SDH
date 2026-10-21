@@ -1,0 +1,485 @@
+TAP version 13
+# ▶ intentional-failure: node -e console.log('0 passed, 1 failed');process.exit(1)
+# FAIL intentional-failure: 0 passed, 1 failed; 0 skip/availability notices; Expected at least 1 executed passes
+# ▶ after-failure: node -e console.log('1 passed, 0 failed')
+# PASS after-failure: 1 passed, 0 failed; 0 skip/availability notices
+# Evidence: /var/folders/20/2b_pk2zx5r9_l0bvjqpszq7m0000gn/T/f01-runner-AMB9Po/summary.json (optional skips are not passes)
+# Subtest: baseline explicitly discovers the 15 prototype tests and all named modes
+ok 1 - baseline explicitly discovers the 15 prototype tests and all named modes
+  ---
+  duration_ms: 0.559125
+  type: 'test'
+  ...
+# Subtest: source-sync failure coverage is explicitly discovered
+ok 2 - source-sync failure coverage is explicitly discovered
+  ---
+  duration_ms: 0.093583
+  type: 'test'
+  ...
+# Subtest: zero discovery, failed checks, and a nonzero exit cannot be green
+ok 3 - zero discovery, failed checks, and a nonzero exit cannot be green
+  ---
+  duration_ms: 0.251041
+  type: 'test'
+  ...
+# Subtest: optional skips remain separate from executed passes
+ok 4 - optional skips remain separate from executed passes
+  ---
+  duration_ms: 0.042875
+  type: 'test'
+  ...
+# Subtest: isolated deliberate failing process propagates exit 1 and later checks still run
+ok 5 - isolated deliberate failing process propagates exit 1 and later checks still run
+  ---
+  duration_ms: 67.036583
+  type: 'test'
+  ...
+# Subtest: RC.8 absent dependency: only absence skips
+ok 6 - RC.8 absent dependency: only absence skips
+  ---
+  duration_ms: 211.442708
+  type: 'test'
+  ...
+# Subtest: RC.8 partial dependency: only absence skips
+ok 7 - RC.8 partial dependency: only absence skips
+  ---
+  duration_ms: 82.019125
+  type: 'test'
+  ...
+# Subtest: RC.8 broken dependency: only absence skips
+ok 8 - RC.8 broken dependency: only absence skips
+  ---
+  duration_ms: 81.957291
+  type: 'test'
+  ...
+# Subtest: RC.8 root-only dependency: only absence skips
+not ok 9 - RC.8 root-only dependency: only absence skips
+  ---
+  duration_ms: 190.928208
+  type: 'test'
+  location: '/Users/austinhartt/Documents/ChatGPT/BimCraft Test/bimcraft-f01/tests/features/f01/runner.test.mjs:38:94'
+  failureType: 'testCodeFailure'
+  error: 'Expected "actual" to be strictly unequal to: 0'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 0
+  actual: 0
+  operator: 'notStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///Users/austinhartt/Documents/ChatGPT/BimCraft%20Test/bimcraft-f01/tests/features/f01/runner.test.mjs:59:14)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: RC.8 dangling-root dependency: only absence skips
+not ok 10 - RC.8 dangling-root dependency: only absence skips
+  ---
+  duration_ms: 191.317
+  type: 'test'
+  location: '/Users/austinhartt/Documents/ChatGPT/BimCraft Test/bimcraft-f01/tests/features/f01/runner.test.mjs:38:94'
+  failureType: 'testCodeFailure'
+  error: 'Expected "actual" to be strictly unequal to: 0'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 0
+  actual: 0
+  operator: 'notStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///Users/austinhartt/Documents/ChatGPT/BimCraft%20Test/bimcraft-f01/tests/features/f01/runner.test.mjs:59:14)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: RC.8 dangling-dev dependency: only absence skips
+not ok 11 - RC.8 dangling-dev dependency: only absence skips
+  ---
+  duration_ms: 191.898458
+  type: 'test'
+  location: '/Users/austinhartt/Documents/ChatGPT/BimCraft Test/bimcraft-f01/tests/features/f01/runner.test.mjs:38:94'
+  failureType: 'testCodeFailure'
+  error: 'Expected "actual" to be strictly unequal to: 0'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 0
+  actual: 0
+  operator: 'notStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///Users/austinhartt/Documents/ChatGPT/BimCraft%20Test/bimcraft-f01/tests/features/f01/runner.test.mjs:59:14)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# (node:38717) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///Users/austinhartt/Documents/ChatGPT/BimCraft%20Test/bimcraft-f01/app/res-elec-symbols.js is not specified and it doesn't parse as CommonJS.
+# Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+# To eliminate this warning, add "type": "module" to /Users/austinhartt/Documents/ChatGPT/BimCraft Test/bimcraft-f01/package.json.
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: terrain: absent source verifies bundled assets and explicitly skips live parity
+ok 12 - terrain: absent source verifies bundled assets and explicitly skips live parity
+  ---
+  duration_ms: 31.763167
+  type: 'test'
+  ...
+# Subtest: terrain: partial source app fails instead of skipping
+ok 13 - terrain: partial source app fails instead of skipping
+  ---
+  duration_ms: 30.317375
+  type: 'test'
+  ...
+# Subtest: terrain: file source app fails instead of skipping
+ok 14 - terrain: file source app fails instead of skipping
+  ---
+  duration_ms: 28.261083
+  type: 'test'
+  ...
+# Subtest: terrain: dangling source app fails instead of skipping
+ok 15 - terrain: dangling source app fails instead of skipping
+  ---
+  duration_ms: 28.857833
+  type: 'test'
+  ...
+# Subtest: terrain: write mode cannot substitute pins for absent source
+ok 16 - terrain: write mode cannot substitute pins for absent source
+  ---
+  duration_ms: 28.111041
+  type: 'test'
+  ...
+# Subtest: terrain: present matching source executes comparator/generator
+ok 17 - terrain: present matching source executes comparator/generator
+  ---
+  duration_ms: 36.587792
+  type: 'test'
+  ...
+# Subtest: terrain: present differing source fails comparison
+ok 18 - terrain: present differing source fails comparison
+  ---
+  duration_ms: 38.573792
+  type: 'test'
+  ...
+# Subtest: terrain: malformed source errors propagate
+ok 19 - terrain: malformed source errors propagate
+  ---
+  duration_ms: 31.04575
+  type: 'test'
+  ...
+# Subtest: terrain: changed bundled tin.js fails even without source
+ok 20 - terrain: changed bundled tin.js fails even without source
+  ---
+  duration_ms: 25.909583
+  type: 'test'
+  ...
+# Subtest: terrain: missing bundled tin.js fails even without source
+ok 21 - terrain: missing bundled tin.js fails even without source
+  ---
+  duration_ms: 25.61775
+  type: 'test'
+  ...
+# Subtest: terrain: changed bundled raster.js fails even without source
+ok 22 - terrain: changed bundled raster.js fails even without source
+  ---
+  duration_ms: 26.576708
+  type: 'test'
+  ...
+# Subtest: terrain: missing bundled raster.js fails even without source
+ok 23 - terrain: missing bundled raster.js fails even without source
+  ---
+  duration_ms: 27.284292
+  type: 'test'
+  ...
+# Subtest: electrical: absent source verifies bundled assets and explicitly skips live parity
+ok 24 - electrical: absent source verifies bundled assets and explicitly skips live parity
+  ---
+  duration_ms: 26.754167
+  type: 'test'
+  ...
+# Subtest: electrical: partial source app fails instead of skipping
+ok 25 - electrical: partial source app fails instead of skipping
+  ---
+  duration_ms: 26.872584
+  type: 'test'
+  ...
+# Subtest: electrical: file source app fails instead of skipping
+ok 26 - electrical: file source app fails instead of skipping
+  ---
+  duration_ms: 26.88225
+  type: 'test'
+  ...
+# Subtest: electrical: dangling source app fails instead of skipping
+ok 27 - electrical: dangling source app fails instead of skipping
+  ---
+  duration_ms: 27.110791
+  type: 'test'
+  ...
+# Subtest: electrical: write mode cannot substitute pins for absent source
+ok 28 - electrical: write mode cannot substitute pins for absent source
+  ---
+  duration_ms: 29.865917
+  type: 'test'
+  ...
+# Subtest: electrical: present matching source executes comparator/generator
+ok 29 - electrical: present matching source executes comparator/generator
+  ---
+  duration_ms: 28.854584
+  type: 'test'
+  ...
+# Subtest: electrical: present differing source fails comparison
+ok 30 - electrical: present differing source fails comparison
+  ---
+  duration_ms: 27.457625
+  type: 'test'
+  ...
+# Subtest: electrical: malformed source errors propagate
+ok 31 - electrical: malformed source errors propagate
+  ---
+  duration_ms: 28.942583
+  type: 'test'
+  ...
+# Subtest: electrical: changed bundled res-elec-symbols.js fails even without source
+ok 32 - electrical: changed bundled res-elec-symbols.js fails even without source
+  ---
+  duration_ms: 27.917875
+  type: 'test'
+  ...
+# Subtest: electrical: missing bundled res-elec-symbols.js fails even without source
+ok 33 - electrical: missing bundled res-elec-symbols.js fails even without source
+  ---
+  duration_ms: 25.561208
+  type: 'test'
+  ...
+# Subtest: terrain: invalid bundled mapping fails
+ok 34 - terrain: invalid bundled mapping fails
+  ---
+  duration_ms: 25.268708
+  type: 'test'
+  ...
+# Subtest: terrain: invalid bundled missing-key fails
+ok 35 - terrain: invalid bundled missing-key fails
+  ---
+  duration_ms: 31.134041
+  type: 'test'
+  ...
+# Subtest: terrain: invalid bundled object-string fails
+ok 36 - terrain: invalid bundled object-string fails
+  ---
+  duration_ms: 32.725209
+  type: 'test'
+  ...
+# Subtest: terrain: invalid bundled invalid-json fails
+ok 37 - terrain: invalid bundled invalid-json fails
+  ---
+  duration_ms: 28.35925
+  type: 'test'
+  ...
+# Subtest: terrain: incomplete pin or translation empty-files cannot disable checks
+not ok 38 - terrain: incomplete pin or translation empty-files cannot disable checks
+  ---
+  duration_ms: 34.825542
+  type: 'test'
+  location: '/Users/austinhartt/Documents/ChatGPT/BimCraft Test/bimcraft-f01/tests/features/f01/source-sync.test.mjs:117:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    terrain: bundled integrity verified against 72664187a1cc2694d1f8972fd2e1aa5b46106bc3
+    SKIP terrain live source comparison: civilcraft app absent at /private/var/folders/20/2b_pk2zx5r9_l0bvjqpszq7m0000gn/T/f01-sync-SzrOEa/public_html/assets/apps/civilcraft; bundled integrity checked separately
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 0
+  actual: 0
+  operator: 'notStrictEqual'
+  stack: |-
+    fail (file:///Users/austinhartt/Documents/ChatGPT/BimCraft%20Test/bimcraft-f01/tests/features/f01/source-sync.test.mjs:53:10)
+    file:///Users/austinhartt/Documents/ChatGPT/BimCraft%20Test/bimcraft-f01/tests/features/f01/source-sync.test.mjs:130:5
+    harness (file:///Users/austinhartt/Documents/ChatGPT/BimCraft%20Test/bimcraft-f01/tests/features/f01/source-sync.test.mjs:49:5)
+    TestContext.<anonymous> (file:///Users/austinhartt/Documents/ChatGPT/BimCraft%20Test/bimcraft-f01/tests/features/f01/source-sync.test.mjs:117:87)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: terrain: incomplete pin or translation missing-imports cannot disable checks
+not ok 39 - terrain: incomplete pin or translation missing-imports cannot disable checks
+  ---
+  duration_ms: 30.769125
+  type: 'test'
+  location: '/Users/austinhartt/Documents/ChatGPT/BimCraft Test/bimcraft-f01/tests/features/f01/source-sync.test.mjs:117:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    terrain: bundled integrity verified against 72664187a1cc2694d1f8972fd2e1aa5b46106bc3
+    SKIP terrain live source comparison: civilcraft app absent at /private/var/folders/20/2b_pk2zx5r9_l0bvjqpszq7m0000gn/T/f01-sync-LHDfFw/public_html/assets/apps/civilcraft; bundled integrity checked separately
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 0
+  actual: 0
+  operator: 'notStrictEqual'
+  stack: |-
+    fail (file:///Users/austinhartt/Documents/ChatGPT/BimCraft%20Test/bimcraft-f01/tests/features/f01/source-sync.test.mjs:53:10)
+    file:///Users/austinhartt/Documents/ChatGPT/BimCraft%20Test/bimcraft-f01/tests/features/f01/source-sync.test.mjs:130:5
+    harness (file:///Users/austinhartt/Documents/ChatGPT/BimCraft%20Test/bimcraft-f01/tests/features/f01/source-sync.test.mjs:49:5)
+    TestContext.<anonymous> (file:///Users/austinhartt/Documents/ChatGPT/BimCraft%20Test/bimcraft-f01/tests/features/f01/source-sync.test.mjs:117:87)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: terrain: incomplete pin or translation empty-imports cannot disable checks
+not ok 40 - terrain: incomplete pin or translation empty-imports cannot disable checks
+  ---
+  duration_ms: 32.379875
+  type: 'test'
+  location: '/Users/austinhartt/Documents/ChatGPT/BimCraft Test/bimcraft-f01/tests/features/f01/source-sync.test.mjs:117:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    terrain: bundled integrity verified against 72664187a1cc2694d1f8972fd2e1aa5b46106bc3
+    SKIP terrain live source comparison: civilcraft app absent at /private/var/folders/20/2b_pk2zx5r9_l0bvjqpszq7m0000gn/T/f01-sync-Fc8jkl/public_html/assets/apps/civilcraft; bundled integrity checked separately
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 0
+  actual: 0
+  operator: 'notStrictEqual'
+  stack: |-
+    fail (file:///Users/austinhartt/Documents/ChatGPT/BimCraft%20Test/bimcraft-f01/tests/features/f01/source-sync.test.mjs:53:10)
+    file:///Users/austinhartt/Documents/ChatGPT/BimCraft%20Test/bimcraft-f01/tests/features/f01/source-sync.test.mjs:130:5
+    harness (file:///Users/austinhartt/Documents/ChatGPT/BimCraft%20Test/bimcraft-f01/tests/features/f01/source-sync.test.mjs:49:5)
+    TestContext.<anonymous> (file:///Users/austinhartt/Documents/ChatGPT/BimCraft%20Test/bimcraft-f01/tests/features/f01/source-sync.test.mjs:117:87)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: terrain: incomplete pin or translation empty-keys cannot disable checks
+not ok 41 - terrain: incomplete pin or translation empty-keys cannot disable checks
+  ---
+  duration_ms: 32.817708
+  type: 'test'
+  location: '/Users/austinhartt/Documents/ChatGPT/BimCraft Test/bimcraft-f01/tests/features/f01/source-sync.test.mjs:117:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    terrain: bundled integrity verified against 72664187a1cc2694d1f8972fd2e1aa5b46106bc3
+    SKIP terrain live source comparison: civilcraft app absent at /private/var/folders/20/2b_pk2zx5r9_l0bvjqpszq7m0000gn/T/f01-sync-gUzri6/public_html/assets/apps/civilcraft; bundled integrity checked separately
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 0
+  actual: 0
+  operator: 'notStrictEqual'
+  stack: |-
+    fail (file:///Users/austinhartt/Documents/ChatGPT/BimCraft%20Test/bimcraft-f01/tests/features/f01/source-sync.test.mjs:53:10)
+    file:///Users/austinhartt/Documents/ChatGPT/BimCraft%20Test/bimcraft-f01/tests/features/f01/source-sync.test.mjs:130:5
+    harness (file:///Users/austinhartt/Documents/ChatGPT/BimCraft%20Test/bimcraft-f01/tests/features/f01/source-sync.test.mjs:49:5)
+    TestContext.<anonymous> (file:///Users/austinhartt/Documents/ChatGPT/BimCraft%20Test/bimcraft-f01/tests/features/f01/source-sync.test.mjs:117:87)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: terrain: incomplete pin or translation missing-key-pin cannot disable checks
+not ok 42 - terrain: incomplete pin or translation missing-key-pin cannot disable checks
+  ---
+  duration_ms: 33.343583
+  type: 'test'
+  location: '/Users/austinhartt/Documents/ChatGPT/BimCraft Test/bimcraft-f01/tests/features/f01/source-sync.test.mjs:117:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    terrain: bundled integrity verified against 72664187a1cc2694d1f8972fd2e1aa5b46106bc3
+    SKIP terrain live source comparison: civilcraft app absent at /private/var/folders/20/2b_pk2zx5r9_l0bvjqpszq7m0000gn/T/f01-sync-BYBvap/public_html/assets/apps/civilcraft; bundled integrity checked separately
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 0
+  actual: 0
+  operator: 'notStrictEqual'
+  stack: |-
+    fail (file:///Users/austinhartt/Documents/ChatGPT/BimCraft%20Test/bimcraft-f01/tests/features/f01/source-sync.test.mjs:53:10)
+    file:///Users/austinhartt/Documents/ChatGPT/BimCraft%20Test/bimcraft-f01/tests/features/f01/source-sync.test.mjs:130:5
+    harness (file:///Users/austinhartt/Documents/ChatGPT/BimCraft%20Test/bimcraft-f01/tests/features/f01/source-sync.test.mjs:49:5)
+    TestContext.<anonymous> (file:///Users/austinhartt/Documents/ChatGPT/BimCraft%20Test/bimcraft-f01/tests/features/f01/source-sync.test.mjs:117:87)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: terrain: incomplete pin or translation null-translation cannot disable checks
+not ok 43 - terrain: incomplete pin or translation null-translation cannot disable checks
+  ---
+  duration_ms: 34.388375
+  type: 'test'
+  location: '/Users/austinhartt/Documents/ChatGPT/BimCraft Test/bimcraft-f01/tests/features/f01/source-sync.test.mjs:117:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    terrain: bundled integrity verified against 72664187a1cc2694d1f8972fd2e1aa5b46106bc3
+    SKIP terrain live source comparison: civilcraft app absent at /private/var/folders/20/2b_pk2zx5r9_l0bvjqpszq7m0000gn/T/f01-sync-hqbBer/public_html/assets/apps/civilcraft; bundled integrity checked separately
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 0
+  actual: 0
+  operator: 'notStrictEqual'
+  stack: |-
+    fail (file:///Users/austinhartt/Documents/ChatGPT/BimCraft%20Test/bimcraft-f01/tests/features/f01/source-sync.test.mjs:53:10)
+    file:///Users/austinhartt/Documents/ChatGPT/BimCraft%20Test/bimcraft-f01/tests/features/f01/source-sync.test.mjs:130:5
+    harness (file:///Users/austinhartt/Documents/ChatGPT/BimCraft%20Test/bimcraft-f01/tests/features/f01/source-sync.test.mjs:49:5)
+    TestContext.<anonymous> (file:///Users/austinhartt/Documents/ChatGPT/BimCraft%20Test/bimcraft-f01/tests/features/f01/source-sync.test.mjs:117:87)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: terrain: incomplete pin or translation empty-plural cannot disable checks
+not ok 44 - terrain: incomplete pin or translation empty-plural cannot disable checks
+  ---
+  duration_ms: 34.401792
+  type: 'test'
+  location: '/Users/austinhartt/Documents/ChatGPT/BimCraft Test/bimcraft-f01/tests/features/f01/source-sync.test.mjs:117:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    terrain: bundled integrity verified against 72664187a1cc2694d1f8972fd2e1aa5b46106bc3
+    SKIP terrain live source comparison: civilcraft app absent at /private/var/folders/20/2b_pk2zx5r9_l0bvjqpszq7m0000gn/T/f01-sync-gL6pvn/public_html/assets/apps/civilcraft; bundled integrity checked separately
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 0
+  actual: 0
+  operator: 'notStrictEqual'
+  stack: |-
+    fail (file:///Users/austinhartt/Documents/ChatGPT/BimCraft%20Test/bimcraft-f01/tests/features/f01/source-sync.test.mjs:53:10)
+    file:///Users/austinhartt/Documents/ChatGPT/BimCraft%20Test/bimcraft-f01/tests/features/f01/source-sync.test.mjs:130:5
+    harness (file:///Users/austinhartt/Documents/ChatGPT/BimCraft%20Test/bimcraft-f01/tests/features/f01/source-sync.test.mjs:49:5)
+    TestContext.<anonymous> (file:///Users/austinhartt/Documents/ChatGPT/BimCraft%20Test/bimcraft-f01/tests/features/f01/source-sync.test.mjs:117:87)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+1..44
+# tests 44
+# suites 0
+# pass 34
+# fail 10
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1052.96875
