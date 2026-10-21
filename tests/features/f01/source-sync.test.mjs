@@ -7,8 +7,21 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 import { GROUPS, SYMBOLS } from '../../../app/res-elec-symbols.js';
+import { verifyPinProvenance } from './pin-provenance.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
+const recordedPins = JSON.parse(fs.readFileSync(path.join(root, 'tests/tools/bimcraft-test/source-sync-pins.json'), 'utf8'));
+test('pin provenance matches the recorded immutable Git revision', () => verifyPinProvenance(root, recordedPins));
+test('rehashed asset cannot claim unchanged provenance', () => {
+  const pins = structuredClone(recordedPins);
+  pins.terrain.files['tin.js'] = '0'.repeat(64);
+  assert.throws(() => verifyPinProvenance(root, pins), /Pin provenance mismatch/);
+});
+test('missing provenance history fails instead of skipping', () => {
+  const pins = structuredClone(recordedPins);
+  pins.provenance.revision = '0'.repeat(40);
+  assert.throws(() => verifyPinProvenance(root, pins), /Cannot verify pin provenance/);
+});
 const groups = [
   { name: 'terrain', script: 'terrain-sync.mjs', source: 'civilcraft', files: ['tin.js', 'raster.js'] },
   { name: 'electrical', script: 'elec-sync.mjs', source: 'cadcraft', files: ['res-elec-symbols.js'] },
