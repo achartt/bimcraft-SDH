@@ -42,7 +42,7 @@ npm run test:baseline -- --offline
 npm run test:baseline -- --list
 ```
 
-The command builds `.cc-test` from this checkout and runs precision (7), materials (8), model (at least 122), comforts (at least 103), views2 (at least 104), residential (at least 193), the fixture lifecycle scenario (1) and runner contract tests (7). Named modes run as separate processes. `tests/unit` is invoked explicitly; `tests/bin` discovery alone does not cover it. Counts prevent an empty discovery or accidental default reader run from being reported as passing. These are minimum executed-pass guards, not a promise that optional readers add no checks.
+The command builds `.cc-test` from this checkout and runs precision (7), materials (8), model (at least 122), comforts (at least 103), views2 (at least 104), residential (at least 195), the fixture lifecycle scenario (1), source-sync contract tests (26) and runner contract tests (8). Named modes run as separate processes. `tests/unit` is invoked explicitly; `tests/bin` discovery alone does not cover it. Counts prevent an empty discovery or accidental default reader run from being reported as passing. These are minimum executed-pass guards, not a promise that optional readers add no checks.
 
 Any failed check, child-process failure, missing summary, insufficient execution count, or invalid/missing vendor file returns nonzero. Later stages still run after a test failure. Vendor setup failure aborts before stages. Logs and `summary.json` are in `.cc-test/baseline/`; each stage has pass/fail counts, exit status and separate skip/availability notices. A notice can represent several optional checks, so its count is not a test count. Skips are never added to passes. The runner contract suite injects a deliberately failing subprocess into a temporary directory and asserts the aggregate result is 1 while a later stage still runs.
 
@@ -60,7 +60,24 @@ node .cc-test/bin/test-bimcraft.mjs --res --only rc8 --keep
 
 A present but partial directory, import-time exception, broken transitive dependency or bad pack sync is a failure. Only absence of the directory is optional. PDF attachment readback additionally needs the declared `pdfjs-dist` package under `.cc-test/tools/takeoffcraft-test/node_modules`. If its entry file exists, import/read errors propagate. The harness validates absence, a partial installation, and an import-time exception in isolated temporary mirrors. It does not fake a working TakeoffCraft implementation. Real cross-app success remains unverified here.
 
-The residential suite also contains CivilCraft terrain and CadCraft electrical source-sync checks. Those source repositories are absent here. Their two failures remain visible and keep standalone baseline red; all remaining residential checks finish. Library-repository asset checks remain explicitly skipped. A future integration decision can define standalone provenance checks for those copied assets; F01 does not silently bless them.
+## Bundled terrain/electrical integrity and live source comparison
+
+The residential checks now verify a committed integrity pin before considering upstream availability. `tests/tools/bimcraft-test/source-sync-pins.json` records SHA-256 hashes of `app/tin.js`, `app/raster.js` and `app/res-elec-symbols.js` from approved base `72664187a1cc2694d1f8972fd2e1aa5b46106bc3`. All three are unchanged from that revision (originally imported in `e2dff527fa6b4c651781c3d0fa1bc9bddf6cb37c`). Terrain additionally checks the three vendor import mappings and 38 required language keys inherited from that base, retaining the invalid `[object Object]` translation check. This is evidence of bundled integrity against an immutable BimCraft revision; it does not certify equality with current CivilCraft/CadCraft sources.
+
+When the `civilcraft` or `cadcraft` **app root** is absent under `.cc-test/public_html/assets/apps`, the corresponding script prints a named `SKIP … live source comparison` notice after the integrity check passes. These notices are recorded separately in the baseline summary. The two executed residential passes describe bundled integrity, not skipped upstream comparisons. A present app root requires the original comparison to run: absent source files, invalid JSON, broken imports, differing generated output, unreadable paths and broken symlinks fail. Library-repository asset checks still skip explicitly.
+
+To exercise real upstream comparison, put the actual source tree (including its transitive dependencies) at the corresponding app root after mirror construction, then run:
+
+```sh
+node .cc-test/tools/bimcraft-test/terrain-sync.mjs --check
+node .cc-test/tools/bimcraft-test/elec-sync.mjs --check
+```
+
+The terrain source needs `dev/tin.js`, `dev/raster.js`, `dev/manifest.json` and `dev/lang/en.json`; electrical needs `dev/addons/electrical/lib/install.js` and everything it imports. No source app is downloaded by baseline setup. Check mode never writes assets or updates pins. Write mode still requires actual upstream sources; pins are never used as a generator fallback.
+
+A deliberate update requires review of the upstream change and provenance: use the original sync write mode against actual sources, review and copy the resulting mirror asset changes into `app/`, record their immutable source revision, update the affected pin hashes/imports/required keys explicitly, then rerun both live comparisons and baseline. Verify the initial pin independently with `git show 72664187a1cc2694d1f8972fd2e1aa5b46106bc3:app/tin.js | shasum -a 256` (and the other two files). Do not replace a hash merely to silence drift. There is no automatic pin refresh command.
+
+The 26 isolated contract tests cover missing/corrupt local assets, maps/translations, absent/partial/malformed sources, live mismatches and source exceptions. Controlled matching fixtures exercise the original comparator/generator paths; they are not independent upstream integration evidence. Real CivilCraft/CadCraft comparisons remain unverified until actual sources are supplied.
 
 ## Repeat the fixture review
 
@@ -83,6 +100,6 @@ Browser evidence: opened the fixture on 8016, displayed plan and 3D, selected th
 
 PDF review uses the application's `planPdf`, not a reconstructed drawing. The full A4 plan shows the opening and dimension marks at 1:50; short dimension labels do not fit and are omitted by current application logic. The 1:10 detail explicitly crops to both dimension lines so their exact values can be read. PDFs were rendered using bundled Poppler, independently of the initially absent system Poppler. This is drawing inspection, not external IFC validation.
 
-Before integrating PR #1: review its 29-file application diff and stable-ID/version handling; address the exposed source-sync dependencies, optional setup reporting and PHP-free/narrow UI issues; obtain independent IFC schema and external-reader evidence; review short dimension label behavior and supported reference limits. Layer graphics, schedules, solid-material takeoffs, roofs/windows beyond this small fixture and performance remain outside F01. IFC2X3 membrane omission from physical layers and full recipe retention, IFC4 zero-width layers, all six reference modes and unknown-version preservation stay unchanged.
+Before integrating PR #1: review its 29-file application diff and stable-ID/version handling; review the pinned source-sync boundary, optional setup reporting and PHP-free/narrow UI issues; obtain independent IFC schema and external-reader evidence; review short dimension label behavior and supported reference limits. Layer graphics, schedules, solid-material takeoffs, roofs/windows beyond this small fixture and performance remain outside F01. IFC2X3 membrane omission from physical layers and full recipe retention, IFC4 zero-width layers, all six reference modes and unknown-version preservation stay unchanged.
 
-No merge or integrated SHA is claimed. Final head-specific validation and remaining acceptance gaps are recorded in the PR handoff; a red baseline is deliberately not called acceptance of the prototype.
+No merge or integrated SHA is claimed. Final head-specific validation and remaining acceptance gaps are recorded in the PR handoff; passing standalone checks do not establish optional cross-app or IFC schema acceptance.

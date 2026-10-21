@@ -1,7 +1,7 @@
 # F01 feature handoff
 
 Feature: F01 — Integration baseline and standalone test workflow.
-State: **implemented; integration acceptance blocked by two exposed residential source-sync failures**. Draft review is appropriate; neither F01 nor the prototype is merged.
+State: **source-sync boundary implemented; fresh validation of this revision pending**. Draft review is appropriate; neither F01 nor the prototype is merged.
 
 ## Ownership and exact state
 
@@ -12,6 +12,8 @@ State: **implemented; integration acceptance blocked by two exposed residential 
 - Implementation head: `4c018522552b0fe5897558315b6e509611e2770b`; subsequent delivery commit contains only evidence and documentation. The final exact delivery head and its CI status are recorded in [draft PR #2](https://github.com/achartt/bimcraft-SDH/pull/2).
 - PR target: `feature/wall-assemblies-dimensions`. PR #1 was reverified open/draft/unmerged with unchanged base/head before publication.
 - Independent clone: `/private/tmp/bimcraft-f01-clean-20261021`, created using `git clone --no-local`, with no copied vendor cache or `.cc-test`. Both clone and feature checkout belong to this F01 chat.
+
+The source-sync follow-up adds immutable bundle pins and 26 failure-path tests; real upstream comparisons remain explicitly unverified when sources are absent. The validation tables below describe the previous delivery and will be superseded after fresh validation.
 
 ## Acceptance
 
@@ -55,12 +57,12 @@ Initial pre-change baseline reproduced 7/8 and 122/103/104, then residential abo
 
 ## Remaining blockers and review items
 
-1. `terrain-sync.mjs --check`: absent CivilCraft `dev/tin.js`/`raster.js` sources. This is a reported failure, not a skipped pass.
-2. `elec-sync.mjs --check`: absent CadCraft electrical `addons/electrical/lib/install.js`. Also remains a failure. Do not import another application wholesale just to make the baseline green; agree on a scoped provenance contract in integration review.
+1. Terrain now checks the approved-base bundle hashes, vendor imports and required translations; absent CivilCraft is a named live-comparison skip. Partial or broken sources still fail.
+2. Electrical now checks the approved-base generated-file hash; absent CadCraft is a named live-comparison skip. Its original generator/comparator still runs whenever the source app is present. No other app was imported.
 3. Independent IFC schema acceptance and a real TakeoffCraft present-dependency run remain unverified. Review legacy optional-reader exception handling and partial venv reporting separately.
 4. PR #1 still needs application-diff review: stable IDs, unknown-version behavior, geometry/reference precision, IFC2X3/IFC4 compatibility and supported host limits. F01 tests those existing contracts but does not redesign or certify every imported IFC case.
 5. UI observations: some menu/toolbar labels are blank, and narrow layout clips controls. Short printed dimension labels are suppressed at whole-house scale. The 1:10 detail provides reviewable numeric evidence; no renderer/UI fixes are included.
 
 Shared contracts: adds `test:baseline` and `fixture:f01`, explicit discovery/exit reporting, `.cc-test/baseline` logs and feature-owned fixture/export layout. RC.8 optionality is restricted to an absent app directory. No schema, geometry, material defaults, reference semantics, dependency licenses or kernel changes. Two custom types, explicit cores, cavity widths, zero membrane records, six existing reference modes and project isolation remain intact.
 
-Recommended next action: review draft PR #2's runner/fixture boundary, then coordinate the two source-sync dependencies and external validation before approving integration of PR #1 and F01. Keep subsequent feature work pinned to an explicitly accepted SHA. Do not mark the foundation integrated merely because the workflow is reproducible.
+Recommended next action: review draft PR #2's runner/fixture boundary, including the pinned source-sync contract, then coordinate independent upstream and external validation before approving integration of PR #1 and F01. Keep subsequent feature work pinned to an explicitly accepted SHA. Do not mark the foundation integrated merely because the workflow is reproducible.

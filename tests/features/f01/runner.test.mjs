@@ -6,7 +6,10 @@ import os from 'node:os';
 import path from 'node:path';
 import { assess, runStages, stages } from '../../../devshell/baseline.mjs';
 test('baseline explicitly discovers the 15 prototype tests and all named modes', () => {
-  assert.deepEqual(stages.slice(0, 6).map(s => [s.name, s.minimum]), [['precision',7],['materials',8],['model',122],['comforts',103],['views2',104],['res',193]]);
+  assert.deepEqual(stages.slice(0, 6).map(s => [s.name, s.minimum]), [['precision',7],['materials',8],['model',122],['comforts',103],['views2',104],['res',195]]);
+});
+test('source-sync failure coverage is explicitly discovered', () => {
+  assert.deepEqual(stages.find(s => s.name === 'source-sync-contract'), { name: 'source-sync-contract', args: ['--test', '--test-reporter=tap', 'tests/features/f01/source-sync.test.mjs'], minimum: 26, tap: true });
 });
 test('zero discovery, failed checks, and a nonzero exit cannot be green', () => {
   const stage = { name: 'probe', minimum: 2 };

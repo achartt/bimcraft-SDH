@@ -641,8 +641,10 @@ export async function resMode({ APP, ROOT, WebIFC, IfcModel, quiet, require, arg
     const { ModelWriter } = await import(path.join(APP, 'model-write.js'));
     console.log('== RC.10 the ground (res-terrain.js, CivilCraft\'s tin.js)');
     const { execFileSync } = await import('node:child_process');
-    let syncOk = true; try { execFileSync(process.execPath, [path.join(ROOT, 'tools/bimcraft-test/terrain-sync.mjs'), '--check'], { encoding: 'utf8' }); } catch (e) { syncOk = false; }
-    ok(syncOk, 'tin.js and raster.js are byte-identical copies of CivilCraft\'s (terrain-sync.mjs --check)');
+    let syncOk = true;
+    try { console.log(execFileSync(process.execPath, [path.join(ROOT, 'tools/bimcraft-test/terrain-sync.mjs'), '--check'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trimEnd()); }
+    catch (e) { syncOk = false; console.error(e.stdout || '', e.stderr || e.message); }
+    ok(syncOk, 'bundled terrain integrity and available CivilCraft source comparison (terrain-sync.mjs --check)');
     const csv = 'Point,Northing,Easting,Elevation,Desc\n1,1000,2000,101.5,GND\n2,1010,2000,101.0,GND\n3,1000,2010,102.0,GND\n4,1010,2010,101.25,GND';
     const P4 = TR.parsePointText(csv);
     ok(P4.length === 4 && P4[0].x === 2000 && P4[0].y === 1000 && P4[0].z === 101.5, 'a PNEZD file: four points, the header skipped, easting as x');
@@ -850,8 +852,10 @@ export async function resMode({ APP, ROOT, WebIFC, IfcModel, quiet, require, arg
     const { ModelWriter } = await import(path.join(APP, 'model-write.js'));
     console.log('== RC.6 the symbols (CadCraft\'s Electrical add-on) and the rules');
     const { execFileSync } = await import('node:child_process');
-    let syncOk = true; try { execFileSync(process.execPath, [path.join(ROOT, 'tools/bimcraft-test/elec-sync.mjs'), '--check'], { encoding: 'utf8' }); } catch (e) { syncOk = false; }
-    ok(syncOk, 'res-elec-symbols.js is what the Electrical add-on\'s installation symbols give (elec-sync.mjs --check)');
+    let syncOk = true;
+    try { console.log(execFileSync(process.execPath, [path.join(ROOT, 'tools/bimcraft-test/elec-sync.mjs'), '--check'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trimEnd()); }
+    catch (e) { syncOk = false; console.error(e.stdout || '', e.stderr || e.message); }
+    ok(syncOk, 'bundled electrical integrity and available CadCraft source comparison (elec-sync.mjs --check)');
     ok(SY.SYMBOLS.length === EL.KINDS.length && SY.SYMBOLS.every((s) => EL.DEVICES[s.key]), 'every add-on symbol has a device (' + EL.KINDS.length + ': outlets, switches, a sensor, lights, a junction box, an appliance outlet, a panel)');
     // the socket's half circle faces the room: on a wall along +x with the room to the north (+y), its arc bulges north
     const sp = EL.symbolPlan('socket', [1000, 0], Math.PI / 2, 50);
