@@ -1,0 +1,58 @@
+TAP version 13
+# Subtest: legacy recipes migrate losslessly and library edits never resize walls or move dimension references
+ok 1 - legacy recipes migrate losslessly and library edits never resize walls or move dimension references
+  ---
+  duration_ms: 13.975041
+  type: 'test'
+  ...
+# Subtest: cavities retain width, explicit cores and all references; IFC layers contain no solid material for air
+ok 2 - cavities retain width, explicit cores and all references; IFC layers contain no solid material for air
+  ---
+  duration_ms: 17.913208
+  type: 'test'
+  ...
+# Subtest: invalid material references and invalid defaults roll back without partially migrating the library
+ok 3 - invalid material references and invalid defaults roll back without partially migrating the library
+  ---
+  duration_ms: 1.270875
+  type: 'test'
+  ...
+# Subtest: new built-in brick walls use a cavity; stored library versions are not silently overwritten
+ok 4 - new built-in brick walls use a cavity; stored library versions are not silently overwritten
+  ---
+  duration_ms: 2.229917
+  type: 'test'
+  ...
+# Subtest: IFC2X3 stores library materials and ventilated voids through save/reopen
+ok 5 - IFC2X3 stores library materials and ventilated voids through save/reopen
+  ---
+  duration_ms: 1.871208
+  type: 'test'
+  ...
+# Subtest: zero-thickness membranes retain schedule data without moving any wall reference
+ok 6 - zero-thickness membranes retain schedule data without moving any wall reference
+  ---
+  duration_ms: 12.6785
+  type: 'test'
+  ...
+# Subtest: IFC2X3 keeps membrane records without inventing physical layer thickness
+ok 7 - IFC2X3 keeps membrane records without inventing physical layer thickness
+  ---
+  duration_ms: 1.483834
+  type: 'test'
+  ...
+# Subtest: preview dimensions preserve exact zero boundaries and separate crowded labels
+ok 8 - preview dimensions preserve exact zero boundaries and separate crowded labels
+  ---
+  duration_ms: 0.584208
+  type: 'test'
+  ...
+1..8
+# tests 8
+# suites 0
+# pass 8
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 122.808917

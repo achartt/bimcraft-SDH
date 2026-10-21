@@ -1,0 +1,91 @@
+{
+  "runtime": "v22.23.3",
+  "dirty": true,
+  "head": "5c05e7a9874cdca451f5d19a3175eb2d2a2da2a6",
+  "results": [
+    {
+      "name": "precision",
+      "status": "PASS",
+      "exitCode": 0,
+      "passed": 7,
+      "failed": 0,
+      "skipped": [],
+      "error": null
+    },
+    {
+      "name": "materials",
+      "status": "PASS",
+      "exitCode": 0,
+      "passed": 8,
+      "failed": 0,
+      "skipped": [],
+      "error": null
+    },
+    {
+      "name": "model",
+      "status": "PASS",
+      "exitCode": 0,
+      "passed": 129,
+      "failed": 0,
+      "skipped": [],
+      "error": null
+    },
+    {
+      "name": "comforts",
+      "status": "PASS",
+      "exitCode": 0,
+      "passed": 106,
+      "failed": 0,
+      "skipped": [],
+      "error": null
+    },
+    {
+      "name": "views2",
+      "status": "PASS",
+      "exitCode": 0,
+      "passed": 105,
+      "failed": 0,
+      "skipped": [],
+      "error": null
+    },
+    {
+      "name": "res",
+      "status": "PASS",
+      "exitCode": 0,
+      "passed": 218,
+      "failed": 0,
+      "skipped": [
+        "  --   no library repo at /private/tmp/f01-independent-validation-20261021/repo/repos/library: item checks skipped"
+      ],
+      "error": null
+    },
+    {
+      "name": "fixture",
+      "status": "PASS",
+      "exitCode": 0,
+      "passed": 1,
+      "failed": 0,
+      "skipped": [],
+      "error": null
+    },
+    {
+      "name": "source-sync-contract",
+      "status": "PASS",
+      "exitCode": 0,
+      "passed": 44,
+      "failed": 0,
+      "skipped": [],
+      "error": null
+    },
+    {
+      "name": "runner-contract",
+      "status": "PASS",
+      "exitCode": 0,
+      "passed": 19,
+      "failed": 0,
+      "skipped": [],
+      "error": null
+    }
+  ],
+  "exitCode": 0
+}

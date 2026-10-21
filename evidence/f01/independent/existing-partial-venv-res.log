@@ -1,0 +1,237 @@
+== RC.1 the roof solver (res-skeleton.js)
+  ok   hip on 8 × 6 m at 6/12: four faces covering the plan once, the ridge 1500 up
+  ok   its ridge is 2000 long (8000 − 6000)
+  ok   gable ends (speed 0): two faces
+  ok   shed: one face rising 3000 over 6000 at 6/12
+  ok   an L: six faces (not two overlapping hips), the top 1000
+  ok   a T: eight faces, the plan once
+  ok   a U: eight faces, the plan once
+  ok   a plus: twelve faces, four valleys
+  ok   a notched shape no square-corner rule fits: five faces, every corner at or above the eave
+  ok   an octagon: eight faces meeting at a point (the inradius × pitch)
+  ok   6/12 sides and 12/12 ends with a 300 overhang: every face meets its wall line at the plate, the eaves drop differently
+== RC.1 the roof from the walls (res-roof.js)
+  ok   each outline edge finds the wall under it
+  ok   per-wall settings read and written back the same
+  ok   hip, no overhang: ridge 2000, four hips of 4650, the ridge 1550 over the plate
+  ok   an L: one valley from the inside corner, two ridges
+  ok   Shed preset: the side nearest the pointer is the low eave, the rest are gable ends
+  ok   a shed roof: one face, three gable walls, 3100 high at the back wall
+  ok   steeper ends (12/12) on 6/12 sides: the hips move, the ridge height stays
+  ok   a plate 600 higher lifts the whole roof 600
+  ok   fascia all round the eave (30934 mm) and four soffit panels
+  ok   the soffit is level with the bottom of the fascia (never above the roof's underside at the eave)
+  ok   no pitched side at all: refused
+== RC.1 roofs in the model (IFC, follows the walls, undo)
+  ok   a hip roof with its fascia (IfcMember) and soffit (IfcCovering), all parts of the IfcRoof
+  ok   CadCraft_RoofLines: ridge, hip, valley, eave and rake lengths for the takeoff
+  ok   cc-ifc draws it: the top at 4773 (wall top 3000 + half the width × 6/12 + the thickness)
+  ok   east and west walls set to gable: two faces, two gable walls
+  ok   north too: a shed roof — one face, three gable walls (the high wall closed up to the roof)
+  ok   back to hip with the south side at 12/12: four faces, one at 45°
+  ok   plate height 3300, fascia and soffit off: the roof 300 higher, four faces only
+  ok   undo: the 12/12 south side on the walls' top again, fascia and soffit back
+  ok   redo: 300 higher again
+  ok   the east wall moves out: the roof follows (projected area with the overhang)
+  ok   an L-shaped house: six faces and a valley over 1 m long
+  ok   gables on both wing ends: four faces, two gable walls, still one valley
+  ok   posts, an inside wall poking out and a garden wall: the building outline is still the L (6 corners)
+  ok   its hip roof: six faces, as without them
+  ok   a room of inside wall types only: its outline is found
+  ok   a roof plane: an IfcRoof (.FREEFORM.) on Level 2 with one face slab
+  ok   its eave (the first side) at 2400, rising 3/12 inward: 3000 at the far side
+  ok   cc-ifc draws it where it should be (top 3157)
+  ok   pitch changed to 12/12 in Properties: the plane is made again
+  ok   two corners only: refused, nothing written
+  ok   deleted with its slab; no dangling references
+  ok   undo brings it back
+  ok   web-ifc (oracle): one roof, four face slabs, no fascia (it was turned off)
+== RC.2 foundation sizes and shapes (res-foundation.js)
+  ok   footing widths: 12" / 15" for 1 / 2 stories on a slab, 27" × 10" for 3 over a crawlspace, 4" more under masonry
+  ok   slab on grade: a 4" slab with its top at the floor, a 12" × 12" thickened edge all round
+  ok   stem walls and slab: 8" walls up to the floor on a 15" footing centred under them, its underside 24" down, a slab inside
+  ok   crawlspace: walls stop 12" under the floor (the floor framing sits on them), footing 36" down, no slab
+  ok   basement: an 8' basement under the floor framing, its slab on top of the footing
+  ok   a footing width typed in wins over the default; the others stay automatic
+== RC.2 foundations in the model (follow the walls, undo)
+  ok   a slab on grade under the walls: an IfcElementAssembly with an IfcSlab .BASESLAB. and a thickened edge (IfcFooting)
+  ok   the slab reaches the outside of the walls (56.796 m²)
+  ok   cc-ifc draws it: its lowest point 12" under the floor
+  ok   changed to a crawlspace: foundation walls on a footing 36" down
+  ok   one story of walls over a crawlspace: an 18" footing
+  ok   walls drawn on Level 2: the footing below widens to 22" for two stories
+  ok   a footing width typed in Properties (700) is used
+  ok   0 puts it back to automatic
+  ok   the east wall moved out 1000: the foundation follows (wall centre line 31924 mm)
+  ok   a basement: walls, footing and slab, the footing's underside 8' + framing + slab + footing down
+  ok   undo: back to the crawlspace
+  ok   redo: the basement again
+  ok   walls 5 m thick: refused, nothing changed
+  ok   deleted with its parts; no dangling references
+  ok   concrete block walls: a 16" footing (12" + 4" under masonry)
+  ok   web-ifc (oracle): the assembly, its footing and its slab
+== RC.4 the residential set (library repo items/residential)
+  --   no library repo at /Users/austinhartt/Documents/ChatGPT/BimCraft Test/bimcraft-f01/repos/library: item checks skipped
+== RC.4 cabinets placed, countertops that follow them
+== RC.4 door and window types
+  ok   four new doors and three new windows placed in walls
+  ok   IFC: the bifold folds (FOLDING_TO_LEFT), the French doors are a double door, each in its opening
+  ok   plan symbols: bifold panels folded out, the barn door's slide (dashed), one swing between two sidelites
+  ok   their names (res.ot.*) beside the starter types' (model.ot.*)
+  ok   web-ifc (oracle): four doors, three windows
+== RC.3 stair layouts (res-stair.js)
+  ok   straight, 10' floor to floor: 16 risers of 7½", 15 treads of 10" (a 12'-6" run), every labelled check met
+  ok   tread tops 7½" apart; the handrails follow the nosings up to the floor above
+  ok   l turning left: 15 steps (a landing counts as one), each higher than the last, one outline
+  ok   l turning right: 15 steps (a landing counts as one), each higher than the last, one outline
+  ok   u turning left: 15 steps (a landing counts as one), each higher than the last, one outline
+  ok   u turning right: 15 steps (a landing counts as one), each higher than the last, one outline
+  ok   winder turning left: 15 steps (a landing counts as one), each higher than the last, one outline
+  ok   winder turning right: 15 steps (a landing counts as one), each higher than the last, one outline
+  ok   three winders fanned from the inside corner fill the corner square
+  ok   risers allowed up to 8¼": the check says they are over the 7¾" default
+  ok   two risers are too few steps for a U: refused
+  ok   a 3 m guard: posts at the ends, 21 balusters, no gap 4" or wider (widest 3.78")
+== RC.3 stairs in the model (IFC, follows the level, the stairwell)
+  ok   a straight stair: IfcStair with one IfcStairFlight and two handrails
+  ok   the flight says 16 risers, 15 treads, 187.5 riser (3000 / 16), 254 tread (IFC4 attributes): 602,#770,$,16,15,187.5,254.,.STRAIGHT.);
+  ok   Pset_StairCommon: 16 risers
+  ok   the stairwell: an opening voids the floor of Level 2 over the steps
+  ok   cc-ifc cuts it: the floor is 0.850 m³ lighter
+  ok   Level 1 made 3300 tall: the stair has 17 risers now, its stairwell made again
+  ok   changed to an L turning right: two flights, a landing, one handrail (on the outside)
+  ok   with winders: an IfcStairFlight .WINDER. in place of the landing
+  ok   undo: the landing again
+  ok   a 100 mm wide stair: refused
+  ok   a guardrail drawn on Level 2: IfcRailing .GUARDRAIL. with 3 posts and 22 balusters
+  ok   its height 42" in Properties
+  ok   railing and stair deleted, the stairwell with them; no dangling references
+  ok   web-ifc (oracle): the stair, its two flights, its handrail
+== RC.9 framing rules and tables (res-framing.js)
+  ok   headers by width: 3' 2-2x6, 4' 2-2x8, 6' 2-2x10, 8' 2-2x12, wider = 3-2x12 flagged for a designer
+  ok   board feet: a 2x4 8' = 5.33, a 2x10 12' = 20
+  ok   joists by span at 16": 12' 2x8, 13' 2x10, 25' beyond the table
+  ok   plates: a double top plate, the bottom plate cut at the door
+  ok   each opening: two kings, two jacks and a header (2x6 over the door, 2x8 over the window)
+  ok   the window: a rough sill with cripples under it, cripples over both headers
+  ok   three-stud corners at both ends (the wall that runs through), two backer studs where the inside wall tees in
+  ok   common studs on the 16" layout from the wall's start
+  ok   no two studs in the same place
+  ok   a row of blocking between the studs (not across openings)
+  ok   at a corner the first wall runs through to the outside of the other's studs; the other stops against it (and runs through at its far corner)
+  ok   California corners: one flat stud at each corner; 24" layout without blocking
+  ok   a block wall has no studs to frame: refused
+  ok   a floor spanning 12'-10": 2x10 joists, rims all round, doubled trimmers and headers round the stairwell
+  ok   joists through the opening are cut short of it (tail joists)
+  ok   a hip roof in rafters: four hips, a ridge board, common and jack rafters, ceiling joists, collar ties
+  ok   rafters follow the roof's planes
+  ok   or trusses: 10 at 24", one element each
+== RC.9 framing in the model (follows the walls, kept pieces, the cut list)
+  ok   every wall framed: an assembly each of IfcMember studs and plates, an IfcBeam header over the door
+  ok   the cut list: 163 pieces, 1622 board feet, 2x6 studs ordered as 8' stock
+  ok   cc-ifc draws the framing up to the top of the walls (3000)
+  ok   the door moved: the wall's framing is made again, the kept stud stays and is flagged to check
+  ok   a wall deleted: its framing goes too; no dangling references
+  ok   undo: the wall and its framing back
+  ok   one wall changed to 24" on centre without blocking
+  ok   a floor (IfcBeam joists, rims) and a roof (rafters, hips, a ridge, ceiling joists, collar ties) framed
+  ok   the roof switched to trusses: one element each, no rafters left
+  ok   web-ifc (oracle): 136 members in four assemblies
+== RC.10 the ground (res-terrain.js, CivilCraft's tin.js)
+terrain: bundled integrity verified against 72664187a1cc2694d1f8972fd2e1aa5b46106bc3
+SKIP terrain live source comparison: civilcraft app absent at /Users/austinhartt/Documents/ChatGPT/BimCraft Test/bimcraft-f01/.cc-test/public_html/assets/apps/civilcraft; bundled integrity checked separately
+  ok   bundled terrain integrity and available CivilCraft source comparison (terrain-sync.mjs --check)
+  ok   a PNEZD file: four points, the header skipped, easting as x
+  ok   bare E N Z rows
+  ok   a 12 × 10 m pad on a 1:10 slope: flat on the pad, 2:1 slopes out of it (cut uphill, fill downhill), back on the ground beyond
+  ok   cut and fill balance on a pad set at the middle of an even slope (24.7 / 24.6 m³)
+  ok   LandXML 1.2 with the surface's points and faces (CivilCraft reads it)
+  ok   contours from a drawing: polylines at their elevation and 3D polylines (flat lines at 0 left out)
+  ok   a cloud thinned to the lowest point in each cell
+== RC.10 the ground in the model (IFC, a pad that follows the walls, paving, stepped footings)
+  ok   the ground: an IfcGeographicElement .TERRAIN. in the site, a closed triangulated body, the survey kept with it
+  ok   cc-ifc draws the ground
+  ok   a building pad: cut on the uphill side, fill downhill (20.4 / 19.9 m³)
+  ok   the finished grade is flat 8" under the floor out to the pad's edge
+  ok   the east wall moved out 1000: the pad (and the grade) follow
+  ok   a driveway: IfcSlab "Paving" draped on the grade
+  ok   it follows the slope (rising 1605 mm along its length)
+  ok   a stem-wall foundation on the pad
+  ok   on the flat pad the footings stay level
+  ok   the pad taken away: on the 1:10 slope the footings step down with the ground in 8" steps (3 steps)
+  ok   undo: the pad back, the footings level again
+  ok   a second ground: refused
+  ok   the ground deleted with its pad and its paving; no dangling references
+  ok   web-ifc (oracle): the ground, the pad, their triangulated bodies
+== RC.5 hidden lines (res-views.js)
+  ok   the south elevation of three boxes: 4000 wide, 4000 high
+  ok   the front box: its outline, every edge seen (14000 of 14000)
+  ok   the box hidden behind it: no lines (0)
+  ok   the taller box behind: only the part over the front one (top and the two sides above 3000: 2987 of 3000)
+  ok   from the north the tall box is in front: its whole outline
+  ok   a section through the middle box: it is cut (poché 1000 × 2000), the front box is left out
+  ok   beyond the cut the tall box is seen; nothing in front of the plane is drawn
+  ok   with a depth of 500 the tall box 900 behind is left out
+  ok   with a 44 m site round it the elevation is framed on the building: the ground cut 3000 past each side
+== RC.5 a house: elevations, a section line, the sheet set
+  ok   a section line: an IfcAnnotation "Section A" in its level, its ends and look kept in CadCraft_SectionLine
+  ok   drawn south → north it looks to the left: west
+  ok   flipped and renamed: looks east, "Section B"
+  ok   undo: back to Section A
+  ok   a section line 50 mm long: refused
+  ok   the south elevation: the house with its eaves (9784 wide), the roof over the walls (4773 high)
+  ok   the door's head and the window's sill and head are lines on it
+  ok   the north elevation: no window drawn (it is on the far side)
+  ok   Section A cuts both long walls and the roof (IfcWall, IfcWall, IfcSlab, IfcSlab, IfcMember, IfcCovering)
+  ok   six sheets: the plan, two of elevations, the section, the schedule, the framing (A-101, A-201, A-202, A-301, A-401, S-101)
+  ok   the four elevations two to a sheet, at a standard architectural scale (3/16" = 1'-0")
+  ok   every elevation at the same scale
+  ok   each sheet's title block: number, title, project and date
+  ok   tabloid paper, 10 mm border
+  ok   every line on every sheet inside its border
+  ok   the PDF: header, every xref offset lands on its object
+  --   poppler not installed: PDF reader checks skipped (spawnSync pdftotext ENOENT)
+  ok   the preview: an SVG of the sheet (72 lines)
+  ok   text in the preview is escaped
+  ok   the section line deleted; no dangling references
+  ok   web-ifc (oracle): the section line's annotation
+== RC.6 the symbols (CadCraft's Electrical add-on) and the rules
+electrical: bundled integrity verified against 72664187a1cc2694d1f8972fd2e1aa5b46106bc3
+SKIP electrical live source comparison: cadcraft app absent at /Users/austinhartt/Documents/ChatGPT/BimCraft Test/bimcraft-f01/.cc-test/public_html/assets/apps/cadcraft; bundled integrity checked separately
+  ok   bundled electrical integrity and available CadCraft source comparison (elec-sync.mjs --check)
+  ok   every add-on symbol has a device (16: outlets, switches, a sensor, lights, a junction box, an appliance outlet, a panel)
+  ok   a socket on a wall facing north: its flat side on the wall (300 wide at 1:50), the half circle into the room
+  ok   facing south: the half circle turns with it
+  ok   a click 250 inside the wall: the device sits on its inside face (y = 100), 1500 along, facing in
+  ok   the other face from outside; nothing far from a wall
+  ok   mounting heights (planning defaults): outlets 16", switches 1100 mm, lights at the ceiling
+== RC.6 devices in the model
+  ok   five devices tagged by kind: L1, L2, P1, R1, S1
+  ok   IFC4 classes: IfcOutlet, IfcSwitchingDevice, IfcLightFixture, IfcElectricDistributionBoard, with their predefined types
+  ok   heights 16", 48", the lights at the ceiling (the walls' top); the outlet on the south wall's inside face
+  ok   cc-ifc draws the outlet's box at its height (top 464)
+  ok   S1 switches both lights
+  ok   clicking L1 again unlinks it
+  ok   an outlet switches nothing: refused
+  ok   an outlet in the middle of the room: refused (it goes on a wall)
+  ok   a tag that is taken: refused
+  ok   retagged R10, on circuit 3, 360 W, at 1100 mm
+  ok   the device schedule: tag, device, level, circuit, load, height, what a switch controls
+  ok   the circuit schedule: circuit 2 = a switch and two lights, 70 W, 0.6 A at 120 V; the panel itself left out
+  ok   the south wall moved 500 out: its outlet and switch move with it, the lights stay
+  ok   undo: back on the wall where it was
+  ok   a light deleted: gone from its switch; no dangling references
+  ok   web-ifc (oracle): the outlet, two lights, the switch
+  SKIP RC.8 cross-app reader, quantities, estimate and pack sync: TakeoffCraft directory absent at /Users/austinhartt/Documents/ChatGPT/BimCraft Test/bimcraft-f01/.cc-test/public_html/assets/apps/takeoffcraft/dev
+== RC.8 the trade packs (TakeoffCraft's) and the hand-off file
+  ok   the quantities gathered: 23 items on 2 plans (walls, doors, windows, roof, foundation, devices, floor), 8 cut-list rows
+  ok   one PDF: the plans and the cut list, the takeoff attached inside (3 sheets)
+  ok   poppler opens it too
+== IfcOpenShell schema validation (when a venv with it is on this machine)
+  FAIL IfcOpenShell finds no schema errors in 
+
+203 passed, 1 failed
+Traceback (most recent call last):
+  File "/Users/austinhartt/Documents/ChatGPT/BimCraft Test/bimcraft-f01/.cc-test/tools/bimcraft-test/ifc_validate.py", line 14, in <module>
+    import ifcopenshell
+ModuleNotFoundError: No module named 'ifcopenshell'

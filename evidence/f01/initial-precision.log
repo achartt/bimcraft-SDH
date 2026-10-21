@@ -1,0 +1,21 @@
+npm notice run test:precision
+npm notice run node --test tests/unit/wall-precision.test.mjs
+(node:25765) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///Users/austinhartt/Documents/ChatGPT/BimCraft%20Test/bimcraft-f01/app/ifc/api.js is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /Users/austinhartt/Documents/ChatGPT/BimCraft Test/bimcraft-f01/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ assembly validation requires a finite thickness and contiguous explicit core (0.485125ms)
+✔ custom types, core anchors, hosted openings, persistent dimensions, undo and IFC round trip (33.614666ms)
+✔ dimensions retain IDs across redo, type swaps, flips, curves and rebinds (7.341667ms)
+✔ failed type edits roll back, duplicate type applies only to selected walls (2.490084ms)
+✔ assembly changes preserve connected core-anchored corners (2.212333ms)
+✔ sub-millimetre faces use the actual IFC layer set in metre-based files (1.375875ms)
+✔ dimension picking, fit bounds and PDF export include offset lines and true witnesses (2.194375ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 151.458166

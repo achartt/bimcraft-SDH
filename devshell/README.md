@@ -1,5 +1,7 @@
 # Dev shell
 
+For this residential fork, run `npm run test:baseline` as well as the legacy tests. See the [F01 standalone workflow](../docs/features/F01-INTEGRATION-BASELINE.md) for isolated startup, fixture review, explicit discovery and known integration blockers.
+
 Run this app from a clone, without getcadcraft.com.
 
 ```sh

@@ -1,0 +1,3 @@
+{"beforeThickness":209.55,"afterThickness":241.3,"coreAnchor":[0,22.224999999999994],"wall":"3WTGhXmIf6bR4yGAtJf5aq","dimension":"3kvgSIKhr59eXyC7a99uYT","type":"2lIjbmfNr7$RfQNIFwzX5c","opening":"1RW2h3A1zDRh3r$ADsh1K$","material":"material-studs","cavity":25.4,"membrane":0,"missingHostStatus":"missing","checks":["core anchor","dimension update","stable IDs and references","hosted opening retained","undo/redo","material-default isolation","cavity/membrane","save/reopen","project isolation","missing host has no curve"]}
+1 passed, 0 failed
+Fixture: /Users/austinhartt/Documents/ChatGPT/BimCraft Test/bimcraft-f01/.cc-test/f01-generated/house.ifc; exports: /Users/austinhartt/Documents/ChatGPT/BimCraft Test/bimcraft-f01/.cc-test/f01-generated

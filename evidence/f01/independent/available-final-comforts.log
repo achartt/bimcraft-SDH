@@ -1,0 +1,119 @@
+== 1 Curved walls: geometry
+  ok   a half circle from (4000, 0) to (0, 0), bulge 1: centre (2000, 0), radius 2000, through (2000, 2000)
+  ok   a quarter turn clockwise: θ = −90°, R = chord / √2, the centre on the right of travel (below), bowing up, length R·π/2
+  ok   bulgeThrough: the half circle (1), a flat arc bowing down (0.25), three points in a line (0)
+  ok   arc height 600 (to the left) ↔ bulge −0.3 and back
+  ok   wallGeom: along the arc (s = R·angle) and off it (− = outside an anticlockwise arc), and back
+  ok   chord ↔ arc length for the same turn
+  ok   a bulged polygon flattens to chords of at most 4°
+== 1 Curved walls: joins and rooms
+  ok   the curved wall's corners sit on its faces (radius 2100 outside, 1900 inside)
+  ok   the outer corner: where the straight wall's outside face (y = −100) meets the curved outside face — both walls share it
+  ok   the faces are arc edges: the outside one anticlockwise (bulge = tan(sweep / 4)), the inside one back the other way
+  ok   one room inside: the half disc above the straight wall's face, 5.286 m² (exact 5.291)
+  ok   a wall ending on a curved wall's side: a T, it stops at the inside face
+== 1 Curved walls: in a building, IFC, 3D
+  ok   a straight wall and a half-round one: one undo step; the curve read back (Bulge 1)
+  ok   its Length runs along the arc (3000·π = 9424.8 mm); its end is the chord away (0, 0)
+  ok   Axis: an IfcTrimmedCurve of an IfcCircle (radius 3000), trimmed by its ends, anticlockwise (SenseAgreement .T.)
+  ok   Body: an IfcIndexedPolyCurve profile with two IfcArcIndex edges (the faces)
+  ok   CadCraft_Wall Bulge 1; a centre-line wall writes no Justification
+  ok   Qto_WallBaseQuantities Length = the arc length
+  ok   cc-ifc builds the curved wall: 3.2237 m³ against the half annulus 3.2318 m³ (within 2 %: the mitred corners)
+  ok   regenWalls again: 0 walls rewritten (the stored IfcIndexedPolyCurve and IfcTrimmedCurve read back as the same shape)
+  ok   arc height 1500 (Properties): one step, the ends stay, the curve flatter
+  ok   arc height 0: a straight wall again (an IfcPolyline axis, Bulge 0, Length 6000)
+  ok   two undos: the half circle back
+  ok   redo: the flatter curve again (the same GlobalId)
+  ok   its end dragged out 1000: still a half circle, now 3500·π long
+  ok   more than three quarters of a circle: refused (comforts.err.arc), no step
+  ok   a door 3000 along the curved wall: its offset reads back along the arc (3000.00)
+  ok   the plan symbol: its jambs run along the radius, from face to face of the curved wall
+  ok   the plan cuts the curved wall in two at the door (2 pieces)
+  ok   IFC: the opening voids the curved wall
+  ok   cc-ifc cuts the door out of the curved wall: 206.9 l less, the opening is 209.0 l
+  ok   web-ifc (oracle) builds the curved wall too (152 triangles)
+== 1 Curved walls: what follows the walls
+  ok   a room with one curved side gets its space (IfcSpace) like any other
+  ok   a roof over it: made over the curve's chords, or a plain refusal (made, 9 ms)
+  ok   Trim / extend and Corner refuse a curved wall (not built yet), with their own message
+  ok   framing refuses a curved wall (not built yet), with its own message
+== 1 Curved walls: an IFC2X3 file
+  ok   IFC2X3: the curved wall's axis an IfcTrimmedCurve, its profile an IfcPolyline of chords (2X3 has no IfcIndexedPolyCurve)
+== 2 Wall justification (the location line)
+  ok   locationOffset: centre 0, the outside face on its side, the inside face opposite, left / right faces
+  ok   drawn on the outside face: both walls keep Justification exterior (CadCraft_Wall)
+  ok   the location line is the drawn line (y = 0); the centre line is half a thickness inside
+  ok   a thicker type: one step; the outside face stays on y = 0, the centre line moves in to 92.08
+  ok   the corner: the other wall's end moved along its own line to meet the new centre line (still one node)
+  ok   the outside corner is still (8000, 0): the mitre joins as before
+  ok   flip the outside: the outside face stays on y = 0, the wall flips across it
+  ok   Location line › Inside face: the wall stays where it is; only the line it keeps changes
+  ok   then thinner: the inside face stays put now (y = 184.15)
+  ok   several walls: Location line › Center line for all of them in one step
+  ok   a curved wall kept on its left face gets thicker: the same centre, the left face at the same radius
+== 3 Moving and turning placed library items
+  ok   placedItems: both placed items, in their storey's plan (3000, 2000), turned 0°, z 0 on its level
+  ok   moved to (5000, 1000): one undo step, a model change (it travels in Live)
+  ok   the item keeps its number (7), its library data and its type; IfcPlacer reads the new spot too
+  ok   R (turn 90°): turned about its insertion point, which stays
+  ok   reopened: the turned item's footprint is 838 × 914 (depth × width, turned)
+  ok   undo: not turned
+  ok   undo again: back where it was placed
+  ok   redo: moved again
+  ok   on Level 2: moved by (500, −250) and set to 45°; still on its level (world z 3000)
+  ok   two turned 180° about (0, 0) together: one step, both go round
+  ok   an item that is gone: refused (comforts.err.noitem), no step
+  ok   nothing in the saved file points at a line that is gone (the old placements were deleted)
+== 4 Dormers
+  ok   roofPlans: the hip roof with its faces as written (plate height); the face over (4000, 900) runs up +y at 10/12
+  ok   gable dormer geometry: its eave 600 above the roof's top at its front; its ridge runs back to where it meets the roof
+  ok   the dormer roof's top meets the roof's top along its back edge (the valley line)
+  ok   three walls (front with its gable, two cheeks) and a five-sided hole (up to the ridge)
+  ok   a shed dormer steeper than the roof: refused (comforts.err.shedpitch)
+  ok   a dormer past the face's hip: refused (comforts.err.dormerfit)
+  ok   placed: one undo step; an IfcRoof "Dormer" with 5 parts (two roof planes, front, two cheeks)
+  ok   IFC: IfcRoof .GABLE_ROOF. ObjectType Dormer, CadCraft_Dormer; the hole tagged CadCraft_DormerCut
+  ok   the hole voids the south face's slab (IfcRelVoidsElement)
+  ok   cc-ifc: the roof slab is 302.0 l lighter (the hole: 302.0 l); the dormer's parts 0.976 m³
+  ok   changed to a shed dormer 2000 wide: one roof plane at 3/12, front and cheeks; .SHED_ROOF.
+  ok   the south wall moved out 1000: the roof made again, the dormer with it on the new face (one hole in the new slab, nothing dangling)
+  ok   removed: the dormer, its parts and its hole are gone; nothing dangling
+  ok   undo: the dormer is back
+  ok   web-ifc (oracle): the roof and the dormer, the hole
+== 5 Spiral stairs
+  ok   a 9'-0" floor to floor: 12 risers of 228.6 mm (the spiral default: at most 9½"), 11 treads
+  ok   each tread turns 30.16° so it is 7½" deep on the walk line 12" from the post; outside radius = post + 30"
+  ok   wedge treads between the post and the outside; a post piece
+  ok   turning left (the default): the treads go round anticlockwise going up
+  ok   turning right: clockwise
+  ok   one handrail on the outside, a helix rising with the nosings to the top
+  ok   its labelled defaults pass (9½" riser, 6¾" on the walk line, 26" wide, 36" handrail)
+  ok   a 22" spiral with 6" treads: flagged narrower than 26" and too shallow on the walk line
+  ok   the plan outline: the part of the circle its treads cover, and the post
+  ok   placed: one undo step, read back as a spiral with its post and its own defaults (30" wide, 9½" risers)
+  ok   IFC: IfcStair .SPIRAL_STAIR. aggregating an IfcStairFlight .SPIRAL., the post (IfcMember .POST.) and the handrail
+  ok   CadCraft_Stair Post 114.3 (4½")
+  ok   cc-ifc builds the treads and the post
+  ok   changed: winds the other way, a 150 mm post; made again with as many parts
+  ok   turned into a straight stair: back to the straight stair's defaults
+== 6 Interior elevations, 7 dimensions and tags on elevations and sections
+  ok   interiorView north: framed on the room, wall to wall 3835 mm, floor to 3000 (17 ms)
+  ok   the side walls come out cut (poché round the frame); the north wall is seen, not cut
+  ok   the window in the north wall is drawn (16 lines round x 2038)
+  ok   its dimensions: the room's width under it, its height beside it
+  ok   its tags: the window W1 and the range (item 4) on the north wall; not the south door
+  ok   the south interior elevation: the door D1 only
+  ok   all four sides of the room (N / E / S / W) come out, each with its side walls cut
+  ok   the south elevation: level marks for Level 1 and Level 2
+  ok   the height between the levels (3000) and the building's width (4165)
+  ok   tags on the wall facing the viewer only: D1 (the window W1 is on the far side)
+  ok   interiorSheet: the four walls at one scale (1:50), each named, with W1, D1 and item 4 tagged; the SVG preview
+  ok   the PDF: one page, its title, the walls' names, the tags and the room's width as text
+  ok   a section: level marks and the height between them, no tags
+  ok   the drawing set draws the notes: level marks, the 3000 between levels, the width, the D1 tag
+  ok   your own sheet: an interior elevation placed at 1:25 with its tags (W1, item 4)
+== IfcOpenShell schema validation (when a venv with it is on this machine)
+  ok   IfcOpenShell finds no schema errors in curved.ifc (0), x3.ifc (0), just.ifc (0), moved.ifc (0), dormer.ifc (0), spiral.ifc (0)
+
+106 passed, 0 failed
