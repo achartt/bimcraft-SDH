@@ -26,7 +26,7 @@ Development checkout on the current computer: `/Users/austinhartt/Documents/Chat
 
 The original checkout `/Users/austinhartt/Documents/GitHub/bimcraft` is separate and was not the implementation workspace. Do not assume changes in one are in the other.
 
-Prototype branch: `feature/wall-assemblies-dimensions`. Feature baseline: `bb2b8d2`. Draft PR: https://github.com/achartt/bimcraft-SDH/pull/1. **Verify current branch/PR state before starting; this document does not declare that PR merged.** Roadmap-only commits may follow this baseline.
+Prototype branch: `feature/wall-assemblies-dimensions`. Historical feature baseline: `bb2b8d2`; reviewed handoff: `7266418`. **Integrated and validated for internal prototype use on 2026-10-21:** PR #2 merged into the prototype branch at `994e4168609316d17ada992bb0dbef473f52ed18`, then updated PR #1 merged into `main` at `1c35f47d69af2214b4747f541703224d0a4a4742`. See [integration record and accepted follow-ups](INTEGRATION-2026-10-21.md). Reverify current Git state before starting a feature; do not reset the existing previews/checkouts.
 
 Implemented and tested as a prototype:
 
@@ -228,9 +228,9 @@ Keep this small and factual. Detailed scope lives in the feature cards; implemen
 
 | Item | State | Evidence / next action |
 |---|---|---|
-| Wall/material/dimension prototype | Implemented on feature branch; draft PR awaiting integration review at baseline | PR #1, feature commit `bb2b8d2`, `WALL-PRECISION.md` |
-| F01 | Ready for baseline inspection | Confirm PR status, branch and standalone checks |
-| F02–F03 | Planned; depend on F01 | Precision contract and measured baseline |
+| Wall/material/dimension prototype | Validated for internal prototype use; integrated into main | PR #1 merged at `1c35f47`; known UI/layout/reader/version-message limits tracked in [integration record](INTEGRATION-2026-10-21.md) |
+| F01 | Validated for internal prototype use; integrated into main | PR #2 → prototype `994e416`; PR #1 → main `1c35f47`; local baseline/independent IFC and CI evidence in integration record |
+| F02–F03 | Planned; F01 prerequisite satisfied; not started | Pin `main@1c35f47d69af2214b4747f541703224d0a4a4742` in briefs before dispatch; separate checkouts remain required |
 | F04–F26 | Proposed; follow card dependencies | PM schedules after prerequisite acceptance |
 
 Allowed states: proposed, ready, in progress, blocked (with concrete blocker), review, integrated, validated. A feature may be implemented without yet being integrated or validated in the reference project.
