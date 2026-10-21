@@ -53,3 +53,17 @@ node .cc-test/bin/test-bimcraft.mjs --views2
 The precision suite covers validation, duplication, bulk edits, anchoring, corners, hosted openings, six reference modes, type swaps, flips, curved walls, deletion/rebinding, undo/redo, isolation, metre-unit files, sub-millimetre references, picking, print bounds and save/reopen. Existing suites passed 122, 103 and 104 checks respectively. Optional external IFC schema validators were unavailable.
 
 The broader `--res` suite stops at a cross-application test requiring `takeoffcraft/dev/model.js`, absent from this standalone checkout.
+
+## Project materials and cavities
+
+In **Draw**, open **Material library…** to edit, create or duplicate a material. Each material has a stable ID, name, category, default thickness, display color, cut fill pattern/color and notes. Thirteen generic residential materials are supplied, using the existing wall recipes as starting thicknesses. These are editable examples, not manufacturer specifications or engineering properties. No external catalog or account is required.
+
+The assembly editor now has a material picker. Selecting a material keeps the layer's explicit thickness. **Use default** copies that material's saved thickness into the layer; adding a material layer uses its default. Later library edits never resize existing walls. Core flags, wall/type GlobalIds and dimension references remain independent of material names.
+
+**Add cavity** creates a separate air layer. It has thickness and an unspecified/unventilated/ventilated setting. It contributes to total assembly thickness and face locations, but its IFC material layer has a null Material reference. The proportional preview leaves cavities unfilled and underlines core layers in blue. Existing recipes with `mat: "air"` are read as cavities at exactly their original thickness; other historical free-text materials get stable library entries. Reading a file does not rewrite it. Saving an assembly migrates that recipe in the same undo transaction.
+
+The project stores a versioned `CadCraft_MaterialLibrary.Library` property containing the definitions. Authored solid IFC materials carry a `CadCraft_Material.Id` property so renaming cannot break their identity. New IFC4 and IFC2X3 material layers include cavity ventilation. Existing type entities are retained, and unsupported library versions are rejected rather than overwritten. Definitions, custom material IDs, notes, colors and fill patterns survive IFC save/reopen and undo/redo.
+
+Current scope: colors and fills appear in the assembly preview. Per-layer plan/section fills, 3D layer solids, thermal properties, material mass/takeoffs and a reusable cross-project catalog are not implemented. Existing gross/net wall quantities still describe the wall envelope, including its cavities; they are not solid-material quantities. Built-in types already present in older files keep their original IFC layer sets until explicitly saved as custom assemblies. Deleting library definitions is intentionally unavailable while layers may reference them.
+
+Run `npm run test:materials` in addition to the precision suite. It covers the checked-in pre-library IFC fixture, default-edit isolation, all six dimension reference modes, cavity exports, custom material migration, undo/redo, rollback, project isolation, and IFC4/IFC2X3 round trips.

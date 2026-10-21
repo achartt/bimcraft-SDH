@@ -1,0 +1,81 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import * as W from '../../app/ifc/api.js';
+import { init } from '../../app/i18n.js';
+import { ids, val } from '../../app/ifc-util.js';
+import { newBuilding, stackLevels } from '../../app/new-model.js';
+import { IfcEditor } from '../../app/ifc-edit.js';
+import { ModelWriter } from '../../app/model-write.js';
+import { readLevels } from '../../app/model-levels.js';
+import { readWalls, wallType } from '../../app/model-walls.js';
+import { saveWallAssembly, drawWalls, op } from '../../app/model-ops.js';
+import { readAssemblies } from '../../app/wall-assemblies.js';
+import { saveWallDimension, readWallDimensions, resolveDimension, WALL_REFERENCES } from '../../app/wall-dimensions.js';
+import { readMaterials, saveMaterial, MATERIAL_PSET, legacyMaterialId } from '../../app/project-materials.js';
+init({strings:JSON.parse(fs.readFileSync(new URL('../../app/lang/en.json',import.meta.url)))});
+async function model(bytes){const api=new W.IfcAPI();await api.Init({manifold:false});const modelID=api.OpenModel(bytes || new TextEncoder().encode(newBuilding({name:'Materials test',levels:stackLevels(1,3000,i=>'Level '+(i+1)),fileName:'materials.ifc'})));const ed=new IfcEditor(W,{api,modelID});return {ed,w:()=>new ModelWriter(W,api,modelID),change:op=>ed.modelChange(op)};}
+const recipe={key:'wall-cavity',name:'Brick and wood with cavity',exterior:true,layers:[{mat:'brick',t:92.075,function:'finish',core:false},{mat:'air',t:25.4,function:'substrate',core:false},{mat:'Unknown historical board',t:17.125,function:'substrate',core:false},{mat:'studs',t:139.7,function:'structure',core:true},{mat:'gypsum',t:12.7,function:'finish',core:false}]};
+const snapshot=m=>({walls:readWalls(m.w()).map(w=>({guid:w.guid,t:w.t,a:w.a,b:w.b,typeKey:w.typeKey})),types:readAssemblies(m.w()).map(t=>({guid:t.guid,key:t.key,layers:t.layers})),dims:readWallDimensions(m.w()).map(d=>({guid:d.guid,refs:d.refs,resolved:resolveDimension(d,readWalls(m.w()))}))});
+test('legacy recipes migrate losslessly and library edits never resize walls or move dimension references',async()=>{
+  const fixture=fs.readFileSync(new URL('../fixtures/wall-precision-legacy.ifc',import.meta.url));
+  const m=await model(fixture), before=snapshot(m);
+  assert.ok(before.types.length && before.dims.length);
+  const material=readMaterials(m.w()).find(x=>x.id==='material-studs');
+  m.change(op(w=>{saveMaterial(w,{...material,name:'Edited wood framing',defaultThickness:200,color:'#123456',fill:'crosshatch',fillColor:'#abcdef'});return [];}));
+  assert.deepEqual(snapshot(m),before);
+  const reopened=await model(m.ed.save());assert.deepEqual(snapshot(reopened),before);
+  const saved=readMaterials(reopened.w()).find(x=>x.id===material.id);assert.equal(saved.defaultThickness,200);assert.equal(saved.name,'Edited wood framing');
+  m.ed.undo();assert.equal(readMaterials(m.w()).find(x=>x.id===material.id).defaultThickness,139.7);assert.deepEqual(snapshot(m),before);
+  m.ed.redo();assert.equal(readMaterials(m.w()).find(x=>x.id===material.id).defaultThickness,200);assert.deepEqual(snapshot(m),before);
+  const isolated=await model();assert.equal(readMaterials(isolated.w()).find(x=>x.id===material.id).defaultThickness,139.7);
+});
+test('cavities retain width, explicit cores and all references; IFC layers contain no solid material for air',async()=>{
+  const m=await model(),level=readLevels(m.w())[0];m.change(saveWallAssembly(recipe));
+  const ty=readAssemblies(m.w())[0],cavity=ty.layers[1];assert.equal(cavity.kind,'cavity');assert.equal(cavity.materialId,null);assert.equal(cavity.t,25.4);
+  const custom=readMaterials(m.w()).find(x=>x.id===legacyMaterialId('Unknown historical board'));assert.equal(custom.name,'Unknown historical board');assert.equal(custom.defaultThickness,17.125);
+  const set=m.w().api.GetLine(m.w().mid,m.w().materialRel(ty.id).def,false);
+  const layer=m.w().api.GetLine(m.w().mid,set.MaterialLayers[1].value,false);assert.equal(layer.Material,null);assert.equal(layer.LayerThickness.value,25.4);
+  m.change(drawWalls({storey:level.guid,typeKey:recipe.key,segs:[{a:[0,0],b:[5000,0]},{a:[0,3000],b:[5000,3000]}],height:2700}));
+  const [a,b]=readWalls(m.w());
+  for(const reference of WALL_REFERENCES)m.change(saveWallDimension({level:level.guid,view:'plan:'+level.guid,axis:'y',offset:1000,refs:[{wall:a.guid,reference,station:0.5},{wall:b.guid,reference,station:0.5}]}));
+  const before=snapshot(m);
+  const brick=readMaterials(m.w()).find(x=>x.id==='material-brick');
+  m.change(op(w=>{saveMaterial(w,{...brick,name:'Local brick',defaultThickness:101.6});return [];}));assert.deepEqual(snapshot(m),before);
+  const mat=m.w().api.GetLine(m.w().mid,m.w().api.GetLine(m.w().mid,set.MaterialLayers[0].value,false).Material.value,false);assert.equal(val(mat.Name),'Local brick');
+  m.change(saveWallAssembly({...ty,layers:ty.layers.map((l,i)=>i===1?{...l,ventilation:'ventilated'}:l)}));
+  const reopened=await model(m.ed.save()),rt=readAssemblies(reopened.w())[0];assert.equal(rt.layers[1].ventilation,'ventilated');
+  const rs=reopened.w().api.GetLine(reopened.w().mid,reopened.w().materialRel(rt.id).def,false);
+  const rl=reopened.w().api.GetLine(reopened.w().mid,rs.MaterialLayers[1].value,false);assert.equal(rl.Material,null);assert.ok([true,'T',1].includes(val(rl.IsVentilated)),JSON.stringify(rl.IsVentilated));
+  assert.deepEqual(snapshot(reopened).dims,before.dims);assert.deepEqual(snapshot(reopened).walls,before.walls);
+});
+test('invalid material references and invalid defaults roll back without partially migrating the library',async()=>{
+  const m=await model(),before=m.ed.save();
+  assert.throws(()=>m.change(saveWallAssembly({...recipe,layers:recipe.layers.map((l,i)=>i===0?{...l,materialId:'material-missing'}:l)})),/missing material/);
+  assert.deepEqual(m.ed.save(),before);
+  const material=readMaterials(m.w())[0];
+  for(const change of [{defaultThickness:0},{color:'red; background:url(x)'},{fill:'script'},{name:''}]) assert.throws(()=>m.change(op(w=>saveMaterial(w,{...material,...change}))));
+  assert.deepEqual(m.ed.save(),before);
+  m.change(op(w=>{saveMaterial(w,{...material,id:'material-new',name:'My board'});return [];}));
+  assert.throws(()=>m.change(op(w=>saveMaterial(w,{...material,name:'My board'}))),/already exists/);
+});
+test('new built-in brick walls use a cavity; stored library versions are not silently overwritten',async()=>{
+  const m=await model(),level=readLevels(m.w())[0];
+  assert.equal(wallType('brick-2x4').layers[1].kind,'cavity');
+  m.change(drawWalls({storey:level.guid,typeKey:'brick-2x4',segs:[{a:[0,0],b:[5000,0]}],height:2700}));
+  const layers=ids(m.w().api,m.w().mid,'IFCMATERIALLAYER').map(id=>m.w().api.GetLine(m.w().mid,id,false));assert.equal(layers.filter(l=>l.Material==null).length,1);
+  m.change(op(w=>{w.upsertPset(ids(w.api,w.mid,'IFCPROJECT')[0],MATERIAL_PSET,[['Library','IFCTEXT','{"version":99,"materials":[]}']]);return [];}));
+  assert.throws(()=>readMaterials(m.w()),/Unsupported/);const before=m.ed.save();
+  assert.throws(()=>m.change(saveWallAssembly(recipe)),/Unsupported/);assert.deepEqual(m.ed.save(),before);
+});
+test('IFC2X3 stores library materials and ventilated voids through save/reopen',async()=>{
+  const m=await model(fs.readFileSync(new URL('../tools/detailcraft-test/fixtures/ios-steel-ifc2x3.ifc',import.meta.url)));
+  assert.equal(m.w().v4,false);
+  m.change(saveWallAssembly({...recipe,layers:recipe.layers.map((l,i)=>i===1?{...l,kind:'cavity',ventilation:'ventilated'}:l)}));
+  const reopened=await model(m.ed.save()),ty=readAssemblies(reopened.w())[0];
+  const set=reopened.w().api.GetLine(reopened.w().mid,reopened.w().materialRel(ty.id).def,false);
+  const cavity=reopened.w().api.GetLine(reopened.w().mid,set.MaterialLayers[1].value,false);assert.equal(cavity.Material,null);assert.equal(val(cavity.IsVentilated),true);
+  assert.ok(ids(reopened.w().api,reopened.w().mid,'IFCEXTENDEDMATERIALPROPERTIES').length>=4);
+  assert.equal(ty.layers[1].t,25.4);assert.ok(readMaterials(reopened.w()).some(m=>m.name==='Unknown historical board'));
+});
