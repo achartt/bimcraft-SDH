@@ -1,5 +1,7 @@
 # Contributing to BimCraft
 
+For this residential fork, run `npm run test:baseline` as well as the legacy tests. See the [F01 standalone workflow](docs/features/F01-INTEGRATION-BASELINE.md) for isolated startup, fixture review, explicit discovery and known integration blockers.
+
 Thanks for helping. BimCraft is the bim review & editing app in the [CadCraft](https://getcadcraft.com) family: eight
 open-source apps for CAD and BIM work, each in its own repository. It is early: expect rough edges.
 

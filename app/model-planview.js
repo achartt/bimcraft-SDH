@@ -1,4 +1,5 @@
 /* SPDX-License-Identifier: Apache-2.0 */
+import { dimensionFootprint } from './dimension-geometry.js';
 /**
  * model-planview.js — the plan view of one level (0.5 part 3, BM.2): a 2D canvas beside the 3D view, where the building
  * tools draw. Plan millimetres, x right, y up (model-plan.js builds what it shows). Colours from the page's tokens, so
@@ -78,6 +79,7 @@ export class PlanView {
     for (const s of this.scene.symbols) { if (s.box) { g(s.box[0], s.box[1]); g(s.box[2], s.box[3]); } for (const q of s.poly || []) g(q[0], q[1]); }
     for (const x of this.scene.grids || []) { g(x.a[0], x.a[1]); g(x.b[0], x.b[1]); }
     for (const d of this.scene.drafting || []) for (const l of d.lines || []) for (const q of l) g(q[0], q[1]);   // 0.6 DC.117 (d)
+    for (const d of this.scene.dims || []) if (d.key) for (const q of dimensionFootprint(d)) g(q[0], q[1]);
     return Number.isFinite(bb.x0) ? bb : null;
   }
   /** Fit the drawing (or a 12 m square round the origin when there is nothing yet). Room is left for the bars on top. */
@@ -174,6 +176,12 @@ export class PlanView {
   // ---- picking ----
   hit(clientX, clientY, tolPx = 6) {
     const [x, y] = this.toPlan(clientX, clientY), tol = tolPx / this.scale;
+    for (const d of this.scene.dims || []) {
+      if (!d.key) continue;
+      const L = Math.hypot(d.b[0]-d.a[0],d.b[1]-d.a[1]); if (L < 0.001) continue;
+      const n = [-(d.b[1]-d.a[1])/L,(d.b[0]-d.a[0])/L], off = d.off || 0;
+      if (segD(x,y,d.a[0]+n[0]*off,d.a[1]+n[1]*off,d.b[0]+n[0]*off,d.b[1]+n[1]*off)<=tol) return d.key;
+    }
     // 0.6 DC.117 (d): drafting first (it is drawn over the building): near a line, or inside a hatch region
     for (const d of this.scene.drafting || []) {
       for (const l of d.lines || []) for (let i = 0; i + 1 < l.length + (d.closed ? 1 : 0); i++) { const a = l[i], b = l[(i + 1) % l.length]; if (segD(x, y, a[0], a[1], b[0], b[1]) <= tol) return d.key; }
@@ -260,7 +268,7 @@ export class PlanView {
     this.drawDrafting(g, C, S, sel, hov);   // 0.6 DC.117 (d)
     // dimensions
     g.font = '600 11px system-ui, sans-serif';
-    for (const d of this.scene.dims || []) this.drawDim(g, d, ink2, S);
+    for (const d of this.scene.dims || []) this.drawDim(g, d, d.key && (this.selection.has(d.key) || this.hover === d.key) ? action : ink2, S);
     // room labels on top
     g.textAlign = 'center'; g.textBaseline = 'middle';
     for (const r of this.scene.rooms || []) {
@@ -396,7 +404,7 @@ export class PlanView {
     if (L < 1) return;
     const u = [(d.b[0] - d.a[0]) / L, (d.b[1] - d.a[1]) / L], n = [-u[1], u[0]], off = d.offPx !== undefined ? d.offPx / this.scale : d.off || 0;
     const A = [d.a[0] + n[0] * off, d.a[1] + n[1] * off], B = [d.b[0] + n[0] * off, d.b[1] + n[1] * off];
-    const a = S(A), b = S(B), ea = S(d.a), eb = S(d.b);
+    const a = S(A), b = S(B), ea = S(d.witnesses?.[0] || d.a), eb = S(d.witnesses?.[1] || d.b);
     if (Math.hypot(b.x - a.x, b.y - a.y) < 18) return;
     g.strokeStyle = color; g.fillStyle = color; g.lineWidth = 0.75;
     g.beginPath();

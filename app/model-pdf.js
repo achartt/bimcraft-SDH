@@ -1,4 +1,5 @@
 /* SPDX-License-Identifier: Apache-2.0 */
+import { dimensionFootprint } from './dimension-geometry.js';
 /**
  * model-pdf.js — the plan of a level as a vector PDF (0.5 part 3, BM.7). No DOM, no library: bin/test-bimcraft.mjs --model
  * writes one and checks it (and with poppler's pdfinfo / pdftotext when they are installed).
@@ -112,9 +113,13 @@ export function planPdf(scene, { title = '', lines = [], paper = 'letter', units
     const A = [d.a[0] + nn[0] * off, d.a[1] + nn[1] * off], B = [d.b[0] + nn[0] * off, d.b[1] + nn[1] * off];
     pen(0.13, 0);
     path([A, B]);
-    const ext = 1.5 / k, gap = 0.8 / k, sg = Math.sign(off) || 1;
-    path([[d.a[0] + nn[0] * gap * sg, d.a[1] + nn[1] * gap * sg], [A[0] + nn[0] * ext * sg, A[1] + nn[1] * ext * sg]]);
-    path([[d.b[0] + nn[0] * gap * sg, d.b[1] + nn[1] * gap * sg], [B[0] + nn[0] * ext * sg, B[1] + nn[1] * ext * sg]]);
+    const ext = 1.5 / k, gap = 0.8 / k;
+    for (const [i, q] of [A, B].entries()) {
+      const source = d.witnesses?.[i] || (i ? d.b : d.a), distance = Math.hypot(q[0]-source[0],q[1]-source[1]);
+      if (distance < 0.001) continue;
+      const dir = [(q[0]-source[0])/distance,(q[1]-source[1])/distance];
+      path([source.map((v,j)=>v+dir[j]*Math.min(gap,distance/2)),q.map((v,j)=>v+dir[j]*ext)]);
+    }
     const tk = 1 / k, tick = [(u[0] - nn[0]) * tk, (u[1] - nn[1]) * tk];
     for (const q of [A, B]) path([[q[0] - tick[0], q[1] - tick[1]], [q[0] + tick[0], q[1] + tick[1]]]);
     ops.push('S');
@@ -160,7 +165,7 @@ function bounds(scene) {
   for (const w of scene.walls || []) for (const q of w.poly || []) g(q[0], q[1]);
   for (const c of [...(scene.cut || []), ...(scene.below || [])]) for (let i = 0; i + 1 < c.segs.length; i += 2) g(c.segs[i], c.segs[i + 1]);
   for (const s of scene.symbols || []) for (const q of s.poly || []) g(q[0], q[1]);
-  for (const d of scene.dims || []) { g(d.a[0], d.a[1]); g(d.b[0], d.b[1]); }
+  for (const d of scene.dims || []) for (const q of dimensionFootprint(d)) g(q[0], q[1]);
   for (const x of scene.grids || []) { g(x.a[0], x.a[1]); g(x.b[0], x.b[1]); }
   for (const d of scene.drafting || []) for (const l of d.lines || []) for (const q of l) g(q[0], q[1]);   // 0.6 DC.117 (d)
   if (!Number.isFinite(b.x0)) return { x0: 0, y0: 0, x1: 10000, y1: 10000 };

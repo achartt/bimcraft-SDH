@@ -1,11 +1,15 @@
 {
     "name": "bimcraft",
     "private": true,
-    "description": "BimCraft — BIM review & editing (the CadCraft family)",
+    "description": "BimCraft \u2014 BIM review & editing (the CadCraft family)",
     "scripts": {
         "start": "node devshell/serve.mjs",
         "test": "node devshell/test.mjs",
-        "fetch-vendor": "node devshell/fetch-vendor.mjs"
+        "fetch-vendor": "node devshell/fetch-vendor.mjs",
+        "test:precision": "node --test tests/unit/wall-precision.test.mjs",
+        "test:materials": "node --test tests/unit/material-library.test.mjs",
+        "test:baseline": "node devshell/baseline.mjs",
+        "fixture:f01": "node tests/features/f01/fixture.mjs"
     },
     "engines": {
         "node": ">=20.19"

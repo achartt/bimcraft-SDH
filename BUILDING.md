@@ -1,5 +1,7 @@
 # Building BimCraft from source
 
+For this residential fork, run `npm run test:baseline` as well as the legacy tests. See the [F01 standalone workflow](docs/features/F01-INTEGRATION-BASELINE.md) for isolated startup, fixture review, explicit discovery and known integration blockers.
+
 There is nothing to compile: BimCraft is plain ES modules, CSS and one page of markup that run in the browser. "Building"
 means running it locally, testing it, compiling its help, and packing the browser edition.
 

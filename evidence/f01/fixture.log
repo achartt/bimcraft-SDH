@@ -1,0 +1,6 @@
+(node:30332) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///Users/austinhartt/Documents/ChatGPT/BimCraft%20Test/bimcraft-f01/app/ifc/api.js is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /Users/austinhartt/Documents/ChatGPT/BimCraft Test/bimcraft-f01/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+{"beforeThickness":209.55,"afterThickness":241.3,"coreAnchor":[0,22.224999999999994],"wall":"3m3HKxfUfBc9zcaBYY5ZpD","dimension":"338Z0dOXvEmB0iQCJqn52t","type":"18nDOwQE9Ecx4I57y57pbi","opening":"08RZurfWjEJhe7xhh_x9kW","material":"material-studs","cavity":25.4,"membrane":0,"missingHostStatus":"missing","checks":["core anchor","dimension update","stable IDs and references","hosted opening retained","undo/redo","material-default isolation","cavity/membrane","save/reopen","project isolation","missing host has no curve"]}
+1 passed, 0 failed

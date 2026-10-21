@@ -12,15 +12,20 @@
  *   node tools/bimcraft-test/terrain-sync.mjs           copy the files and the missing keys
  *   node tools/bimcraft-test/terrain-sync.mjs --check   exit 1 when a copy differs or a key is missing (bin/test-bimcraft.mjs --res runs it)
  */
+// Standalone --check first verifies the reviewed bundle pin; only absent source apps skip live parity.
+// See docs/features/F01-INTEGRATION-BASELINE.md for pin provenance and update procedure.
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { checkBundledAssets, terrainLanguageKeys, validateTerrainLanguage } from './source-sync-pins.mjs';
 
 const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const dev = (app, f = '') => path.join(REPO, 'public_html/assets/apps', app, 'dev', f);
 const FILES = ['tin.js', 'raster.js'];
 const LIBS = ['delaunator', 'robust-predicates', 'geotiff'];
 const check = process.argv.includes('--check');
+// Write mode always requires real source files. Check mode also enforces the reviewed bundle pin.
+if (check && checkBundledAssets(REPO, 'terrain', 'civilcraft')) process.exit(0);
 const problems = [];
 for (const f of FILES) {
   const want = fs.readFileSync(dev('civilcraft', f));
@@ -39,6 +44,7 @@ if (lack.length) {
 }
 // language keys
 const civ = JSON.parse(fs.readFileSync(dev('civilcraft', 'lang/en.json'), 'utf8'));
+validateTerrainLanguage(civ, terrainLanguageKeys(FILES.map(f => fs.readFileSync(dev('civilcraft', f), 'utf8'))), 'civilcraft/dev/lang/en.json');
 const file = dev('bimcraft', 'lang/en.json');
 let text = fs.readFileSync(file, 'utf8');
 const have = JSON.parse(text);

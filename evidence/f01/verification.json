@@ -1,0 +1,28 @@
+{
+  "beforeThickness": 209.55,
+  "afterThickness": 241.3,
+  "coreAnchor": [
+    0,
+    22.224999999999994
+  ],
+  "wall": "3m3HKxfUfBc9zcaBYY5ZpD",
+  "dimension": "338Z0dOXvEmB0iQCJqn52t",
+  "type": "18nDOwQE9Ecx4I57y57pbi",
+  "opening": "08RZurfWjEJhe7xhh_x9kW",
+  "material": "material-studs",
+  "cavity": 25.4,
+  "membrane": 0,
+  "missingHostStatus": "missing",
+  "checks": [
+    "core anchor",
+    "dimension update",
+    "stable IDs and references",
+    "hosted opening retained",
+    "undo/redo",
+    "material-default isolation",
+    "cavity/membrane",
+    "save/reopen",
+    "project isolation",
+    "missing host has no curve"
+  ]
+}
