@@ -23,6 +23,7 @@ export function assemblySchedules(w) {
   types.push(t?{...t,id,guid:val(line.GlobalId),name:val(line.Name)||typeName(t)}:{id,guid:val(line.GlobalId),key,issue:'unavailable',message:'Authored type has no supported assembly definition.'});
  }
  for(const key of used)if(!types.some(r=>r.key===key))types.push({key,issue:'missing-type',message:'Wall references a missing authored type.'});
+ for(const r of types)if(!r.issue&&types.some(x=>x!==r&&(x.key===r.key||(r.guid&&x.guid===r.guid))))Object.assign(r,{issue:'ambiguous-type',message:'Duplicate type key or GlobalId; assembly totals are unavailable.'});
  types.sort((a,b)=>order(a.key,b.key)||order(a.guid,b.guid)||a.id-b.id);
  let materials=[],libraryIssue='';try{materials=readMaterials(w);}catch(e){libraryIssue=e.message;}
  const byId=new Map(materials.map(m=>[m.id,m])), refs=new Map(), cavities=new Set();
@@ -35,7 +36,10 @@ export function assemblySchedules(w) {
    add([`${r.key || '(missing key)'} / ${r.guid || '(missing GlobalId)'}: ${r.issue}. ${r.message}`],{group:true,issue:r.issue});
    let raw;try{raw=JSON.parse(r.raw);}catch{/* Unparseable record is still represented in full in CSV. */}
    const rawLayers=Array.isArray(raw?.layers)?raw.layers:[];
-   for(const [i,l]of rawLayers.entries())add([String(i+1),text(l?.mat),text(l?.materialId),text(l?.function),'Unverified','Unavailable','Unverified record'],{issue:r.issue});
+   for(const [i,l]of rawLayers.entries()){
+    add([String(i+1),text(l?.mat),text(l?.materialId),text(l?.function),'Unverified','Unavailable','Unverified record'],{issue:r.issue});
+    assembly.csvRows.push(['diagnostic-layer',r.key,r.guid,raw?.name,usage,i+1,text(l?.materialId),text(l?.mat),text(l?.function),'','','','','','',r.issue,JSON.stringify(l)]);
+   }
    assembly.csvRows.push(['diagnostic',r.key,r.guid,raw?.name,usage,'','','','','','','','','','',r.issue,r.raw||'']);continue;
   }
   const total=r.layers.reduce((s,l)=>s+l.t,0),core=r.layers.filter(l=>l.core).reduce((s,l)=>s+l.t,0);
