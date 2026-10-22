@@ -1,0 +1,43 @@
+Tests run 39698929235, job 119563087739, source 85b627546af6349c379cf81ea2a3413cf962625f: success.
+Selected actual log lines; skips remain included in stage summaries.
+2026-10-22T00:19:02.1465688Z PASS precision: 7 passed, 0 failed; 0 skip/availability notices
+2026-10-22T00:19:02.3739730Z PASS materials: 8 passed, 0 failed; 0 skip/availability notices
+2026-10-22T00:19:03.1466362Z PASS model: 124 passed, 0 failed; 4 skip/availability notices
+2026-10-22T00:19:04.1062142Z PASS comforts: 103 passed, 0 failed; 3 skip/availability notices
+2026-10-22T00:19:04.5377410Z PASS views2: 104 passed, 0 failed; 1 skip/availability notices
+2026-10-22T00:19:06.8432375Z PASS res: 197 passed, 0 failed; 13 skip/availability notices
+2026-10-22T00:19:09.5153861Z PASS f02-contract: 21 passed, 0 failed; 0 skip/availability notices
+2026-10-22T00:19:09.6828936Z PASS fixture: 1 passed, 0 failed; 0 skip/availability notices
+2026-10-22T00:19:11.3072595Z PASS source-sync-contract: 44 passed, 0 failed; 0 skip/availability notices
+2026-10-22T00:19:12.4529133Z PASS runner-contract: 19 passed, 0 failed; 0 skip/availability notices
+2026-10-22T00:19:30.6568179Z # tests 4
+2026-10-22T00:19:30.6569219Z # pass 4
+2026-10-22T00:19:30.6571308Z # fail 0
+2026-10-22T00:20:01.3865618Z {"status": "PASS", "fixture_sets": 2, "negative_controls": 3}
+2026-10-22T00:20:38.2301571Z {"files": 16, "maxPointMm": 0.0020386012624830437, "maxDimensionMm": 0.0009286677004638477, "maxShapeMm": 0.0014559999999619322}
+2026-10-22T00:21:06.4233823Z 3 of 3 test files passed
+2026-10-22T00:21:06.7173239Z PASS precision: 7 passed, 0 failed; 0 skip/availability notices
+2026-10-22T00:21:06.9223878Z PASS materials: 8 passed, 0 failed; 0 skip/availability notices
+2026-10-22T00:21:08.1775398Z PASS model: 129 passed, 0 failed; 0 skip/availability notices
+2026-10-22T00:21:09.4884891Z PASS comforts: 106 passed, 0 failed; 0 skip/availability notices
+2026-10-22T00:21:10.1480554Z PASS views2: 105 passed, 0 failed; 0 skip/availability notices
+2026-10-22T00:21:13.1916727Z PASS res: 206 passed, 0 failed; 4 skip/availability notices
+2026-10-22T00:21:15.6906550Z PASS f02-contract: 21 passed, 0 failed; 0 skip/availability notices
+2026-10-22T00:21:15.8456766Z PASS fixture: 1 passed, 0 failed; 0 skip/availability notices
+2026-10-22T00:21:17.3009664Z PASS source-sync-contract: 44 passed, 0 failed; 0 skip/availability notices
+2026-10-22T00:21:18.2686801Z PASS runner-contract: 19 passed, 0 failed; 0 skip/availability notices
+
+Availability notices (not passes):
+2026-10-22T00:19:06.8433905Z   --   no library repo at /home/runner/work/bimcraft-SDH/bimcraft-SDH/repos/library: item checks skipped
+2026-10-22T00:19:06.8435709Z SKIP terrain live source comparison: civilcraft app absent at /home/runner/work/bimcraft-SDH/bimcraft-SDH/.cc-test/public_html/assets/apps/civilcraft; bundled integrity checked separately
+2026-10-22T00:19:06.8437662Z SKIP electrical live source comparison: cadcraft app absent at /home/runner/work/bimcraft-SDH/bimcraft-SDH/.cc-test/public_html/assets/apps/cadcraft; bundled integrity checked separately
+2026-10-22T00:19:06.8439376Z   SKIP RC.8 cross-app reader, quantities, estimate and pack sync: TakeoffCraft directory absent at /home/runner/work/bimcraft-SDH/bimcraft-SDH/.cc-test/public_html/assets/apps/takeoffcraft/dev
+2026-10-22T00:21:05.6061833Z no Revit IFC exports in /var/www/CADCRAFT/testfiles/samples (a clean clone): skipped
+2026-10-22T00:21:06.4057459Z   (skipped: MassWithBoxAndCone.rfa — the public samples are not in this checkout)
+2026-10-22T00:21:06.4058465Z   (skipped: Room_Properties.rvt — the public samples are not in this checkout)
+2026-10-22T00:21:06.4058971Z   (skipped: empty2013.rfa — the public samples are not in this checkout)
+2026-10-22T00:21:06.4059420Z   (skipped: cutWalls.rvt — the public samples are not in this checkout)
+2026-10-22T00:21:13.1917338Z   --   no library repo at /home/runner/work/bimcraft-SDH/bimcraft-SDH/repos/library: item checks skipped
+2026-10-22T00:21:13.1917969Z SKIP terrain live source comparison: civilcraft app absent at /home/runner/work/bimcraft-SDH/bimcraft-SDH/.cc-test/public_html/assets/apps/civilcraft; bundled integrity checked separately
+2026-10-22T00:21:13.1918774Z SKIP electrical live source comparison: cadcraft app absent at /home/runner/work/bimcraft-SDH/bimcraft-SDH/.cc-test/public_html/assets/apps/cadcraft; bundled integrity checked separately
+2026-10-22T00:21:13.1919497Z   SKIP RC.8 cross-app reader, quantities, estimate and pack sync: TakeoffCraft directory absent at /home/runner/work/bimcraft-SDH/bimcraft-SDH/.cc-test/public_html/assets/apps/takeoffcraft/dev
