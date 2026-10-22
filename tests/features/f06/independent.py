@@ -45,6 +45,7 @@ for path in sorted(root.glob('*.pdf')):
  text=' '.join(texts)
  if path.name in ['documentation.pdf','drawing-set.pdf']:
   assert 'ventilated' in text and 'unventilated' in text and 'Membrane' in text and 'Non-core' in text and '127 mm' in text
+ if path.name=='edited-assembly-sheet.pdf':assert 'Revised rainscreen' in text and '216 mm' in text and 'Air cavity' in text and 'material-f06-a' in text
  if 'legend' in path.name:assert 'material-f06-a' in text and 'material-f06-b' in text
  print(json.dumps(dict(file=path.name,pages=len(reader.pages),minFontPt=min_font,vectorOnly=True,dashedPaths=dashed)))
 # Original CSV contains the duplicate names with comma, quotes, actual LF and accent.
