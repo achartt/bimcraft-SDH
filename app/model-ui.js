@@ -327,7 +327,15 @@ export function mountModel(host) {
         if(!sc.rowInfo)tr.addEventListener('click', () => host.select(keysOf(i))); return tr;
       })),
       sc.total ? el('tfoot', {}, el('tr', {}, ...sc.head.map((_, i) => el('td', {}, sc.total[i] ?? '')))) : null);
-    ui.sched.replaceChildren(...(sc.note?[el('p',{className:'bc-muted','data-schedule-note':''},sc.note)]:[]), sc.rows.length ? table : el('p', { className: 'bc-muted' }, t('model.sch.none')));
+    const expand=sc.rowInfo?el('button',{type:'button',className:'btn-line btn-sm-cc','data-schedule-expand':'',onClick:()=>{
+      const full=table.cloneNode(true);full.style='width:100%;min-width:900px';
+      const dlg=el('dialog',{className:'bc-dialog','data-schedule-expanded':'',style:'width:min(1240px,96vw);max-width:1240px'},
+        el('h2',{},sc.title),el('p',{className:'bc-muted'},sc.note),
+        el('div',{style:'max-height:70vh;overflow:auto'},full),
+        el('button',{type:'button',className:'btn-line btn-sm-cc','data-schedule-close':'',onClick:()=>dlg.close()},'Close'));
+      dlg.addEventListener('close',()=>dlg.remove());dlg.addEventListener('keydown',e=>e.stopPropagation());host.root.append(dlg);dlg.showModal();
+    }},'Open full schedule'):null;
+    ui.sched.replaceChildren(...(sc.note?[el('p',{className:'bc-muted','data-schedule-note':''},sc.note)]:[]),...(expand?[expand]:[]), sc.rows.length ? table : el('p', { className: 'bc-muted' }, t('model.sch.none')));
   }
   ui.schedCsv?.addEventListener('click', () => {
     if (!S.data) return;
