@@ -1,0 +1,52 @@
+# Full collection is deliberate/manual; the normal Tests workflow runs F03 smoke on PRs.
+# Provisional Linux/headless reference, kept separate from local model measurements.
+name: F03 performance evidence
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  measure:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Reuse checksum-verified libraries
+        uses: actions/cache@v4
+        with:
+          path: devshell/vendor
+          key: vendor-${{ hashFiles('devshell/vendor.json') }}
+      - name: Verified vendor setup
+        run: npm run fetch-vendor
+      - name: Harness smoke
+        run: npm run test:f03
+      - name: Install pinned test browser
+        run: |
+          npm install --prefix .cc-test/f03-browser --no-save playwright@1.62.1 bootstrap-icons@1.13.2
+          node .cc-test/f03-browser/node_modules/playwright/cli.js install --with-deps chromium
+      - name: Measure browser (no wall-clock gates)
+        env:
+          F03_PLAYWRIGHT: .cc-test/f03-browser/node_modules/playwright
+          F03_CONDITIONS: GitHub hosted shared runner; headless Chromium; GPU details recorded; not equivalent to local Apple reference.
+        run: |
+          npm start -- --port 8018 --host 127.0.0.1 --offline > .cc-test/f03-server.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
+          for attempt in $(seq 1 30); do curl --fail --silent http://127.0.0.1:8018/ > /dev/null && break; sleep 1; done
+          node tests/features/f03/browser.mjs --out .cc-test/f03-ci
+          node tests/features/f03/profile-report.mjs .cc-test/f03-ci
+          node tests/features/f03/phase-report.mjs .cc-test/f03-ci
+          node tests/features/f03/trace-report.mjs .cc-test/f03-ci
+      - name: Retain raw evidence even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: f03-browser-evidence
+          path: |
+            .cc-test/f03-ci/
+            .cc-test/f03-server.log

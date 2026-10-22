@@ -1,5 +1,10 @@
 # F04 — Layered plan graphics and vector output
 
+Integration update: PM accepted supported scope with follow-ups and authorized integration
+with main's F03 baseline. Both F03/F04 checks are preserved, and F04 browser acceptance now
+runs on main pushes. Open performance and inherited limitations are tracked in
+[F04-FOLLOWUPS.md](F04-FOLLOWUPS.md); historical measurements below remain unchanged.
+
 Status: implemented and browser-verified for the supported geometry below; **draft PM review**.
 Draft PR: https://github.com/achartt/bimcraft-SDH/pull/6. Real Chromium UI, save/reopen,
 Undo/Redo and export verification ran on GitHub Actions. PM acceptance and integration

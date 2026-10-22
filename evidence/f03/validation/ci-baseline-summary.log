@@ -1,0 +1,41 @@
+Source: GitHub Actions run 39689960021, job 119533408210; PR head b76e9d283e45fa4cdd138bc0d4d6328a32bc9283. Selected validation lines; complete log available on GitHub.
+2026-10-21T22:56:00.3314660Z PASS precision: 7 passed, 0 failed; 0 skip/availability notices
+2026-10-21T22:56:00.6744369Z PASS materials: 8 passed, 0 failed; 0 skip/availability notices
+2026-10-21T22:56:01.7708940Z PASS model: 124 passed, 0 failed; 4 skip/availability notices
+2026-10-21T22:56:03.1746105Z PASS comforts: 103 passed, 0 failed; 3 skip/availability notices
+2026-10-21T22:56:03.8191864Z PASS views2: 104 passed, 0 failed; 1 skip/availability notices
+2026-10-21T22:56:07.0670130Z PASS res: 197 passed, 0 failed; 13 skip/availability notices
+2026-10-21T22:56:11.5213139Z PASS f02-contract: 21 passed, 0 failed; 0 skip/availability notices
+2026-10-21T22:56:11.7872363Z PASS fixture: 1 passed, 0 failed; 0 skip/availability notices
+2026-10-21T22:56:13.7913842Z PASS source-sync-contract: 44 passed, 0 failed; 0 skip/availability notices
+2026-10-21T22:56:15.4802314Z PASS runner-contract: 19 passed, 0 failed; 0 skip/availability notices
+2026-10-21T22:56:41.4583405Z # tests 4
+2026-10-21T22:56:53.3146290Z 1 passed, 0 failed
+2026-10-21T22:57:59.7372708Z {"file": "fixtures/f02/mm-local.ifc", "schemaFindings": 0, "walls": 3, "dimensions": 18, "maxPointMm": 8.776391459191729e-07, "maxDimensionMm": 7.433873179252259e-07, "maxShapeMm": 4.547473508864641e-13}
+2026-10-21T22:57:59.7375617Z {"file": ".cc-test/f02/mm-local.ifc", "schemaFindings": 0, "walls": 3, "dimensions": 18, "maxPointMm": 4.207925528932193e-06, "maxDimensionMm": 4.70572013000492e-06, "maxShapeMm": 5.000000783184078e-06}
+2026-10-21T22:57:59.7378351Z {"file": "fixtures/f02/mm-translated.ifc", "schemaFindings": 0, "walls": 3, "dimensions": 18, "maxPointMm": 8.77757399137863e-07, "maxDimensionMm": 7.434282451868057e-07, "maxShapeMm": 4.547473508864641e-13}
+2026-10-21T22:57:59.7383067Z {"file": ".cc-test/f02/mm-translated.ifc", "schemaFindings": 0, "walls": 3, "dimensions": 18, "maxPointMm": 4.208011306080039e-06, "maxDimensionMm": 4.705740138888359e-06, "maxShapeMm": 5.000000783184078e-06}
+2026-10-21T22:57:59.7385531Z {"file": "fixtures/f02/m-local.ifc", "schemaFindings": 0, "walls": 3, "dimensions": 18, "maxPointMm": 0.0013137290529362678, "maxDimensionMm": 0.0008500411408931541, "maxShapeMm": 0.00045599999998557905}
+2026-10-21T22:57:59.7388117Z {"file": ".cc-test/f02/m-local.ifc", "schemaFindings": 0, "walls": 3, "dimensions": 18, "maxPointMm": 0.0020386012624830437, "maxDimensionMm": 0.0009286677004638477, "maxShapeMm": 0.0007249999998748535}
+2026-10-21T22:57:59.7390437Z {"file": "fixtures/f02/m-translated.ifc", "schemaFindings": 0, "walls": 3, "dimensions": 18, "maxPointMm": 0.0013137290496748498, "maxDimensionMm": 0.0008500410476699471, "maxShapeMm": 0.0014559999999619322}
+2026-10-21T22:57:59.7392806Z {"file": ".cc-test/f02/m-translated.ifc", "schemaFindings": 0, "walls": 3, "dimensions": 18, "maxPointMm": 0.002038601116923757, "maxDimensionMm": 0.0009286674903705716, "maxShapeMm": 0.001094000000023243}
+2026-10-21T22:57:59.7395255Z {"file": "fixtures/f02/inch-local.ifc", "schemaFindings": 0, "walls": 3, "dimensions": 18, "maxPointMm": 2.351536521533574e-05, "maxDimensionMm": 2.405996519883047e-05, "maxShapeMm": 1.7600000319362152e-05}
+2026-10-21T22:57:59.7397724Z {"file": ".cc-test/f02/inch-local.ifc", "schemaFindings": 0, "walls": 3, "dimensions": 18, "maxPointMm": 0.00015766053177913348, "maxDimensionMm": 4.864887660005479e-05, "maxShapeMm": 4.599999920174014e-05}
+2026-10-21T22:57:59.7400013Z {"file": "fixtures/f02/inch-translated.ifc", "schemaFindings": 0, "walls": 3, "dimensions": 18, "maxPointMm": 2.452050620058463e-05, "maxDimensionMm": 2.4060020223259926e-05, "maxShapeMm": 1.7600000319362152e-05}
+2026-10-21T22:57:59.7402295Z {"file": ".cc-test/f02/inch-translated.ifc", "schemaFindings": 0, "walls": 3, "dimensions": 18, "maxPointMm": 0.000152045692501128, "maxDimensionMm": 4.864879883825779e-05, "maxShapeMm": 4.599999920174014e-05}
+2026-10-21T22:57:59.7404489Z {"file": "fixtures/f02/foot-local.ifc", "schemaFindings": 0, "walls": 3, "dimensions": 18, "maxPointMm": 0.0003418758837977731, "maxDimensionMm": 0.00023599999985890463, "maxShapeMm": 0.00010079999998424682}
+2026-10-21T22:57:59.7406737Z {"file": ".cc-test/f02/foot-local.ifc", "schemaFindings": 0, "walls": 3, "dimensions": 18, "maxPointMm": 0.0009997899378986735, "maxDimensionMm": 0.0005537057190849737, "maxShapeMm": 0.0004718000009233947}
+2026-10-21T22:57:59.7409213Z {"file": "fixtures/f02/foot-translated.ifc", "schemaFindings": 0, "walls": 3, "dimensions": 18, "maxPointMm": 0.0003439846641657688, "maxDimensionMm": 0.00023599981795996428, "maxShapeMm": 0.00010079999998424682}
+2026-10-21T22:57:59.7411508Z {"file": ".cc-test/f02/foot-translated.ifc", "schemaFindings": 0, "walls": 3, "dimensions": 18, "maxPointMm": 0.0009972582476862656, "maxDimensionMm": 0.0005537058459594846, "maxShapeMm": 0.0004718000009233947}
+2026-10-21T22:57:59.7413300Z {"files": 16, "maxPointMm": 0.0020386012624830437, "maxDimensionMm": 0.0009286677004638477, "maxShapeMm": 0.0014559999999619322}
+2026-10-21T22:58:43.8357668Z 3 of 3 test files passed
+2026-10-21T22:58:44.3016959Z PASS precision: 7 passed, 0 failed; 0 skip/availability notices
+2026-10-21T22:58:44.6337914Z PASS materials: 8 passed, 0 failed; 0 skip/availability notices
+2026-10-21T22:58:46.5840136Z PASS model: 129 passed, 0 failed; 0 skip/availability notices
+2026-10-21T22:58:48.7315992Z PASS comforts: 106 passed, 0 failed; 0 skip/availability notices
+2026-10-21T22:58:49.8021677Z PASS views2: 105 passed, 0 failed; 0 skip/availability notices
+2026-10-21T22:58:54.7168885Z PASS res: 206 passed, 0 failed; 4 skip/availability notices
+2026-10-21T22:58:58.8275512Z PASS f02-contract: 21 passed, 0 failed; 0 skip/availability notices
+2026-10-21T22:58:59.0882310Z PASS fixture: 1 passed, 0 failed; 0 skip/availability notices
+2026-10-21T22:59:01.3162895Z PASS source-sync-contract: 44 passed, 0 failed; 0 skip/availability notices
+2026-10-21T22:59:02.9401746Z PASS runner-contract: 19 passed, 0 failed; 0 skip/availability notices

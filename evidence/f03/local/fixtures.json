@@ -1,0 +1,38 @@
+{
+  "seed": "F03-grid-v1 (no PRNG); row-major 6x4m bays, 9x7m spacing",
+  "fixtures": {
+    "small": {
+      "bytes": 90139,
+      "sha256": "b9afbb39b9dc563966e213e48a59e7f5a2e413fbbfc84f8f2b40042f019f9403",
+      "entities": 1504,
+      "walls": 12,
+      "openings": 3,
+      "dimensions": 3,
+      "roofs": 1,
+      "bays": 3,
+      "bayAreaM2": 72
+    },
+    "medium": {
+      "bytes": 219188,
+      "sha256": "168be011e64585f757934c3775ce83ae47c86a97eda98734e720fcda3ffc7058",
+      "entities": 3682,
+      "walls": 36,
+      "openings": 9,
+      "dimensions": 9,
+      "roofs": 1,
+      "bays": 9,
+      "bayAreaM2": 216
+    },
+    "large": {
+      "bytes": 542426,
+      "sha256": "f583a575665ee0ecfced5ed9ff9053388f0e69f15aeabfd54c7a3c4ab45cf371",
+      "entities": 9127,
+      "walls": 96,
+      "openings": 24,
+      "dimensions": 24,
+      "roofs": 1,
+      "bays": 24,
+      "bayAreaM2": 576
+    }
+  }
+}
