@@ -57,7 +57,8 @@ See [reproduction](F03-REPRODUCTION.md) for exact timing/cache definitions.
 Nearest-rank p95 is sample 29 of 30, not an interpolated percentile or a confidence bound.
 No retained local group meets the p95 > 2×median noise flag; this does not prove low
 variance across machines, thermal states or house shapes. The local report explicitly
-marks all 30 browser size/workload groups unverified.
+marks all 30 browser size/workload groups unverified on the Mac; they are measured
+separately on Linux below.
 
 Memory: fresh-process open RSS medians are 65.8 / 67.5 / 72.6 MiB. In the long-lived warmed
 runner, type-edit RSS medians are 182.3 / 250.0 / 286.5 MiB; final large PDF median is
@@ -65,6 +66,63 @@ runner, type-edit RSS medians are 182.3 / 250.0 / 286.5 MiB; final large PDF med
 allocator retention. They are **not** independent per-document sizes, peak memory or leak
 evidence. Raw records also retain JS heap/external/ArrayBuffer observations. Browser CDP
 heap excludes worker/native/GPU memory; missing metrics remain unverified, never zero.
+
+## Browser reference results
+
+Successful [run 39697936624](https://github.com/achartt/bimcraft-SDH/actions/runs/39697936624),
+measured browser source `faa6422d9aa0b911adb6de59bda570a2d529ddff`; clean Actions merge
+`b5c49a8599b23436507498c465f2ff283a61bb5f` into the approved base. The later harness-code
+head `85b627546af6349c379cf81ea2a3413cf962625f` adds trace post-processing, error-bearing
+report guards and manual collection triggers; measured browser/model code is unchanged.
+
+AMD EPYC 9V45 (4 allocated logical CPUs), 15.6 GiB RAM, x64 Linux 7.0.0-1017-azure,
+Node 22.23.3, headless Chromium 151.0.7922.34 / Playwright 1.62.1, 1440 × 1000 at DPR 1.
+ANGLE uses SwiftShader 5.0.0 software rendering. Power/thermal conditions are unverified;
+the shared hosted runner is not equivalent to the local Apple platform. The final run's
+CPU/kernel differ from the exploratory run, so differences are not an optimization claim.
+Fixture bytes/hashes exactly match the local manifest.
+
+**900 retained observations: 30 per size/workload, five warmups for warmed operations,
+zero console/page errors.** No group is insufficient or flagged p95 > 2×median. Values
+below are p50 / p95 milliseconds; no outliers were removed. All phase values, per-gesture
+frame intervals, worker state and memory observations remain in the raw archive.
+
+| Browser operation | Small | Medium | Large |
+|---|---:|---:|---:|
+| Context-cold open | 232.60 / 271.10 | 258.40 / 289.10 | 312.60 / 345.20 |
+| Warm open | 123.00 / 160.10 | 131.60 / 145.90 | 174.80 / 212.40 |
+| Selection / Properties feedback | 56.80 / 57.90 | 40.10 / 40.60 | 39.10 / 39.80 |
+| Pan gesture maximum frame | 16.80 / 16.80 | 16.70 / 16.80 | 16.70 / 16.80 |
+| Zoom gesture maximum frame | 16.80 / 16.80 | 16.80 / 16.80 | 16.80 / 16.80 |
+| Wall-instance feedback | 208.20 / 215.30 | 161.10 / 191.00 | 293.20 / 322.80 |
+| Assembly/type feedback | 213.00 / 245.50 | 212.50 / 215.20 | 478.30 / 497.40 |
+| Roof regeneration feedback | 210.40 / 229.40 | 226.80 / 237.70 | 323.30 / 359.00 |
+| IFC serialization | 1.30 / 1.50 | 3.00 / 3.20 | 7.70 / 8.30 |
+| Controlled A3 plan PDF generation | 0.40 / 0.50 | 0.70 / 0.80 | 1.80 / 2.70 |
+
+Renderer JS heap after-operation medians for context-cold open are 13.9 / 19.7 / 20.8 MiB;
+type-edit medians are 38.6 / 51.6 / 80.6 MiB. Large roof-edit median is 91.4 MiB; largest
+observed large-fixture heap value across workloads is 159.3 MiB. Every workload's memory
+median and observed maximum are in `browser-ci/summary.json`. This is renderer JS heap,
+not total browser, worker, native or GPU memory, not a measured peak and not leak evidence.
+Save observations include untimed reopen checks; PDF observations include scene preparation.
+
+The icon font omitted by the packed shell is supplied through a harness-only route from
+the official shell-pinned Bootstrap Icons 1.13.2 package. This workaround is recorded in
+raw metadata. Selection uses actual pointer events with selected-wall checks; edits use
+Properties controls; each pan/zoom starts fitted and verifies a view change. The existing
+open/pick hooks are used only as documented setup adapters. These do not certify the
+clipped Annotate menu or fix inherited UI accessibility issues.
+
+Raw samples, CPU profiles, timeline traces, saved IFCs, controlled PDFs and actual UI
+Letter PDFs are retained under `evidence/f03/browser-ci`; see its README and file hashes.
+All three screenshots and UI PDFs were inspected. The plans have correct page bounds,
+footer/scale and wall/window/roof content. Medium/large automatic dimensions overlap in
+these tightly packed synthetic layouts; short reference labels retain INT-02 suppression.
+Saved IFCs differ from their seeds only at the FILE_NAME timestamp, with every DATA record
+unchanged. Full-file differences were inspected, not silently stripped from a test.
+The exploratory missing-icon run and the subsequent vendor-host setup failure are reported
+separately; neither is used to certify targets.
 
 ## Dominant costs and justified follow-ups
 
@@ -82,20 +140,56 @@ Corner rejoining performs another round. The smallest justified experiment is a
 and unchanged F02 checks. Compare identical fixture hashes and add a real-house sample.
 Do not globally cache mutable records, skip contract checks or suppress dependencies.
 
-The browser's existing commit path serializes/reloads the full model, rebuilds geometry
-and refreshes panels (`bimcraft.js:rebuildNow`, `model-ui.js:apply`). This is a code-inspection
-hypothesis until browser phase evidence quantifies it. If dominant, test the smallest
-safe incremental rebuild boundary. The local data does not justify a parser rewrite,
-Rust/WASM migration or PDF optimization.
+Browser phases confirm that raw parsing and mesh extraction are not the leading large
+edit costs. For a type edit, per-sample phase sums have these medians (ms):
+
+| Phase (overlapping; do not add) | Medium | Large |
+|---|---:|---:|
+| Model transaction/dependencies | 40.6 | 189.7 |
+| IFC serialization | 6.3 | 13.2 |
+| Worker open until adoption | 1.8 | 3.6 |
+| Mesh extraction and batch callback | 3.7 | 8.3 |
+| Full IfcModel.load | 5.9 | 12.8 |
+| Actual plan Canvas draw calls | 1.0 | 2.0 |
+| End-to-end feedback | 212.5 | 478.3 |
+
+`load-total` includes worker/mesh spans; transaction spans can include serialization.
+Their medians cannot be summed or subtracted to infer UI time. Medium context-cold load
+has worker/mesh medians 19.6/29.1 ms versus warm 1.9/4.8 ms; full open also includes kernel,
+viewer/UI setup and paint opportunities beyond those phases.
+
+The representative large trace's feedback marker is 559.66 ms with profiling enabled,
+separate from percentile samples. Its main-thread click dispatch lasts 273.56 ms and
+post-message handling 98.02 ms; nested event totals overlap. Style recalculation totals
+16.32 ms, layout 8.12 ms, paint 11.19 ms and rAF callbacks 23.95 ms within that marker.
+The large browser CPU profile identifies `lineObject` (77.8 ms self), `planLoops`
+(53.2 ms self), and `readPset` (27.7 ms self), with `modelChange` 200.7 ms inclusive.
+The full capture includes substantial unattributed `(program)` and automation/setup time;
+that bucket is not attributed to an app function. See `phases.md`, `profiles.md` and
+`trace-summary.md`, with the original profiles/traces for inspection.
+
+After the transaction-scoped read experiment, isolate the repeated plan-loop/panel-refresh
+work around `model-ui.js:apply` and `bimcraft.js:rebuildNow`. Test a bounded invalidation
+change only if a follow-up retains identical correctness/identity/refusal checks. The
+present data does not justify replacing the parser, broad incremental-rebuild changes,
+a Rust/WASM migration, or prioritizing the sub-3 ms controlled PDF generator.
 
 ## Provisional UX targets
 
 Retain 100 ms selection/Properties, 33 ms interactive frames and 500 ms committed edit
-p95 as investigation targets. Medium model-only edits are below 500 ms, but the target
-covers visible completion. **No local browser target pass is claimed.** A slow browser
-result is a finding, not permission to relax precision or silently revise targets.
-Revisit budgets after a representative house and agreed hardware/browser are measured.
-Headless software rendering is not a direct prediction of this Mac's frame rate.
+p95 as provisional investigation targets. On the synthetic medium fixture, the browser
+reference meets them: selection p95 40.6 ms, pan/zoom gesture-maximum p95 16.8 ms and
+wall/type/roof edit p95 191.0 / 215.2 / 237.7 ms. Small also meets all three categories.
+
+Large meets the numeric p95 thresholds in this run, but type-edit p95 is **497.4 ms**:
+only 2.6 ms below budget. One of 30 samples took 531.1 ms; the separate profiled edit took
+559.66 ms. The latter is not pooled into unprofiled percentiles. This is marginal headroom,
+not a robust release pass. Retain the target and investigate the observed model/UI costs;
+do not raise the budget or relax precision to call the result comfortable.
+
+A real-house fixture and agreed user hardware/browser are still needed for capacity or
+release claims. No local Apple browser pass is claimed. Headless software rendering,
+synthetic geometry, instrumentation and transport/frame scheduling limit generalization.
 
 ## Validation and limits
 
@@ -111,9 +205,11 @@ Headless software rendering is not a direct prediction of this Mac's frame rate.
 - Independent IfcOpenShell: 12 F03 seed/edit files, zero schema/EXPRESS findings; maximum
   exported height/dimension error 3.1833e-12 mm. Counts, persistent identities, cavity
   material/width, zero membrane, units and reference host links checked.
-- PR implementation-head CI Tests succeeded: enriched baseline 646/0, legacy tests
+- Final harness-code `85b6275` CI Tests run `39698929235` succeeded: enriched baseline 646/0, legacy tests
   3/3 files, F03 smoke 4/4, independent F01/F02 acceptance passed. F02 maxima remain
   point 0.0020386013 mm, dimension 0.0009286677 mm, shape 0.001456 mm.
+  CI retains four residential availability notices; absent library/sibling inputs and
+  optional Revit/RFA sample exports are not counted as passes.
 - F02's 0.005 mm bound / 0.001 mm shape gate, migration/refusal and isolation are unchanged.
 - Known timestamp-sensitive comforts assertion is preserved. It did not fail in these
   local runs; zero rewritten walls with header-only time drift remains a known issue.
@@ -121,5 +217,6 @@ Headless software rendering is not a direct prediction of this Mac's frame rate.
   footer and scale are intact. Short thickness labels retain INT-02 suppression. No new
   per-layer fill or external-reader appearance claim.
 
-Browser CI evidence/status is separate in the handoff. Smoke execution and model
-correctness must not be confused with completed browser acceptance.
+Browser collection and correctness succeeded for the provisional reference; production
+capacity, real-house acceptance, physical presentation latency and local Mac browser
+performance remain unverified. No optimization is included.

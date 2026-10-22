@@ -1,0 +1,13 @@
+Run 39697936624, job 119559797628, source faa6422d9aa0b911adb6de59bda570a2d529ddff: success.
+Raw evidence inspected locally: 900 samples, errors [], all fixture hashes match local reference.
+2026-10-22T00:09:18.1696902Z HEAD is now at b5c49a8 Merge faa6422d9aa0b911adb6de59bda570a2d529ddff into 656d46236ff32b444cbd5a2b4ebe5164858c3848
+2026-10-22T00:09:19.5240548Z libraries: 0 fetched, 110 already here
+2026-10-22T00:09:37.2787803Z # tests 4
+2026-10-22T00:09:37.2788112Z # pass 4
+2026-10-22T00:09:37.2788307Z # fail 0
+2026-10-22T00:13:03.6612008Z Measured browser small
+2026-10-22T00:17:08.2409767Z Measured browser medium
+2026-10-22T00:24:39.1103343Z Measured browser large
+2026-10-22T00:24:40.2452784Z SHA256 digest of uploaded artifact zip is 90f61c71402cdae0f3dbf483052133268f2266b011cc1773f9b020f6e10f53e6
+2026-10-22T00:24:40.8224815Z Artifact f03-browser-evidence has been successfully uploaded! Final size is 1213562 bytes. Artifact ID is 12392425918
+2026-10-22T00:24:40.8229787Z Artifact download URL: https://github.com/achartt/bimcraft-SDH/actions/runs/39697936624/artifacts/12392425918
