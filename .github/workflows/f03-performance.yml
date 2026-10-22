@@ -20,6 +20,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: Reuse checksum-verified libraries
+        uses: actions/cache@v4
+        with:
+          path: devshell/vendor
+          key: vendor-${{ hashFiles('devshell/vendor.json') }}
       - name: Verified vendor setup
         run: npm run fetch-vendor
       - name: Harness smoke
