@@ -14,9 +14,25 @@ const dot = (a, b) => a[0] * b[0] + a[1] * b[1];
 const rect = (a, b, lo, hi) => [[Math.min(a,b),lo],[Math.max(a,b),lo],[Math.max(a,b),hi],[Math.min(a,b),hi]];
 const finite = a => a.every(Number.isFinite);
 
+/** Envelope width for the existing overall-elevation note. A wall's thickness
+ * projects along its normal, not along both view axes unconditionally.
+ * Curved envelopes remain outside this analytic slice.
+ */
+export function straightElevationWidth(walls, dir) {
+  if(!walls.length||walls.some(w=>w.bulge||w.frameUnsupported))return null;
+  const right=[dir[1],-dir[0]],xs=[];
+  for(const w of walls) {
+    const L=Math.hypot(w.b[0]-w.a[0],w.b[1]-w.a[1]);if(L<1)return null;
+    const n=[-(w.b[1]-w.a[1])/L,(w.b[0]-w.a[0])/L],half=Math.abs(dot(n,right))*w.t/2;
+    for(const p of [w.a,w.b])xs.push(dot(p,right)-half,dot(p,right)+half);
+  }
+  return {x0:Math.min(...xs),x1:Math.max(...xs)};
+}
+
 export function isolatedWall(w, walls) {
   return !walls.some(q=>{
     if(q.id===w.id)return false;
+    if((w.z??0)+w.height<=(q.z??0)+1e-7 || (q.z??0)+q.height<=(w.z??0)+1e-7)return false;
     const near=(p,a,b)=>segDist(p[0],p[1],a,b)<=(w.t+q.t)/2+1;
     if([w.a,w.b].some(p=>near(p,q.a,q.b))||[q.a,q.b].some(p=>near(p,w.a,w.b)))return true;
     const cross=(a,b,c)=>(b[0]-a[0])*(c[1]-a[1])-(b[1]-a[1])*(c[0]-a[0]);
