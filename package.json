@@ -15,7 +15,10 @@
         "bench:f03:model": "node tests/features/f03/model.mjs",
         "bench:f03:browser": "node tests/features/f03/browser.mjs",
         "report:f03": "node tests/features/f03/report.mjs",
-        "test:f03": "node --test tests/features/f03/harness.test.mjs"
+        "test:f03": "node --test tests/features/f03/harness.test.mjs",
+        "test:f05": "node --test tests/features/f05/sections.test.mjs",
+        "fixture:f05": "node tests/features/f05/fixture.mjs",
+        "bench:f05": "node tests/features/f05/measure.mjs"
     },
     "engines": {
         "node": ">=20.19"

@@ -1,0 +1,48 @@
+name: F05 browser acceptance
+on:
+  pull_request:
+  push:
+    branches: [main, feature/f05-wall-sections-elevations]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Pinned application vendors
+        run: npm run fetch-vendor
+      - name: Browser dependencies
+        run: |
+          npm install --prefix .cc-test/f05-browser-deps --no-package-lock playwright@1.56.1
+          .cc-test/f05-browser-deps/node_modules/.bin/playwright install --with-deps chromium
+      - name: Prepare exact approved baseline
+        run: |
+          mkdir -p .cc-test/f05-approved
+          git archive ff0344b46ca1c29962772528c23f62d175c6d2ea | tar -x -C .cc-test/f05-approved
+          ln -s "$GITHUB_WORKSPACE/devshell/vendor" .cc-test/f05-approved/devshell/vendor
+      - name: Actual UI lifecycle and same-machine measurements
+        env:
+          F05_BASELINE_ROOT: ${{ github.workspace }}/.cc-test/f05-approved
+        run: node tests/features/f05/browser.mjs
+      - name: Independent downloaded vector PDF readback
+        run: |
+          python -m venv .cc-test/f05-pdf-reader
+          .cc-test/f05-pdf-reader/bin/python -m pip install -r tests/features/f04/requirements-independent.txt
+          .cc-test/f05-pdf-reader/bin/python -I tests/features/f05/independent-pdf.py .cc-test/f05-browser
+      - name: Retain evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: f05-browser
+          path: |
+            .cc-test/f05-browser/
+            !.cc-test/f05-browser/*.ifc
