@@ -1,0 +1,56 @@
+Run: https://github.com/achartt/bimcraft-SDH/actions/runs/39847466112
+Head: ed1003d6d5c48e1efd50085291cdd8596bde20fb
+2026-10-22T20:17:00.9982315Z Turn off this advice by setting config variable advice.detachedHead to false
+2026-10-22T20:17:00.9983357Z HEAD is now at ed1003d Validate stacked levels, edited vector output and actual elevation width notes
+2026-10-22T20:18:40.3491817Z PASS precision: 7 passed, 0 failed; 0 skip/availability notices
+2026-10-22T20:18:40.6111293Z PASS materials: 8 passed, 0 failed; 0 skip/availability notices
+2026-10-22T20:18:41.4945315Z PASS model: 124 passed, 0 failed; 4 skip/availability notices
+2026-10-22T20:18:42.5743173Z PASS comforts: 103 passed, 0 failed; 3 skip/availability notices
+2026-10-22T20:18:43.0793784Z PASS views2: 104 passed, 0 failed; 1 skip/availability notices
+2026-10-22T20:18:45.8455069Z PASS res: 197 passed, 0 failed; 13 skip/availability notices
+2026-10-22T20:18:49.1795116Z PASS f02-contract: 21 passed, 0 failed; 0 skip/availability notices
+2026-10-22T20:18:50.7153668Z PASS f04-graphics: 13 passed, 0 failed; 0 skip/availability notices
+2026-10-22T20:18:52.0084009Z PASS f05-sections: 18 passed, 0 failed; 0 skip/availability notices
+2026-10-22T20:18:52.2061508Z PASS fixture: 1 passed, 0 failed; 0 skip/availability notices
+2026-10-22T20:18:54.2636254Z PASS source-sync-contract: 44 passed, 0 failed; 0 skip/availability notices
+2026-10-22T20:18:55.6203751Z PASS runner-contract: 19 passed, 0 failed; 0 skip/availability notices
+2026-10-22T20:19:17.1457900Z # tests 4
+2026-10-22T20:19:17.1458956Z # pass 4
+2026-10-22T20:19:17.1459168Z # fail 0
+2026-10-22T20:20:29.3190819Z {"file": "fixtures/f02/mm-local.ifc", "schemaFindings": 0, "walls": 3, "dimensions": 18, "maxPointMm": 8.776391459191729e-07, "maxDimensionMm": 7.433873179252259e-07, "maxShapeMm": 4.547473508864641e-13}
+2026-10-22T20:20:29.3192932Z {"file": ".cc-test/f02/mm-local.ifc", "schemaFindings": 0, "walls": 3, "dimensions": 18, "maxPointMm": 4.207925528932193e-06, "maxDimensionMm": 4.70572013000492e-06, "maxShapeMm": 5.000000783184078e-06}
+2026-10-22T20:20:29.3194080Z {"file": "fixtures/f02/mm-translated.ifc", "schemaFindings": 0, "walls": 3, "dimensions": 18, "maxPointMm": 8.77757399137863e-07, "maxDimensionMm": 7.434282451868057e-07, "maxShapeMm": 4.547473508864641e-13}
+2026-10-22T20:20:29.3195174Z {"file": ".cc-test/f02/mm-translated.ifc", "schemaFindings": 0, "walls": 3, "dimensions": 18, "maxPointMm": 4.208011306080039e-06, "maxDimensionMm": 4.705740138888359e-06, "maxShapeMm": 5.000000783184078e-06}
+2026-10-22T20:20:29.3196298Z {"file": "fixtures/f02/m-local.ifc", "schemaFindings": 0, "walls": 3, "dimensions": 18, "maxPointMm": 0.0013137290529362678, "maxDimensionMm": 0.0008500411408931541, "maxShapeMm": 0.00045599999998557905}
+2026-10-22T20:20:29.3197369Z {"file": ".cc-test/f02/m-local.ifc", "schemaFindings": 0, "walls": 3, "dimensions": 18, "maxPointMm": 0.0020386012624830437, "maxDimensionMm": 0.0009286677004638477, "maxShapeMm": 0.0007249999998748535}
+2026-10-22T20:20:29.3198478Z {"file": "fixtures/f02/m-translated.ifc", "schemaFindings": 0, "walls": 3, "dimensions": 18, "maxPointMm": 0.0013137290496748498, "maxDimensionMm": 0.0008500410476699471, "maxShapeMm": 0.0014559999999619322}
+2026-10-22T20:20:29.3199545Z {"file": ".cc-test/f02/m-translated.ifc", "schemaFindings": 0, "walls": 3, "dimensions": 18, "maxPointMm": 0.002038601116923757, "maxDimensionMm": 0.0009286674903705716, "maxShapeMm": 0.001094000000023243}
+2026-10-22T20:20:29.3200606Z {"file": "fixtures/f02/inch-local.ifc", "schemaFindings": 0, "walls": 3, "dimensions": 18, "maxPointMm": 2.351536521533574e-05, "maxDimensionMm": 2.405996519883047e-05, "maxShapeMm": 1.7600000319362152e-05}
+2026-10-22T20:20:29.3201668Z {"file": ".cc-test/f02/inch-local.ifc", "schemaFindings": 0, "walls": 3, "dimensions": 18, "maxPointMm": 0.00015766053177913348, "maxDimensionMm": 4.864887660005479e-05, "maxShapeMm": 4.599999920174014e-05}
+2026-10-22T20:20:29.3202848Z {"file": "fixtures/f02/inch-translated.ifc", "schemaFindings": 0, "walls": 3, "dimensions": 18, "maxPointMm": 2.452050620058463e-05, "maxDimensionMm": 2.4060020223259926e-05, "maxShapeMm": 1.7600000319362152e-05}
+2026-10-22T20:20:29.3203955Z {"file": ".cc-test/f02/inch-translated.ifc", "schemaFindings": 0, "walls": 3, "dimensions": 18, "maxPointMm": 0.000152045692501128, "maxDimensionMm": 4.864879883825779e-05, "maxShapeMm": 4.599999920174014e-05}
+2026-10-22T20:20:29.3205027Z {"file": "fixtures/f02/foot-local.ifc", "schemaFindings": 0, "walls": 3, "dimensions": 18, "maxPointMm": 0.0003418758837977731, "maxDimensionMm": 0.00023599999985890463, "maxShapeMm": 0.00010079999998424682}
+2026-10-22T20:20:29.3206072Z {"file": ".cc-test/f02/foot-local.ifc", "schemaFindings": 0, "walls": 3, "dimensions": 18, "maxPointMm": 0.0009997899378986735, "maxDimensionMm": 0.0005537057190849737, "maxShapeMm": 0.0004718000009233947}
+2026-10-22T20:20:29.3207167Z {"file": "fixtures/f02/foot-translated.ifc", "schemaFindings": 0, "walls": 3, "dimensions": 18, "maxPointMm": 0.0003439846641657688, "maxDimensionMm": 0.00023599981795996428, "maxShapeMm": 0.00010079999998424682}
+2026-10-22T20:20:29.3210550Z {"file": ".cc-test/f02/foot-translated.ifc", "schemaFindings": 0, "walls": 3, "dimensions": 18, "maxPointMm": 0.0009972582476862656, "maxDimensionMm": 0.0005537058459594846, "maxShapeMm": 0.0004718000009233947}
+2026-10-22T20:20:29.3211438Z {"files": 16, "maxPointMm": 0.0020386012624830437, "maxDimensionMm": 0.0009286677004638477, "maxShapeMm": 0.0014559999999619322}
+2026-10-22T20:20:37.5634246Z {"file": "fixtures/f04/layered-plans.ifc", "schemaFindings": 0, "walls": 9, "openings": 5, "modelDataIdentical": true, "membranesZero": true, "cavitiesVentilatedUnfilled": true}
+2026-10-22T20:20:37.5635328Z {"file": ".cc-test/f04/styled-reopened.ifc", "schemaFindings": 0, "walls": 9, "openings": 5, "modelDataIdentical": true, "membranesZero": true, "cavitiesVentilatedUnfilled": true}
+2026-10-22T20:20:37.5636337Z {"file": ".cc-test/f04/fine-reopened.ifc", "schemaFindings": 0, "walls": 9, "openings": 5, "modelDataIdentical": true, "membranesZero": true, "cavitiesVentilatedUnfilled": true}
+2026-10-22T20:20:47.5744682Z {"file": "seed.ifc", "schema": "IFC4", "schemaFindings": 0, "authoredWalls": 2, "stableIdentities": true, "cavitiesBlank": true, "membranesZero": true}
+2026-10-22T20:20:47.5746063Z {"file": "styled.ifc", "schema": "IFC4", "schemaFindings": 0, "authoredWalls": 2, "stableIdentities": true, "cavitiesBlank": true, "membranesZero": true}
+2026-10-22T20:20:47.5747368Z {"file": "edited.ifc", "schema": "IFC4", "schemaFindings": 0, "authoredWalls": 2, "stableIdentities": true, "cavitiesBlank": true, "membranesZero": true}
+2026-10-22T20:20:47.5748734Z {"file": "ifc2x3.ifc", "schema": "IFC2X3", "schemaFindings": 0, "authoredWalls": 1, "stableIdentities": true, "cavitiesBlank": true, "membranesZero": true}
+2026-10-22T20:21:22.8633609Z 3 of 3 test files passed
+2026-10-22T20:21:23.3189435Z PASS precision: 7 passed, 0 failed; 0 skip/availability notices
+2026-10-22T20:21:23.5774033Z PASS materials: 8 passed, 0 failed; 0 skip/availability notices
+2026-10-22T20:21:25.0339449Z PASS model: 129 passed, 0 failed; 0 skip/availability notices
+2026-10-22T20:21:26.7552183Z PASS comforts: 106 passed, 0 failed; 0 skip/availability notices
+2026-10-22T20:21:27.5522320Z PASS views2: 105 passed, 0 failed; 0 skip/availability notices
+2026-10-22T20:21:31.3427413Z PASS res: 206 passed, 0 failed; 4 skip/availability notices
+2026-10-22T20:21:34.6304970Z PASS f02-contract: 21 passed, 0 failed; 0 skip/availability notices
+2026-10-22T20:21:36.1860555Z PASS f04-graphics: 13 passed, 0 failed; 0 skip/availability notices
+2026-10-22T20:21:37.4719153Z PASS f05-sections: 18 passed, 0 failed; 0 skip/availability notices
+2026-10-22T20:21:37.6714877Z PASS fixture: 1 passed, 0 failed; 0 skip/availability notices
+2026-10-22T20:21:39.4909456Z PASS source-sync-contract: 44 passed, 0 failed; 0 skip/availability notices
+2026-10-22T20:21:40.8629756Z PASS runner-contract: 19 passed, 0 failed; 0 skip/availability notices
