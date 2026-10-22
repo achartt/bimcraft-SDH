@@ -1,0 +1,31 @@
+npm notice run test:baseline
+npm notice run node devshell/baseline.mjs --offline
+▶ precision: node --test --test-reporter=tap tests/unit/wall-precision.test.mjs
+PASS precision: 7 passed, 0 failed; 0 skip/availability notices
+▶ materials: node --test --test-reporter=tap tests/unit/material-library.test.mjs
+PASS materials: 8 passed, 0 failed; 0 skip/availability notices
+▶ model: node .cc-test/bin/test-bimcraft.mjs --model
+PASS model: 129 passed, 0 failed; 0 skip/availability notices
+▶ comforts: node .cc-test/bin/test-bimcraft.mjs --comforts
+PASS comforts: 106 passed, 0 failed; 0 skip/availability notices
+▶ views2: node .cc-test/bin/test-bimcraft.mjs --views2
+PASS views2: 105 passed, 0 failed; 0 skip/availability notices
+▶ res: node .cc-test/bin/test-bimcraft.mjs --res
+PASS res: 206 passed, 0 failed; 4 skip/availability notices
+  --   no library repo at <F05_CHECKOUT>/repos/library: item checks skipped
+SKIP terrain live source comparison: civilcraft app absent at <F05_CHECKOUT>/.cc-test/public_html/assets/apps/civilcraft; bundled integrity checked separately
+SKIP electrical live source comparison: cadcraft app absent at <F05_CHECKOUT>/.cc-test/public_html/assets/apps/cadcraft; bundled integrity checked separately
+  SKIP RC.8 cross-app reader, quantities, estimate and pack sync: TakeoffCraft directory absent at <F05_CHECKOUT>/.cc-test/public_html/assets/apps/takeoffcraft/dev
+▶ f02-contract: node --test --test-reporter=tap tests/features/f02/contract.test.mjs
+PASS f02-contract: 21 passed, 0 failed; 0 skip/availability notices
+▶ f04-graphics: node --test --test-reporter=tap tests/features/f04/graphics.test.mjs
+PASS f04-graphics: 13 passed, 0 failed; 0 skip/availability notices
+▶ f05-sections: node --test --test-reporter=tap tests/features/f05/sections.test.mjs
+PASS f05-sections: 18 passed, 0 failed; 0 skip/availability notices
+▶ fixture: node tests/features/f01/fixture.mjs --verify
+PASS fixture: 1 passed, 0 failed; 0 skip/availability notices
+▶ source-sync-contract: node --test --test-reporter=tap tests/features/f01/source-sync.test.mjs
+PASS source-sync-contract: 44 passed, 0 failed; 0 skip/availability notices
+▶ runner-contract: node --test --test-reporter=tap tests/features/f01/runner.test.mjs
+PASS runner-contract: 19 passed, 0 failed; 0 skip/availability notices
+Evidence: <F05_CHECKOUT>/.cc-test/baseline/summary.json (optional skips are not passes)

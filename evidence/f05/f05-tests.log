@@ -1,0 +1,32 @@
+npm notice run test:f05
+npm notice run node --test tests/features/f05/sections.test.mjs
+(node:67968) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file://<USER_HOME>/Documents/ChatGPT/BimCraft%20Test/bimcraft-f05/app/ifc/api.js is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to <F05_CHECKOUT>/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ deterministic residential fixture has two opposite assemblies, explicit cores, cavities, membranes and hosted cuts (54.34775ms)
+✔ cut widths, exterior order and opposite orientations agree with independent authored dimensions (11.15625ms)
+✔ sections before, at jambs, inside and after actual door/window widths respect sill and head (59.326ms)
+✔ look flip reverses lateral order while retaining physical widths and exact opening heights (11.579125ms)
+✔ coarse medium fine are presentation-only and elevations never expose internal layers (34.803084ms)
+✔ far clipping intersects straddling triangles rather than retaining geometry beyond depth (4.908667ms)
+✔ crop clips cut bands and zero membrane lines, without changing authored dimensions (6.375708ms)
+✔ height assembly and window edits regenerate cuts, projected elevation and composed sheets, with undo/redo (87.859917ms)
+✔ material/default edits change cut graphics only, preserving widths cores anchors and model IDs (22.036584ms)
+✔ view settings depth and references persist through actual serialization, undo/redo and isolated projects (1.443ms)
+✔ missing settings are read-only defaults; invalid versions values and duplicate properties refuse atomic writes (4.291958ms)
+✔ unsupported cuts and unavailable layers retain diagnosed envelope fallback without fabricated widths (21.443625ms)
+✔ screen SVG and vector PDFs use shared exact cut primitives at normal and enlarged scales (41.087375ms)
+✔ duplicate settings containers/properties preserve unsupported records and refuse scoped writes (2.904542ms)
+✔ IFC2X3 settings and authored cavity/membrane cuts survive actual save/reopen (48.864458ms)
+✔ enlarged crop stays composed on paper and does not invent a ground line at its lower edge (8.045875ms)
+✔ stacked levels retain storey-relative opening heights and independent cut layers (7.355667ms)
+✔ overall elevation note measures the wall envelope without adding thickness along its length (0.891ms)
+ℹ tests 18
+ℹ suites 0
+ℹ pass 18
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 544.811584

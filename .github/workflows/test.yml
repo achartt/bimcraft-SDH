@@ -59,6 +59,10 @@ jobs:
           .cc-test/tools/bimcraft-test/venv/bin/python -m pip install -r tests/features/f04/requirements-independent.txt
           .cc-test/tools/bimcraft-test/venv/bin/python -I tests/features/f04/independent-ifc.py
           .cc-test/tools/bimcraft-test/venv/bin/python -I tests/features/f04/independent-pdf.py
+      - name: F05 independent IFC and vector drawing acceptance
+        run: |
+          .cc-test/tools/bimcraft-test/venv/bin/python -I tests/features/f05/independent.py
+          .cc-test/tools/bimcraft-test/venv/bin/python -I tests/features/f05/independent-pdf.py
       - name: npm test
         if: always()
         run: npm test -- --oracles

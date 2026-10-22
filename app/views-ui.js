@@ -1,5 +1,6 @@
 /* SPDX-License-Identifier: Apache-2.0 */
 import { PLAN_DETAILS } from './wall-plan-graphics.js';
+import { readProjectedView, setProjectedView } from './projected-views.js';
 /**
  * views-ui.js — views the BIM way on screen (0.6 DF.19, session `bim-draw`), through model-ui.js `extend()`:
  *   Project browser  a section of the left panel [data-pb-sec] (made here, before the Links section): Floor plans (each level;
@@ -288,10 +289,11 @@ export function mountViewsBim(modelUi, o = {}) {
     const rcps = levels.map((l) => row({ 'data-pb-rcp': l.guid, 'aria-current': l.id === A.S.level && A.S.on && A.S.kind === 'rcp' ? 'true' : null }, l.name, () => A.showKind(l.id, 'rcp'),
       el('button', { type: 'button', className: 'bc-pb-ic', 'data-pb-rcprange': l.guid, title: t('model.pv.rcpopen', { level: l.name }), 'aria-label': t('model.pv.rcpopen', { level: l.name }), onClick: () => openRange(l.guid, 'rcp') }, icon('bi-sliders'))));
     const openSet = () => A.root.querySelector('[data-res-sheetsopen]')?.click();
-    const elevs = ['north', 'east', 'south', 'west'].map((s) => row({ 'data-pb-elev': s }, t('res.sh.elev.' + s), openSet));
+    const graphicButton=(key)=>el('button',{type:'button',className:'bc-pb-ic','data-pb-projected':key,title:t('f05.settings'),'aria-label':t('f05.settings'),onClick:()=>openProjected(key)},icon('bi-sliders'));
+    const elevs = ['north', 'east', 'south', 'west'].map((s) => row({ 'data-pb-elev': s }, t('res.sh.elev.' + s), openSet,graphicButton('elevation:'+s)));
     let secs = [];
     try { const w = W(); secs = w ? readSectionLines(w) : []; } catch (e) { secs = []; }
-    const sections = secs.map((s) => row({ 'data-pb-section': s.guid }, t('res.sec.name', { name: s.name }), openSet));
+    const sections = secs.map((s) => row({ 'data-pb-section': s.guid }, t('res.sec.name', { name: s.name }), openSet,graphicButton('section:'+s.guid)));
     let views3d = [];
     try { const ed = A.ed(); views3d = ed ? readViews(ed.api, ed.mid).views : []; } catch (e) { views3d = []; }
     const v3 = views3d.map((v) => row({ 'data-pb-3d': v.name }, v.name, () => A.root.querySelector('[data-saved-views]')?.click()));
@@ -379,6 +381,22 @@ export function mountViewsBim(modelUi, o = {}) {
   /** Run an op; a refusal comes back as its message (the dialog stays open). */
   function run(op, meta) {
     try { A.commit(op, meta); return null; } catch (e) { return e.key ? t(e.key) : String(e.message || e); }
+  }
+
+  function openProjected(key) {
+    const settings=readProjectedView(W(),key);
+    const detail=el('select',{className:'select-cc','data-pj-detail':''},...PLAN_DETAILS.map(d=>el('option',{value:d},t('model.pv.detail.'+d))));detail.value=settings.detail;
+    const scale=el('input',{type:'number',min:0,max:10000,step:'any',className:'bc-input',value:settings.scale,'data-pj-scale':''});
+    const crop=el('input',{type:'text',className:'bc-input',value:settings.crop?.join(', ')||'','data-pj-crop':''});
+    const body=[el('p',{},t('f05.scope')),field(t('model.pv.detail'),detail),field(t('model.pv.scale'),scale),field(t('f05.crop'),crop)];
+    if(settings.issue)body.unshift(el('p',{role:'alert'},settings.issue));
+    if(key.startsWith('elevation:'))body.push(el('p',{},t('f05.elevation')));
+    dialog({'data-pj-dialog':''},t('f05.settings'),body,[btn('cancel',t('model.gp.cancel')),btn('save',t('model.sh.save'),{'data-pj-save':'',disabled:!!settings.issue},true)],value=>{
+      if(value!=='save')return null;
+      const values=crop.value.trim()?crop.value.split(',').map(x=>Number(x.trim())):null;
+      if(values&&(crop.value.split(',').some(x=>!x.trim())||values.length!==4||values.some(x=>!Number.isFinite(x))))return t('f05.cropError');
+      return run(setProjectedView(key,{detail:detail.value,scale:Number(scale.value),crop:values}),{label:t('f05.settings'),verb:t('model.verb.changed')});
+    });
   }
 
   // ---------------------------------------------------------------------------------------------- a plan's view range
