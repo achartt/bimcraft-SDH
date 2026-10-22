@@ -1,0 +1,32 @@
+[
+  {
+    "file": "browser-fine-plan.pdf",
+    "scale": 100,
+    "totalMm": 209.5499999999999,
+    "cavityMm": 25.399999999999956,
+    "preDoorLengthMm": 999.9999755555551,
+    "maxLayerErrorMm": 7.176481631177012e-13,
+    "membranePaths": 14,
+    "rasterImages": 0
+  },
+  {
+    "file": "browser-styled-plan.pdf",
+    "scale": 100,
+    "totalMm": 209.5499999999999,
+    "cavityMm": 25.399999999999956,
+    "preDoorLengthMm": 999.9999755555551,
+    "maxLayerErrorMm": 7.176481631177012e-13,
+    "membranePaths": 14,
+    "rasterImages": 0
+  },
+  {
+    "file": "browser-sheet.pdf",
+    "scale": 100,
+    "totalMm": 209.5499999999999,
+    "cavityMm": 25.399999999998958,
+    "preDoorLengthMm": 1000.0000108333328,
+    "maxLayerErrorMm": 1.5258905250448151e-12,
+    "membranePaths": 14,
+    "rasterImages": 0
+  }
+]

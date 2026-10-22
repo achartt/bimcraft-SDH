@@ -1,0 +1,48 @@
+name: F04 browser acceptance
+on:
+  pull_request:
+  push:
+    branches: [main, feature/f04-layered-plan-graphics]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Pinned application vendors
+        run: npm run fetch-vendor
+      - name: Browser dependencies
+        run: |
+          npm install --prefix .cc-test/f04-browser-deps --no-package-lock playwright@1.56.1
+          .cc-test/f04-browser-deps/node_modules/.bin/playwright install --with-deps chromium
+      - name: Prepare approved baseline independently
+        run: |
+          mkdir -p .cc-test/f04-approved
+          git archive 656d46236ff32b444cbd5a2b4ebe5164858c3848 | tar -x -C .cc-test/f04-approved
+          ln -s "$GITHUB_WORKSPACE/devshell/vendor" .cc-test/f04-approved/devshell/vendor
+      - name: Browser workflow and same-machine measurements
+        env:
+          F04_BASELINE_ROOT: ${{ github.workspace }}/.cc-test/f04-approved
+        run: node tests/features/f04/browser.mjs
+      - name: Independent browser PDF readback
+        run: |
+          python -m venv .cc-test/f04-pdf-venv
+          .cc-test/f04-pdf-venv/bin/python -m pip install -r tests/features/f04/requirements-independent.txt
+          .cc-test/f04-pdf-venv/bin/python -I tests/features/f04/browser-pdf.py
+      - name: Retain browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: f04-browser
+          path: |
+            .cc-test/f04-browser/
+            !.cc-test/f04-browser/*.ifc

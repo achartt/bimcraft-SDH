@@ -1,4 +1,5 @@
 /* SPDX-License-Identifier: Apache-2.0 */
+import { PLAN_DETAILS } from './wall-plan-graphics.js';
 /**
  * views-ui.js — views the BIM way on screen (0.6 DF.19, session `bim-draw`), through model-ui.js `extend()`:
  *   Project browser  a section of the left panel [data-pb-sec] (made here, before the Links section): Floor plans (each level;
@@ -340,13 +341,15 @@ export function mountViewsBim(modelUi, o = {}) {
     // 0.6 DC.117: the scale the plan prints and goes onto sheets at (0 = the largest that fits)
     const scale = el('select', { className: 'select-cc', ['data-' + prefix + '-scale']: '' }, el('option', { value: '0' }, t('model.pv.scale.fit')), ...scalesFor(u).map((x) => el('option', { value: String(x.ratio) }, x.label)));
     scale.value = scalesFor(u).some((x) => x.ratio === vals.scale) ? String(vals.scale) : '0';
+    const detail = el('select', { className: 'select-cc', ['data-' + prefix + '-detail']: '' }, ...PLAN_DETAILS.map(d => el('option', { value: d }, t('model.pv.detail.' + d))));
+    detail.value = vals.detail || 'coarse';
     const cats = CATEGORIES.map(([cls, key]) => {
       const c = el('input', { type: 'checkbox', ['data-' + prefix + '-cat']: cls });
       c.checked = !vals.hidden.includes(cls);
       return el('label', {}, c, t('model.pv.cat.' + key));
     });
     const box = el('div', {},
-      el('div', { className: 'bc-pv-grid' }, field(t('model.pv.cut'), inp.cut), field(t('model.pv.top'), inp.top), rcp ? null : field(t('model.pv.bottom'), inp.bottom), rcp ? null : field(t('model.pv.depth'), inp.depth), field(t('model.pv.scale'), scale)),
+      el('div', { className: 'bc-pv-grid' }, field(t('model.pv.cut'), inp.cut), field(t('model.pv.top'), inp.top), rcp ? null : field(t('model.pv.bottom'), inp.bottom), rcp ? null : field(t('model.pv.depth'), inp.depth), field(t('model.pv.scale'), scale), field(t('model.pv.detail'), detail)),
       el('p', { className: 'bc-muted' }, t(rcp ? 'model.pv.rcp.note' : 'model.pv.range.note')),
       el('h3', { className: 'bc-pv-h' }, t('model.pv.cats')), el('div', { className: 'bc-pv-cats' }, ...cats));
     const value = () => {
@@ -355,6 +358,7 @@ export function mountViewsBim(modelUi, o = {}) {
       if (![out.cut, out.top, out.bottom, out.depth].every(Number.isFinite)) return null;
       out.hidden = CATEGORIES.map(([cls]) => cls).filter((cls) => !box.querySelector(`[data-${prefix}-cat="${cls}"]`).checked);
       out.scale = Number(scale.value) || 0;
+      out.detail = detail.value;
       return out;
     };
     const disable = (on) => { for (const i of box.querySelectorAll('input, select')) i.disabled = on; };
@@ -385,7 +389,7 @@ export function mountViewsBim(modelUi, o = {}) {
     const v = (rcp ? R.rcps : R.views).get(lv.id) || { ...(rcp ? RCP_DEFAULTS : { cut: 1200, top: 0, bottom: 0, depth: 50, scale: 0 }), hiddenClasses: [], hiddenGuids: [], template: '', crop: null, underlay: '' };
     const tpl = el('select', { className: 'select-cc', 'data-pv-template': '' }, el('option', { value: '' }, t('model.pv.notpl')), ...R.templates.map((x) => el('option', { value: x.name }, x.name)));
     tpl.value = v.template || '';
-    const show = (name) => { const x = R.templates.find((q) => q.name === name); return x ? { cut: x.cut, top: x.top, bottom: x.bottom, depth: x.depth, hidden: x.hidden, scale: x.scale } : { cut: v.cut, top: v.top, bottom: v.bottom, depth: v.depth, hidden: v.hiddenClasses, scale: v.scale }; };
+    const show = (name) => { const x = R.templates.find((q) => q.name === name); return x ? { cut: x.cut, top: x.top, bottom: x.bottom, depth: x.depth, hidden: x.hidden, scale: x.scale, detail: x.detail } : { cut: v.cut, top: v.top, bottom: v.bottom, depth: v.depth, hidden: v.hiddenClasses, scale: v.scale, detail: v.detail }; };
     let F = rangeFields(show(tpl.value), 'pv', rcp);
     const holder = el('div', {}, F.box);
     const tplNote = el('p', { className: 'bc-muted', 'data-pv-tplnote': '' });
@@ -420,7 +424,7 @@ export function mountViewsBim(modelUi, o = {}) {
         if (!val) return t('model.err.length');
         if (what === 'astpl') { closeAndTemplate(val, levelGuid); return null; }
         const own = { hiddenGuids: hidden, crop, underlay: under.value };
-        const ch = tpl.value ? { template: tpl.value, ...own } : { cut: val.cut, top: val.top, bottom: val.bottom, depth: val.depth, scale: val.scale, hiddenClasses: val.hidden, template: '', ...own };
+        const ch = tpl.value ? { template: tpl.value, ...own } : { cut: val.cut, top: val.top, bottom: val.bottom, depth: val.depth, scale: val.scale, detail: val.detail, hiddenClasses: val.hidden, template: '', ...own };
         if (rcp) { ch.bottom = 0; ch.depth = 0; }
         const top = (tpl.value ? 0 : val.top) || lv.height;
         if (!tpl.value && !((rcp ? val.cut > 0 : val.bottom <= val.cut) && val.cut <= top && (rcp || val.depth >= 0))) return t('model.err.vr.order');

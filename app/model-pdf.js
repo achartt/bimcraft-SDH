@@ -1,4 +1,5 @@
 /* SPDX-License-Identifier: Apache-2.0 */
+import { layerPrimitives, colorRgb } from './wall-plan-graphics.js';
 import { dimensionFootprint } from './dimension-geometry.js';
 /**
  * model-pdf.js — the plan of a level as a vector PDF (0.5 part 3, BM.7). No DOM, no library: bin/test-bimcraft.mjs --model
@@ -41,6 +42,9 @@ function lit(s) {
 }
 const n = (v) => { const s = (Math.abs(v) < 5e-5 ? 0 : v).toFixed(3); return s.replace(/\.?0+$/, '') || '0'; };
 
+// Vector coordinates retain sub-0.005 mm model precision at supported drawing scales.
+const coord = v => String(Number(v.toFixed(6)));
+
 export function planPdf(scene, { title = '', lines = [], paper = 'letter', units = 'ftin', scale = null } = {}) {
   const [PW, PH] = PAPER[paper] || PAPER.letter;
   const margin = 12, strip = 16;
@@ -56,7 +60,7 @@ export function planPdf(scene, { title = '', lines = [], paper = 'letter', units
   const ops = ['1 J 1 j'];
   let missing = 0;
   const pen = (w, gray = 0, dash = null) => ops.push(n(w * PT) + ' w ' + n(gray) + ' G ' + (dash ? '[' + dash.map((d) => n(d * PT)).join(' ') + '] 0 d' : '[] 0 d'));
-  const path = (pts, close) => { pts.forEach((p, i) => { const q = P(p); ops.push(n(q[0] * PT) + ' ' + n(q[1] * PT) + (i ? ' l' : ' m')); }); if (close) ops.push('h'); };
+  const path = (pts, close) => { pts.forEach((p, i) => { const q = P(p); ops.push(coord(q[0] * PT) + ' ' + coord(q[1] * PT) + (i ? ' l' : ' m')); }); if (close) ops.push('h'); };
   const seg = (a) => { for (let i = 0; i < a.length; i += 4) { path([[a[i], a[i + 1]], [a[i + 2], a[i + 3]]]); } };
   const text = (s, x, y, size, { align = 'center', rot = 0, bold = false, gray = 0 } = {}) => {
     const l = lit(s); missing += l.missing;
@@ -87,7 +91,13 @@ export function planPdf(scene, { title = '', lines = [], paper = 'letter', units
     pen(0.25, 0); seg(c.segs); ops.push('S');
   }
   // walls: grey fill, heavy outline
-  for (const w of scene.walls || []) for (const p of w.pieces || [w.poly]) { if (!p?.length) continue; ops.push('0.55 g'); path(p, true); ops.push('f'); if (!scene.wallEdges) { pen(0.5, 0); path(p, true); ops.push('S'); } }
+  for (const w of scene.walls || []) {
+    if (w.layers) for (const it of layerPrimitives(w)) {
+      if (it.t === 'fill') { ops.push(colorRgb(it.color).map(coord).join(' ') + ' rg'); for (const p of it.polys) path(p, true); ops.push('f*'); }
+      else { pen(it.w, 0, it.dash); ops.push(colorRgb(it.color).map(coord).join(' ') + ' RG'); path(it.pts); ops.push('S'); }
+    }
+    for (const p of w.pieces || [w.poly]) { if (!p?.length) continue; if (!w.layers) { ops.push('0.55 g'); path(p, true); ops.push('f'); } if (!scene.wallEdges) { pen(0.5, 0); path(p, true); ops.push('S'); } }
+  }
   if (scene.wallEdges) { pen(0.5, 0); for (const p of scene.wallEdges) path(p, true); ops.push('S'); }   // one outline round the walls: joins not drawn
   // doors, windows, roofs
   for (const s of scene.symbols || []) {

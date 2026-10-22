@@ -1,0 +1,3 @@
+{"file": "fixtures/f04/layered-plans.ifc", "schemaFindings": 0, "walls": 9, "openings": 5, "modelDataIdentical": true, "membranesZero": true, "cavitiesVentilatedUnfilled": true}
+{"file": "evidence/f04/styled-reopened.ifc", "schemaFindings": 0, "walls": 9, "openings": 5, "modelDataIdentical": true, "membranesZero": true, "cavitiesVentilatedUnfilled": true}
+{"file": "evidence/f04/fine-reopened.ifc", "schemaFindings": 0, "walls": 9, "openings": 5, "modelDataIdentical": true, "membranesZero": true, "cavitiesVentilatedUnfilled": true}
