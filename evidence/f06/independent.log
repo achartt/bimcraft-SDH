@@ -1,0 +1,8 @@
+{"file": "seed.ifc", "schemaFindings": 0, "types": 2, "membranes": 3, "cavityWidths": [25.4, 38.1], "csvComparedToAuthoritativeRecords": false}
+{"file": "styled.ifc", "schemaFindings": 0, "types": 2, "membranes": 3, "cavityWidths": [25.4, 38.1], "csvComparedToAuthoritativeRecords": false}
+{"file": "edited.ifc", "schemaFindings": 0, "types": 2, "membranes": 3, "cavityWidths": [25.4, 38.1], "csvComparedToAuthoritativeRecords": false}
+{"file": "ifc2x3.ifc", "schemaFindings": 0, "types": 2, "membranes": 3, "cavityWidths": [25.4, 38.1], "csvComparedToAuthoritativeRecords": false}
+{"file": "documentation.pdf", "pages": 4, "minFontPt": 7.0, "vectorOnly": true, "dashedPaths": 1}
+{"file": "large.pdf", "pages": 20, "minFontPt": 7.0, "vectorOnly": true, "dashedPaths": 1}
+{"file": "legend.pdf", "pages": 1, "minFontPt": 7.0, "vectorOnly": true, "dashedPaths": 1}
+{"csvRows": 14, "layerRows": 12, "escaping": true}

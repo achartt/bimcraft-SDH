@@ -42,19 +42,6 @@ jobs:
         run: node tests/features/f06/browser.mjs
       - name: Independent actual IFC PDF CSV acceptance
         run: .cc-test/f06-reader/bin/python -I tests/features/f06/independent.py .cc-test/f06-browser
-      - name: Review evidence transport
-        if: always()
-        shell: python
-        run: |
-          import io,zipfile,base64
-          from pathlib import Path
-          data=io.BytesIO()
-          with zipfile.ZipFile(data,'w',zipfile.ZIP_DEFLATED) as z:
-            for p in Path('.cc-test/f06-browser').glob('*'):
-              if p.suffix in ['.pdf','.csv','.ifc','.json'] or p.name in ['schedule-expanded.png','edited-assembly-sheet.png','legend-expanded.png','failure.png']:
-                z.write(p,p.name)
-          b=base64.b64encode(data.getvalue()).decode()
-          for i in range(0,len(b),16000): print('F06_EVIDENCE_BASE64 '+b[i:i+16000])
       - name: Retain evidence
         if: always()
         uses: actions/upload-artifact@v4
