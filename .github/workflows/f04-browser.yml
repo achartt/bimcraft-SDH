@@ -35,8 +35,9 @@ jobs:
         run: node tests/features/f04/browser.mjs
       - name: Independent browser PDF readback
         run: |
-          python -m pip install -r tests/features/f04/requirements-independent.txt
-          python -I tests/features/f04/browser-pdf.py
+          python -m venv .cc-test/f04-pdf-venv
+          .cc-test/f04-pdf-venv/bin/python -m pip install -r tests/features/f04/requirements-independent.txt
+          .cc-test/f04-pdf-venv/bin/python -I tests/features/f04/browser-pdf.py
       - name: Retain browser evidence
         if: always()
         uses: actions/upload-artifact@v4
