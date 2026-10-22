@@ -68,7 +68,7 @@ export function projectView(elements, options = {}) {
   const byKey = new Map((walls||[]).map(w=>[w.key??w.id,{...w,junctionUnsupported:!isolatedWall(w,walls)}]));
   const sourced = elements.map(e=>byKey.has(e.key)?{...e,edges:wallSurfaceEdges(byKey.get(e.key),openings)}:e);
   const view = projectMeshView(sourced, options);
-  return walls ? wallSectionGraphics(view, walls, openings, materials, options) : view;
+  return walls ? {...wallSectionGraphics(view, walls, openings, materials, options),groundY:0,...(options.box?{crop:options.box}:{})} : view;
 }
 
 function projectMeshView(elements, { dir, cut = null, far = 0, res = 1600, margin = { side: 3000, below: 1500, above: 500 }, box: frame = null } = {}) {
