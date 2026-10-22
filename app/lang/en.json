@@ -5398,5 +5398,14 @@
   "model.pv.detail.medium": "Medium - layers and colors",
   "model.pv.detail.fine": "Fine - layers, colors and patterns",
   "model.err.vr.detail": "Choose Coarse, Medium or Fine plan detail.",
-  "model.pv.layers.unavailable": "Layer graphics unavailable for an unsupported assembly or material library. Envelope shown; inspect Wall assemblies and Material library."
+  "model.pv.layers.unavailable": "Layer graphics unavailable for an unsupported assembly or material library. Envelope shown; inspect Wall assemblies and Material library.",
+  "contract.projected": "Section/elevation settings",
+  "contract.missing": "The referenced section is missing. Undo its deletion or choose an existing section.",
+  "f05.sectionInvalid": "Section level or cut plane is missing or invalid. Restore its level or recreate the section line.",
+  "f05.settings": "Section / elevation graphics",
+  "f05.scope": "Layered cuts support vertical sections perpendicular to straight, constant-width authored walls. Cut faces are heavy; visible geometry beyond is thin. Levels and notes are separate overlays.",
+  "f05.elevation": "Elevations show visible surfaces and openings. Detail settings do not expose hidden wall layers.",
+  "f05.crop": "Crop in view mm: left, bottom, right, top (blank = none)",
+  "f05.cropError": "Enter four finite millimetre coordinates: left, bottom, right, top.",
+  "f05.diagnostic": "Envelope fallback — inspect view records:"
 }

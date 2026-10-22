@@ -1,5 +1,6 @@
 /* SPDX-License-Identifier: Apache-2.0 */
 import { layerPrimitives, colorRgb } from './wall-plan-graphics.js';
+import { cutFaceItems } from './wall-section-graphics.js';
 import { dimensionFootprint } from './dimension-geometry.js';
 /**
  * res-sheets.js — a print-ready drawing set made from the model (0.5 part 4, RC.5): plans of each level, the four exterior
@@ -117,14 +118,10 @@ function bubble(c, tag, r = 3.5) {
   for (let i = 0; i <= 24; i++) { const a = i / 24 * Math.PI * 2; pts.push([c[0] + r * Math.cos(a), c[1] + r * Math.sin(a)]); }
   return [{ t: 'fill', polys: [pts], g: 1 }, { t: 'line', pts, w: 0.25, g: 0 }, { t: 'text', s: tag, x: c[0], y: c[1] - 1.1, size: tag.length > 2 ? 5 : 6.5, bold: true }];
 }
-function viewItems(view, P, k = 0) {
+export function viewItems(view, P, k = 0) {
   const out = [];
-  for (const c of view.cuts || []) {
-    const polys = c.loops.map((l) => l.map(P));
-    out.push({ t: 'fill', polys, g: /Geographic/.test(c.cls) ? 0.82 : 0.6 });
-    for (const pl of polys) out.push({ t: 'line', pts: [...pl, pl[0]], w: 0.45, g: 0 });
-  }
   for (const l of view.lines || []) out.push({ t: 'line', pts: [P([l[0], l[1]]), P([l[2], l[3]])], w: 0.18, g: 0 });
+  for (const c of view.cuts || []) out.push(...cutFaceItems(c,P,k>0?1/k:c.scale));
   // grid lines seen end on (0.6 DF.16): from under the ground line to above the top, the bubble on top
   const b = view.bounds;
   if (b) for (const g of view.grids || []) {
@@ -136,6 +133,7 @@ function viewItems(view, P, k = 0) {
   if (b && !view.ground) out.push({ t: 'line', pts: [P([b.x0 - 450, b.y0]), P([b.x1 + 450, b.y0])], w: 0.6, g: 0 });
   // 0.6 round 2 (bim-comforts_PART_2): the view's notes — level marks, dimensions, door / window / item tags (comforts-views.js)
   if (view.notes?.length && k > 0) out.push(...noteItems(view.notes, P, k));
+  if(b && view.warnings?.length)out.push({t:'text',s:tr('f05.diagnostic')+' '+[...new Set(view.warnings.map(w=>w.reason))].join(', '),x:P([b.x0,b.y1])[0],y:P([b.x0,b.y1])[1]+4,size:6,align:'left'});
   return out;
 }
 function framingItems(fr, P) {
@@ -234,14 +232,14 @@ export function buildSet(input, { paper = 'tabloid', units = 'ftin', project = '
   if (els.length) {
     const ratio = Math.max(...els.map((e) => scaleFor(e.view.bounds.x1 - e.view.bounds.x0 + 1000, e.view.bounds.y1 - e.view.bounds.y0 + 1000, roomFor(2), units, BUILDING).ratio));
     for (let i = 0; i < els.length; i += 2) {
-      const cells = els.slice(i, i + 2).map((e) => drawCell(e.title, pad(e.view.bounds, 500), units, (P, k) => viewItems(e.view, P, k), ratio));
+      const cells = els.slice(i, i + 2).map((e) => drawCell(e.title, pad(e.view.bounds, 500), units, (P, k) => viewItems(e.view, P, k), e.view.scale || ratio));
       sheets.push(sheet('A-2' + String(i / 2 + 1).padStart(2, '0'), tr('res.sh.elevations'), cells, opts));
     }
   }
   // sections: two a sheet
   const secs = (input.sections || []).filter((e) => e.view?.bounds);
   for (let i = 0; i < secs.length; i += 2) {
-    const cells = secs.slice(i, i + 2).map((e) => drawCell(e.title, pad(e.view.bounds, 500), units, (P, k) => viewItems(e.view, P, k), null, BUILDING));
+    const cells = secs.slice(i, i + 2).map((e) => drawCell(e.title, pad(e.view.bounds, 500), units, (P, k) => viewItems(e.view, P, k), e.view.scale || null, BUILDING));
     sheets.push(sheet('A-3' + String(i / 2 + 1).padStart(2, '0'), tr('res.sh.sections'), cells, opts));
   }
   // schedules: side by side, as many columns as the paper's width takes; a table taller than the sheet goes on in the next
@@ -293,7 +291,7 @@ export function composeSheet(spec, input, { paper = 'tabloid', units = 'ftin', p
       if (!bb) { s.missing.push(i); return; }
       const W = bb.x1 - bb.x0, H = bb.y1 - bb.y0;
       // 1:ratio as placed; else the view's own scale (0.6 DC.117); else the largest standard scale that fits a third of the sheet
-      ratio = v.ratio > 0 ? v.ratio : src.scene?.scale > 0 ? src.scene.scale : scaleFor(W, H, [PW / 3, PH / 3], units, isMetric(units) ? 50 : 48).ratio;
+      ratio = v.ratio > 0 ? v.ratio : src.scene?.scale > 0 ? src.scene.scale : src.view?.scale > 0 ? src.view.scale : scaleFor(W, H, [PW / 3, PH / 3], units, isMetric(units) ? 50 : 48).ratio;
       const k = 1 / ratio;
       w = W * k; h = H * k;
       draw = (x0, y0) => { const P = at(k, x0 - bb.x0 * k, y0 - bb.y0 * k); return planLike(v.kind) ? planItems(src.scene, P, k) : viewItems(src.view, P, k); };
