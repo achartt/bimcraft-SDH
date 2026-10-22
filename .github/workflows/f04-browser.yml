@@ -33,6 +33,10 @@ jobs:
         env:
           F04_BASELINE_ROOT: ${{ github.workspace }}/.cc-test/f04-approved
         run: node tests/features/f04/browser.mjs
+      - name: Independent browser PDF readback
+        run: |
+          python -m pip install -r tests/features/f04/requirements-independent.txt
+          python -I tests/features/f04/browser-pdf.py
       - name: Retain browser evidence
         if: always()
         uses: actions/upload-artifact@v4

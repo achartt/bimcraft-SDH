@@ -245,7 +245,7 @@ export function mountModel(host) {
     const k = kb(), own = ownKeys(), allOps = openingsHere(), ops = allOps.filter((o) => !hiddenOwn(vr, o.kind === 'window' ? 'IfcWindow' : 'IfcDoor', o.guid));
     const byWall = new Map(walls.map((w) => [w.id, w]));
     let materials = null;
-    try { materials = readMaterials(ed().placer()); } catch { /* F02: preserve unsupported library; envelope only. */ }
+    try { materials = readMaterials(new ModelWriter(ed().W, ed().api, ed().mid)); } catch { /* F02: preserve unsupported library; envelope only. */ }
     const scene = {
       walls: wallPlanGraphics(walls, S.outlines, allOps, materials, { detail: vr.detail || 'coarse', cutZ: vr.cut, scale: vr.scale || 50, keyBase: k }),
       symbols: ops.filter((o) => byWall.has(o.wall) && (!S.drag || S.drag.op.guid !== o.guid)).map((o) => ({ key: k + o.id, guid: o.guid, ...openingSymbol(o, byWall.get(o.wall)) })),
