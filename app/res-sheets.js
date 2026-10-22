@@ -1,3 +1,4 @@
+import { documentItems } from './assembly-schedule-layout.js';
 /* SPDX-License-Identifier: Apache-2.0 */
 import { layerPrimitives, colorRgb } from './wall-plan-graphics.js';
 import { cutFaceItems } from './wall-section-graphics.js';
@@ -247,7 +248,10 @@ export function buildSet(input, { paper = 'tabloid', units = 'ftin', project = '
   const perSheet = Math.max(1, Math.min(4, Math.floor((PW - 20) / 130)));
   const fit = Math.max(4, Math.floor((PH - 20 - 18 - 22) / 5) - 3);
   const pieces = [];
-  for (const sc of (input.schedules || []).filter((x) => x.rows.length)) {
+  for (const sc of (input.schedules || []).filter((x) => x.document)) {
+    sheets.push(sheet('A-6'+String(sheets.length+1).padStart(2,'0'),sc.title,[{title:sc.title,draw:(x,y,w,h)=>documentItems(sc,x+(w-sc.document.width)/2,y+h)}],opts));
+  }
+  for (const sc of (input.schedules || []).filter((x) => !x.document && x.rows.length)) {
     for (let r = 0; r < sc.rows.length; r += fit) {
       const last = r + fit >= sc.rows.length;
       pieces.push({ title: r ? tr('res.sh.continued', { title: sc.title }) : sc.title, head: sc.head, rows: sc.rows.slice(r, r + fit), total: last ? sc.total : null });
@@ -284,8 +288,8 @@ export function composeSheet(spec, input, { paper = 'tabloid', units = 'ftin', p
     if (!src) { s.missing.push(i); return; }
     let w, h, draw, ratio = 0;
     if (v.kind === 'schedule') {
-      w = 130; h = 5 * (src.rows.length + 1 + (src.total ? 1 : 0));
-      draw = (x0, y0) => tableItems(src, x0, y0 + h, w).items;
+      w = src.document?.width || 130; h = src.document?.height || 5 * (src.rows.length + 1 + (src.total ? 1 : 0));
+      draw = (x0, y0) => src.document ? documentItems(src,x0,y0+h) : tableItems(src, x0, y0 + h, w).items;
     } else {
       const bb = planLike(v.kind) ? boundsOfScene(src.scene) : src.view?.bounds ? pad(src.view.bounds, src.view.crop?0:500) : null;
       if (!bb) { s.missing.push(i); return; }
@@ -298,6 +302,10 @@ export function composeSheet(spec, input, { paper = 'tabloid', units = 'ftin', p
     }
     const x0 = v.x - w / 2, y0 = v.y - h / 2;
     s.items.push(...draw(x0, y0));
+    if(src.document){
+      const prefix=v.ref.split(':')[0]+':',omitted=input.schedules.filter(p=>p.ref.startsWith(prefix)&&!spec.views.some(v=>v.kind==='schedule'&&v.ref===p.ref));
+      if(omitted.length)s.items.push({t:'text',s:`${omitted.length} continuation page(s) not on this sheet; place all pages or export drawing set.`,x:x0,y:y0-12,size:8,align:'left'});
+    }
     // its title under it, underlined, the scale under that (as the set's cells)
     s.items.push({ t: 'text', s: src.title, x: x0, y: y0 - 6, size: 9, align: 'left', bold: true });
     s.items.push({ t: 'line', pts: [[x0, y0 - 7], [x0 + Math.min(w, 90), y0 - 7]], w: 0.35, g: 0 });
