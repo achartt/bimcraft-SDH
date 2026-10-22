@@ -1,0 +1,27 @@
+(node:19353) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file://<F04_CHECKOUT>/app/ifc/api.js is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to <F04_CHECKOUT>/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+curve chord error mm 2 0.0019976540170318913
+curve chord error mm 3 0.001999403971240099
+✔ fixture is deterministic: two cores, ventilated cavities, membranes, signs, reversed axes, six location lines (58.32125ms)
+✔ fine straight offsets, layer widths, unfilled cavity, zero membrane and reverse ordering (12.917667ms)
+✔ signed curves have exact concentric layer vertices and bounded chord error (10.033667ms)
+✔ door/window intervals interrupt fills and boundary paths including radial curve cuts; cut height respected (14.899417ms)
+✔ L and fractional T junction edges are complete without cap seams; fills conserve joined area (5.525292ms)
+✔ detail changes are read-only: medium retains exact fine polygons, coarse has envelope only (11.923334ms)
+✔ material styles/defaults undo, redo, reopen and project isolation preserve geometry and reference dimensions (85.388083ms)
+✔ view detail, RCP and template persistence, undo/redo and template deletion (7.063583ms)
+✔ unsupported library/assembly cannot fabricate layers; invalid detail rejected atomically (3.803125ms)
+✔ all location lines and exterior sides preserve authored layer widths after placement (106.334667ms)
+✔ real vector PDFs, sheet SVG and enlarged views share the scene primitives and scales (149.858667ms)
+✔ outer-face membranes remain exact boundary lines on either side (1.503125ms)
+✔ production Canvas painter emits the shared fill polygons and never paints cavity bands (12.27225ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 13
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 624.5905

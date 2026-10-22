@@ -20,7 +20,9 @@
  */
 import { t } from './i18n.js';
 import { PlanView } from './model-planview.js';
-import { planCut, chainLoops, viewerToPlan, wallPieces, wallDims } from './model-plan.js';
+import { wallPlanGraphics, wallPlanEdges } from './wall-plan-graphics.js';
+import { readMaterials } from './project-materials.js';
+import { planCut, chainLoops, viewerToPlan, wallDims } from './model-plan.js';
 import { schedules, scheduleCsv } from './model-schedule.js';
 import { planPdf } from './model-pdf.js';
 import { wallOutlines, wallTypes, wallType, typeThickness, typeName, typeAt, JUSTIFICATIONS, locationLine } from './model-walls.js';
@@ -223,17 +225,21 @@ export function mountModel(host) {
     const vr = viewRange();
     const walls = wallsHere().filter((w) => !hiddenOwn(vr, 'IfcWall', w.guid));
     S.outlines = wallOutlines(walls.map((w) => ({ key: w.guid, a: w.a, b: w.b, t: w.t, bulge: w.bulge })));
-    const k = kb(), own = ownKeys(), ops = openingsHere().filter((o) => !hiddenOwn(vr, o.kind === 'window' ? 'IfcWindow' : 'IfcDoor', o.guid));
+    const k = kb(), own = ownKeys(), allOps = openingsHere(), ops = allOps.filter((o) => !hiddenOwn(vr, o.kind === 'window' ? 'IfcWindow' : 'IfcDoor', o.guid));
     const byWall = new Map(walls.map((w) => [w.id, w]));
+    let materials = null;
+    try { materials = readMaterials(ed().placer()); } catch { /* F02: preserve unsupported library; envelope only. */ }
     const scene = {
-      walls: walls.map((w) => { const poly = S.outlines.get(w.guid) || []; return { key: k + w.id, guid: w.guid, poly, pieces: poly.length ? wallPieces(w, poly, ops.filter((o) => o.wall === w.id), vr.cut) : [] }; }),
+      walls: wallPlanGraphics(walls, S.outlines, allOps, materials, { detail: vr.detail || 'coarse', cutZ: vr.cut, scale: vr.scale || 50, keyBase: k }),
       symbols: ops.filter((o) => byWall.has(o.wall) && (!S.drag || S.drag.op.guid !== o.guid)).map((o) => ({ key: k + o.id, guid: o.guid, ...openingSymbol(o, byWall.get(o.wall)) })),
       rooms: hiddenOwn(vr, 'IfcSpace', '') ? [] : roomsScene(), dims: [],
       cut: (S.cut?.cut || []).filter((c) => !own.has(c.key)),
       below: (S.cut?.below || []).filter((c) => !own.has(c.key)),
       above: (S.cut?.above || []).filter((c) => !own.has(c.key)),
-      crop: vr.crop || null, scale: vr.scale || 0,   // 0.6 DC.117: the view's crop region and scale (sheets, print)
+      crop: vr.crop || null, scale: vr.scale || 0, detail: vr.detail || 'coarse',   // 0.6 DC.117: the view's crop region and scale (sheets, print)
     };
+    scene.graphicWarnings = scene.walls.filter(w => w.graphicWarning).map(w => w.guid);
+    if (scene.graphicWarnings.length) host.status(t('model.pv.layers.unavailable'), true);
     if (S.kind === 'rcp') {
       // 0.6 DC.117, a ceiling plan: the walls cut at its height, no door or window symbols, no rooms or dimensions; what is above
       // the cut (ceilings, lights, beams) drawn solid and thin, as a plan draws what is below it
@@ -241,7 +247,7 @@ export function mountModel(host) {
     } else scene.symbols.push(...roofsScene());
     // the walls' outline as one: their joins (mitres, T ends) are not drawn, as on a drafted plan
     const pieces = scene.walls.flatMap((w) => w.pieces || []);
-    if (pieces.length) { const L = planLoops(pieces); scene.wallEdges = [...L.rooms.flatMap((r) => [r.poly, ...r.holes]), ...L.outlines.map((o) => o.poly)]; }
+    if (pieces.length) scene.wallEdges = wallPlanEdges(scene.walls);
     if (S.dims && S.kind !== 'rcp') scene.dims = wallDims(walls, S.outlines, ops, (mm) => fmtLen(mm, S.units), { exteriorOf: (w) => (w.assembly || projectWallType(w.typeKey))?.exterior ?? true });
     for (const x of exts) x.scene?.(scene);
     return scene;

@@ -1,0 +1,19 @@
+{
+  "backend": "@napi-rs/canvas (Skia), Node; not browser frame timing",
+  "approvedBase": "656d46236ff32b444cbd5a2b4ebe5164858c3848",
+  "width": 1600,
+  "height": 1100,
+  "warmup": 5,
+  "metrics": {
+    "before": {
+      "n": 30,
+      "p50Ms": 0.055625000000020464,
+      "p95Ms": 0.08116700000002197
+    },
+    "after": {
+      "n": 30,
+      "p50Ms": 1.9514580000000024,
+      "p95Ms": 2.0477500000000077
+    }
+  }
+}
