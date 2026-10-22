@@ -130,7 +130,8 @@ export function viewItems(view, P, k = 0) {
     out.push({ t: 'line', pts: [lo, hi], w: 0.13, g: 0.35, dash: [5, 1, 0.6, 1] }, ...bubble([hi[0], hi[1] + 3.5], g.tag));
   }
   // the ground line under it all, past both ends — unless the model has its ground (terrain draws itself)
-  if (b && !view.ground) out.push({ t: 'line', pts: [P([b.x0 - 450, b.y0]), P([b.x1 + 450, b.y0])], w: 0.6, g: 0 });
+  const groundY=view.groundY??b?.y0;
+  if (b && !view.ground && groundY>=b.y0 && groundY<=b.y1) out.push({ t: 'line', pts: [P([b.x0 - 450, groundY]), P([b.x1 + 450, groundY])], w: 0.6, g: 0 });
   // 0.6 round 2 (bim-comforts_PART_2): the view's notes — level marks, dimensions, door / window / item tags (comforts-views.js)
   if (view.notes?.length && k > 0) out.push(...noteItems(view.notes, P, k));
   if(b && view.warnings?.length)out.push({t:'text',s:tr('f05.diagnostic')+' '+[...new Set(view.warnings.map(w=>w.reason))].join(', '),x:P([b.x0,b.y1])[0],y:P([b.x0,b.y1])[1]+4,size:6,align:'left'});
@@ -232,14 +233,14 @@ export function buildSet(input, { paper = 'tabloid', units = 'ftin', project = '
   if (els.length) {
     const ratio = Math.max(...els.map((e) => scaleFor(e.view.bounds.x1 - e.view.bounds.x0 + 1000, e.view.bounds.y1 - e.view.bounds.y0 + 1000, roomFor(2), units, BUILDING).ratio));
     for (let i = 0; i < els.length; i += 2) {
-      const cells = els.slice(i, i + 2).map((e) => drawCell(e.title, pad(e.view.bounds, 500), units, (P, k) => viewItems(e.view, P, k), e.view.scale || ratio));
+      const cells = els.slice(i, i + 2).map((e) => drawCell(e.title, pad(e.view.bounds, e.view.crop?0:500), units, (P, k) => viewItems(e.view, P, k), e.view.scale || ratio));
       sheets.push(sheet('A-2' + String(i / 2 + 1).padStart(2, '0'), tr('res.sh.elevations'), cells, opts));
     }
   }
   // sections: two a sheet
   const secs = (input.sections || []).filter((e) => e.view?.bounds);
   for (let i = 0; i < secs.length; i += 2) {
-    const cells = secs.slice(i, i + 2).map((e) => drawCell(e.title, pad(e.view.bounds, 500), units, (P, k) => viewItems(e.view, P, k), e.view.scale || null, BUILDING));
+    const cells = secs.slice(i, i + 2).map((e) => drawCell(e.title, pad(e.view.bounds, e.view.crop?0:500), units, (P, k) => viewItems(e.view, P, k), e.view.scale || null, BUILDING));
     sheets.push(sheet('A-3' + String(i / 2 + 1).padStart(2, '0'), tr('res.sh.sections'), cells, opts));
   }
   // schedules: side by side, as many columns as the paper's width takes; a table taller than the sheet goes on in the next
@@ -287,7 +288,7 @@ export function composeSheet(spec, input, { paper = 'tabloid', units = 'ftin', p
       w = 130; h = 5 * (src.rows.length + 1 + (src.total ? 1 : 0));
       draw = (x0, y0) => tableItems(src, x0, y0 + h, w).items;
     } else {
-      const bb = planLike(v.kind) ? boundsOfScene(src.scene) : src.view?.bounds ? pad(src.view.bounds, 500) : null;
+      const bb = planLike(v.kind) ? boundsOfScene(src.scene) : src.view?.bounds ? pad(src.view.bounds, src.view.crop?0:500) : null;
       if (!bb) { s.missing.push(i); return; }
       const W = bb.x1 - bb.x0, H = bb.y1 - bb.y0;
       // 1:ratio as placed; else the view's own scale (0.6 DC.117); else the largest standard scale that fits a third of the sheet

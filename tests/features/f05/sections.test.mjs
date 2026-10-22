@@ -152,3 +152,9 @@ test('IFC2X3 settings and authored cavity/membrane cuts survive actual save/reop
  const layers=faces(before)[0].layers;assert.ok(layers.some(l=>l.thickness===0&&!l.polys.length));assert.ok(layers.some(l=>l.kind==='cavity'&&l.fill==='none'));
  fs.writeFileSync(out+'/ifc2x3.ifc',m.ed.save());
 });
+test('enlarged crop stays composed on paper and does not invent a ground line at its lower edge',async()=>{
+ const m=await model(),v=await view(m,{box:{x0:-150,y0:400,x1:150,y1:1400},scale:5}),sh=sheet(v,{bounds:null},5);
+ assert.ok(!viewItems(v,p=>p,1/5).some(i=>i.t==='line'&&i.w===.6));
+ for(const i of sh.items.filter(i=>i.t==='text'))assert.ok(i.y>10&&i.y<287,'text off paper: '+i.s);
+ assert.ok(sh.views.every(v=>v.box[0]>=10&&v.box[1]>=28&&v.box[2]<=410&&v.box[3]<=287));
+});
