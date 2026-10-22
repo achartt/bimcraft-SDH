@@ -1,0 +1,115 @@
+{
+  "head": "81c81f620d20cda31be770842b7cf189608ad0ab",
+  "approvedBase": "656d46236ff32b444cbd5a2b4ebe5164858c3848",
+  "cpu": "AMD EPYC 9V74 80-Core Processor",
+  "platform": "linux",
+  "memory": 16760340480,
+  "node": "v22.23.4",
+  "fixtureSha256": "00425e4c58cf0351ee0984f3630952f402e2011e3f3df2bf06b8c14c0732fb8a",
+  "checks": [
+    "fixture opens with 9 walls / 5 hosted openings",
+    "legacy view defaults to coarse",
+    "medium renders layers without hatching",
+    "fine uses medium boundaries and adds patterns without model edits",
+    "true cavity width and zero-width unfilled membrane",
+    "download browser-fine-plan.pdf",
+    "material edit changes graphic style without dimensions, anchors, IDs or layer widths",
+    "UI Undo restores graphics",
+    "UI Redo reapplies graphics",
+    "download browser-styled-plan.pdf",
+    "download browser-sheet.pdf",
+    "download browser-saved.ifc",
+    "actual downloaded IFC reopens with fine detail, material edits and unchanged geometry",
+    "second project retains original material styles and coarse detail",
+    "no unexpected browser errors"
+  ],
+  "console": [
+    {
+      "type": "error",
+      "text": "Refused to apply style from 'http://127.0.0.1:8022/assets/vendor/bootstrap-icons/current/bootstrap-icons.min.css' because its MIME type ('') is not a supported stylesheet MIME type, and strict MIME checking is enabled."
+    },
+    {
+      "type": "error",
+      "text": "Refused to apply style from 'http://127.0.0.1:8022/assets/vendor/bootstrap-icons/current/bootstrap-icons.min.css' because its MIME type ('') is not a supported stylesheet MIME type, and strict MIME checking is enabled."
+    },
+    {
+      "type": "error",
+      "text": "Refused to apply style from 'http://127.0.0.1:8022/assets/vendor/bootstrap-icons/current/bootstrap-icons.min.css' because its MIME type ('') is not a supported stylesheet MIME type, and strict MIME checking is enabled."
+    }
+  ],
+  "notes": [
+    "DOM clicks reveal existing collapsed toolbar/project-browser groups; this is not a certification of inherited menu/icon accessibility.",
+    "Paint CPU duration and requestAnimationFrame intervals are reported separately; no GPU or large-model claim."
+  ],
+  "browser": "141.0.7390.37",
+  "before": {
+    "label": "approved baseline coarse",
+    "viewport": [
+      1680,
+      1100
+    ],
+    "dpr": 1,
+    "paintCpu": {
+      "n": 30,
+      "p50Ms": 0.5,
+      "p95Ms": 0.7000000000698492
+    },
+    "frameIntervals": {
+      "n": 30,
+      "p50Ms": 16.700000000000045,
+      "p95Ms": 50
+    },
+    "planPdf": {
+      "n": 30,
+      "p50Ms": 1.599999999976717,
+      "p95Ms": 2.3999999999068677
+    }
+  },
+  "afterCoarse": {
+    "label": "F04 coarse",
+    "viewport": [
+      1680,
+      1100
+    ],
+    "dpr": 1,
+    "paintCpu": {
+      "n": 30,
+      "p50Ms": 0.5999999999767169,
+      "p95Ms": 0.6000000000931323
+    },
+    "frameIntervals": {
+      "n": 30,
+      "p50Ms": 16.700000000000045,
+      "p95Ms": 33.299999999999955
+    },
+    "planPdf": {
+      "n": 30,
+      "p50Ms": 1.8000000000465661,
+      "p95Ms": 2.5
+    }
+  },
+  "afterFine": {
+    "label": "F04 fine",
+    "viewport": [
+      1680,
+      1100
+    ],
+    "dpr": 1,
+    "paintCpu": {
+      "n": 30,
+      "p50Ms": 2.5,
+      "p95Ms": 6.599999999976717
+    },
+    "frameIntervals": {
+      "n": 30,
+      "p50Ms": 16.700000000000728,
+      "p95Ms": 183.39999999999964
+    },
+    "planPdf": {
+      "n": 30,
+      "p50Ms": 54.59999999997672,
+      "p95Ms": 73.69999999995343
+    }
+  },
+  "status": "PASS"
+}
