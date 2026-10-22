@@ -1,11 +1,7 @@
+# Full collection is deliberate/manual; the normal Tests workflow runs F03 smoke on PRs.
 # Provisional Linux/headless reference, kept separate from local model measurements.
 name: F03 performance evidence
 on:
-  pull_request:
-    branches: [main]
-    paths:
-      - 'tests/features/f03/**'
-      - '.github/workflows/f03-performance.yml'
   workflow_dispatch:
 permissions:
   contents: read
@@ -45,6 +41,7 @@ jobs:
           node tests/features/f03/browser.mjs --out .cc-test/f03-ci
           node tests/features/f03/profile-report.mjs .cc-test/f03-ci
           node tests/features/f03/phase-report.mjs .cc-test/f03-ci
+          node tests/features/f03/trace-report.mjs .cc-test/f03-ci
       - name: Retain raw evidence even on failure
         if: always()
         uses: actions/upload-artifact@v4
