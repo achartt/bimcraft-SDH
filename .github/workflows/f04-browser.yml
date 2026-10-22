@@ -1,6 +1,8 @@
 name: F04 browser acceptance
 on:
   pull_request:
+  push:
+    branches: [feature/f04-layered-plan-graphics]
   workflow_dispatch:
 permissions:
   contents: read

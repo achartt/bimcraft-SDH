@@ -5,7 +5,7 @@ name: Tests
 on:
   pull_request:
   push:
-    branches: [main]
+    branches: [main, feature/f04-layered-plan-graphics]
   workflow_dispatch:
 
 permissions:
@@ -22,6 +22,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           # Baseline verifies copied-asset pins against their recorded immutable Git revision.
           fetch-depth: 0
       - uses: actions/setup-node@v4
