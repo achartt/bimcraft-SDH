@@ -1,8 +1,9 @@
 # F04 — Layered plan graphics and vector output
 
-Status: implemented for the supported geometry below; **draft review, not complete acceptance**.
-The required real-browser workflow/screenshots and browser frame timings are blocked by
-this session's execution policy. Native Canvas evidence is explicitly not browser evidence.
+Status: implemented and browser-verified for the supported geometry below; **draft PM review**.
+Draft PR: https://github.com/achartt/bimcraft-SDH/pull/6. Real Chromium UI, save/reopen,
+Undo/Redo and export verification ran on GitHub Actions. PM acceptance and integration
+with the advanced main branch remain open.
 No merge, deployment, roadmap reconciliation, F03 changes or cross-chat messages.
 
 ## Ownership and starting point
@@ -15,9 +16,11 @@ No merge, deployment, roadmap reconciliation, F03 changes or cross-chat messages
 - Existing checkout was already at the approved SHA and branch. F01 `1c35f47` and
   F02 `e50de2d` ancestry verified. Existing untracked `evidence/f04/baseline-before.log`
   was preserved. No checkout reset/switched and no foreign preview stopped.
-- GitHub connector verified remote main still equals the approved SHA. Shell GitHub
-  DNS failed; tool-level escalation was requested and automatically rejected by the
-  granular approval policy. Publication uses the authorized GitHub connector.
+- Main has advanced to `91b907f4ba1edf7fe781eab44135f22ebc65fa0c` (F03 PR #5).
+  This branch preserves the assigned base. PR #6 has integration conflicts in
+  `.github/workflows/test.yml` and `package.json`; PM must preserve both F03/F04 stages
+  during integration. Feature-head CI is not merged-main validation. Publication uses
+  the authorized GitHub connector; shell network and local listening remain restricted.
 - Final commit and draft PR URL are recorded in the delivery/PR, avoiding a self-referential SHA.
 
 ## What changes and how to try
@@ -31,7 +34,7 @@ No merge, deployment, roadmap reconciliation, F03 changes or cross-chat messages
 4. Zoom into the straight wall or either curve. The cavity is blank at its real width;
    the magenta membrane is a boundary line and has no physical width. Openings cut
    both fills and boundaries. Try the straight L and T joins on the right.
-5. Edit **Material library → Studs**: change color, cut pattern/color and default
+5. Edit **Material library → Wood framing** (`material-studs`): change color, cut pattern/color and default
    thickness. Existing layer widths, wall/core anchors and reference dimensions stay
    unchanged. Undo/redo, save IFC and reopen.
 6. Export the plan PDF, and place its plan/callout on a sheet for vector PDF output.
@@ -50,12 +53,12 @@ preserves its effective detail on its plans. RCP detail is independently persist
 | --- | --- |
 | 1. Deterministic fixture | PASS. Byte-reproducible IFC, two custom cores, finishes, ventilated cavities, zero membranes; 9 walls, 5 hosted openings, signed curves, reversed axes, six location-line modes, straight L/T. `tests/features/f04/fixture.mjs`. |
 | 2. Authored widths/order | PASS for supported cases. Explicit offsets, exact curved vertices, chord error ≤0.002 mm, zero membrane fill area, true cavity width. Both exterior sides × six location modes tested. |
-| 3. Detail behavior | PASS in model/renderer tests. Medium and Fine share identical boundaries; Coarse leaves model data unchanged. UI controls implemented; real-browser interaction pending. |
+| 3. Detail behavior | PASS in model/renderer tests. Medium and Fine share identical boundaries; Coarse leaves model data unchanged. Actual Chromium coarse/medium/fine controls verified. |
 | 4. Openings/junctions | PASS for straight/isolated curved doors/windows and straight L/T. Opening height checks, no fill/boundary inside cut intervals; joined area conserved; fractional T perimeter checked independently. No wrapping/core-priority join rules. |
 | 5. Material edits | PASS. Color/pattern/default changes update shared primitives without resizing or changing identities, anchors, opening parameters or reference dimensions. Undo/redo/reopen/isolation verified. |
-| 6. Screen/PDF/sheets | PARTIAL acceptance. Production Canvas command parity test passes; native Canvas renders inspected. Actual vector PDF paths independently read at 1:50, 1:5, sheet 1:100 and 1:10; PDFs and enlarged/whole-plan PNGs inspected. Browser screenshots/workflow are blocked. |
+| 6. Screen/PDF/sheets | PASS for the fixture. Production Canvas parity, actual Chromium workflow/screenshots, downloaded plan/sheet PDFs, and independent vector readback. Existing enlarged exports checked at 1:5 and 1:10. See browser evidence below. |
 | 7. Persistence/contracts | PASS in automated/independent checks. View details and material styles persist; F02 tests retained. Three IFC files pass IfcOpenShell schema/EXPRESS and physical-data comparison. No model geometry/IFC layer semantics changed. |
-| 8. Impact | PARTIAL acceptance. Same fixture/machine Node scene/export timings and actual production draw() on native Skia measured before/after; browser frame timings blocked. No F03 instrumentation used or changed. |
+| 8. Impact | MEASURED. Same-machine browser paint CPU, frame intervals and PDF timings now recorded alongside Node/native Canvas measurements. Fine has a measurable cost; no broad performance certification. No F03 instrumentation changed. |
 
 Primary outputs under `evidence/f04/`:
 
@@ -106,13 +109,15 @@ python -I tests/features/f04/independent-pdf.py
 python -I tests/features/f04/independent-ifc.py
 ```
 
-Pass `evidence/f04` to either Python script to validate committed review exports.
+Pass `evidence/f04` to the PDF script to validate committed review exports. Run IFC validation against regenerated `.cc-test/f04`, because one published IFC artifact was omitted.
 Set `F04_EVIDENCE_DIR=evidence/f04` only when deliberately refreshing review evidence.
 Independent PDF requires `pypdf==6.10.0`; IFC requires the existing F01 pinned independent
 requirements. CI adds both checks after the baseline and IFC-reader setup. Native
 Canvas evidence is optional: `node tests/features/f04/canvas.mjs <canvas-module-path>`.
-The browser-review generator is retained as a reproducible renderer-only harness for a
-permitted host; it was **not** browser-verified in this session.
+The real browser harness is `tests/features/f04/browser.mjs`; CI setup and approved-base
+preparation are in `.github/workflows/f04-browser.yml`. The independent downloaded-PDF
+checker is `tests/features/f04/browser-pdf.py`. Use an isolated Python venv for pypdf.
+The older renderer-only generator is separate from this actual browser workflow.
 
 - Vendor integrity: **110 checked files**, 0 downloads needed, 0 failures.
 - Focused F04: **13 passed / 0 failed**. Now explicitly part of baseline, minimum 13.
@@ -164,14 +169,51 @@ readers may still display cavity envelopes; F04 changes drawing graphics, not 3D
 - Additive F04 baseline stage and independent CI stage; no F03 harness/fixtures/cache
   changes, no broad performance optimization and no roadmap status edits.
 
-## Required remaining review
+## Browser verification and remaining PM review
 
-Automatic approval rejected the local 8022 listener escalation; shell error was `EPERM`.
-Automated Chrome failed to launch. The browser tool then rejected `file://` URLs under
-its HTTP/HTTPS-only policy, so no further browser workaround was attempted. Run the six
-steps above on a permitted host and retain separate browser screenshots, console output,
-actual Save/reopen and undo/redo interaction, and before/after browser draw timings.
-Until then, F04 must remain a draft with acceptance 6/8 partially open.
+Chromium 141.0.7390.37, Playwright 1.56.1, Ubuntu GitHub runner, AMD EPYC 9V74,
+Node 22.23.4, 1680 x 1100 viewport, DPR 1, SwiftShader. Same fixture and machine for
+approved baseline and feature. Five warmups plus 30 samples. `draw()` is measured
+synchronously; requestAnimationFrame intervals are separate and are not GPU timings.
+
+The browser workflow passed at `81c81f620d20cda31be770842b7cf189608ad0ab` in
+[run 39808621154](https://github.com/achartt/bimcraft-SDH/actions/runs/39808621154).
+That run's separate PDF reader step failed because isolated Python could not import
+its user-installed dependency; `4844411` moves it into an explicit venv.
+The same downloaded PDFs subsequently passed local independent pypdf readback: total
+209.55 mm, cavity 25.4 mm, pre-door length 1000 mm (maximum error 0.000024445 mm),
+14 membrane stroke paths per PDF and no raster XObjects. Both style colors and all
+checked layer widths match. Reports are retained in `evidence/f04/browser-*.json`.
+The run's `f04-browser` artifact (12439911638) includes screenshots, actual downloaded
+PDFs and `report.json`. Screenshots of the whole plan, detailed layers, both curves,
+L/T junctions, material dialog, sheet and reopened file were visually inspected.
+Browser plan/sheet PDFs were independently rendered with Poppler and visually inspected.
+Whole-plan dimension labels remain small/overlapping in places; enlarged detail is
+needed for layer review. This is retained as a known annotation limitation.
+
+The browser test exposed a real integration defect: `makeScene` passed IfcPlacer to
+`readMaterials`, whose record reader requires ModelWriter. This silently suppressed
+live layers. The fix uses ModelWriter, and the browser now verifies material-driven
+layer rendering, Undo/Redo, actual file save/reopen, unchanged walls/types/openings/
+anchors/dimensions, and isolation from a second project. No unexpected browser errors;
+the inherited bootstrap-icons CSS MIME error is explicitly reported and allowlisted.
+DOM clicks reveal existing collapsed menus; inherited menu accessibility is not certified.
+
+| Operation | Approved coarse p50 / p95 ms | F04 coarse p50 / p95 ms | F04 fine p50 / p95 ms |
+| --- | ---: | ---: | ---: |
+| Browser synchronous paint CPU | 0.50 / 0.70 | 0.60 / 0.60 | 2.50 / 6.60 |
+| requestAnimationFrame interval | 16.70 / 50.00 | 16.70 / 33.30 | 16.70 / 183.40 |
+| Browser plan PDF generation | 1.60 / 2.40 | 1.80 / 2.50 | 54.60 / 73.70 |
+
+These are one small synthetic fixture run, not a production responsiveness guarantee.
+The high Fine interval p95 is retained, not hidden; PM should assess representative-model
+performance separately. Earlier scheduler-only timing attempts were invalid and discarded.
+
+Remaining review: judge supported-scope visual acceptance and performance; resolve the
+main integration conflicts in a separate approved integration checkout and rerun all
+F03/F04 gates on that integrated commit. Do not mark F04 merged/deployed from feature-head
+passes. Use `F04-PM-REVIEW.md` for the review prompt. Local listener escalation was
+rejected (`EPERM`); browser acceptance instead ran on the authorized CI runner.
 
 Publication note: local home/workspace paths in retained logs are redacted to `<F04_CHECKOUT>`, `<WORKSPACE>` or `<USER_HOME>`. Test results, warnings and skips are unchanged.
 
