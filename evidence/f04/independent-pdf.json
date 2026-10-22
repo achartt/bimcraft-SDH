@@ -1,0 +1,42 @@
+[
+  {
+    "file": "fine-plan.pdf",
+    "scale": 50,
+    "maxLayerWidthErrorMm": 2.8421709430404007e-13,
+    "totalMm": 209.5499999999999,
+    "cavityMm": 25.40000000000046,
+    "preDoorLengthMm": 999.9999931944444,
+    "membranePaths": 14,
+    "rasterImages": 0
+  },
+  {
+    "file": "fine-detail.pdf",
+    "scale": 5,
+    "maxLayerWidthErrorMm": 7.815970093361102e-14,
+    "totalMm": 209.54999999999998,
+    "cavityMm": 25.399999999999956,
+    "preDoorLengthMm": 1000.0000002500002,
+    "membranePaths": 14,
+    "rasterImages": 0
+  },
+  {
+    "file": "fine-sheet.pdf",
+    "scale": 100,
+    "maxLayerWidthErrorMm": 7.176481631177012e-13,
+    "totalMm": 209.5499999999999,
+    "cavityMm": 25.399999999998958,
+    "preDoorLengthMm": 999.9999755555555,
+    "membranePaths": 28,
+    "rasterImages": 0
+  },
+  {
+    "file": "fine-sheet.pdf",
+    "scale": 10,
+    "maxLayerWidthErrorMm": 1.2079226507921703e-13,
+    "totalMm": 209.5500000000001,
+    "cavityMm": 25.399999999999956,
+    "preDoorLengthMm": 1000.0000002499999,
+    "membranePaths": 28,
+    "rasterImages": 0
+  }
+]

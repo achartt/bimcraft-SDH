@@ -1,4 +1,5 @@
 /* SPDX-License-Identifier: Apache-2.0 */
+import { layerPrimitives, colorRgb } from './wall-plan-graphics.js';
 import { dimensionFootprint } from './dimension-geometry.js';
 /**
  * res-sheets.js — a print-ready drawing set made from the model (0.5 part 4, RC.5): plans of each level, the four exterior
@@ -62,7 +63,10 @@ function planItems(scene, P, k) {
     if (c.loops?.length) out.push({ t: 'fill', polys: c.loops.map((l) => { const pts = []; for (let i = 0; i + 1 < l.length; i += 2) pts.push(P([l[i], l[i + 1]])); return pts; }), g: 0.75 });
     seg(c.segs, 0.25, 0);
   }
-  for (const w of scene.walls || []) for (const p of w.pieces || [w.poly]) if (p?.length) out.push({ t: 'fill', polys: [p.map(P)], g: 0.55 });
+  for (const w of scene.walls || []) {
+    if (w.layers) for (const it of layerPrimitives(w)) out.push(it.t === 'fill' ? { ...it, polys: it.polys.map(p => p.map(P)) } : { ...it, pts: it.pts.map(P) });
+    else for (const p of w.pieces || [w.poly]) if (p?.length) out.push({ t: 'fill', polys: [p.map(P)], g: 0.55 });
+  }
   for (const p of scene.wallEdges || []) out.push({ t: 'line', pts: [...p.map(P), P(p[0])], w: 0.5, g: 0 });
   for (const s of scene.symbols || []) {
     for (const l of s.lines || []) seg(l, 0.35, 0);
@@ -332,11 +336,12 @@ function lit(s) {
   return '(' + out + ')';
 }
 const num = (v) => { const s = (Math.abs(v) < 5e-5 ? 0 : v).toFixed(3); return s.replace(/\.?0+$/, '') || '0'; };
+const coord = v => String(Number(v.toFixed(6)));
 function pageOps(items) {
   const ops = ['1 J 1 j'];
   for (const it of items) {
-    if (it.t === 'fill') { ops.push(num(it.g) + ' g'); for (const p of it.polys) { p.forEach((q, i) => ops.push(num(q[0] * PT) + ' ' + num(q[1] * PT) + (i ? ' l' : ' m'))); ops.push('h'); } ops.push('f*'); }
-    else if (it.t === 'line') { ops.push(num(it.w * PT) + ' w ' + num(it.g || 0) + ' G ' + (it.dash ? '[' + it.dash.map((d) => num(d * PT)).join(' ') + '] 0 d' : '[] 0 d')); it.pts.forEach((q, i) => ops.push(num(q[0] * PT) + ' ' + num(q[1] * PT) + (i ? ' l' : ' m'))); ops.push('S'); }
+    if (it.t === 'fill') { ops.push(it.color ? colorRgb(it.color).map(coord).join(' ') + ' rg' : num(it.g) + ' g'); for (const p of it.polys) { p.forEach((q, i) => ops.push(coord(q[0] * PT) + ' ' + coord(q[1] * PT) + (i ? ' l' : ' m'))); ops.push('h'); } ops.push('f*'); }
+    else if (it.t === 'line') { ops.push(num(it.w * PT) + ' w ' + (it.color ? colorRgb(it.color).map(coord).join(' ') + ' RG ' : num(it.g || 0) + ' G ') + (it.dash ? '[' + it.dash.map((d) => num(d * PT)).join(' ') + '] 0 d' : '[] 0 d')); it.pts.forEach((q, i) => ops.push(coord(q[0] * PT) + ' ' + coord(q[1] * PT) + (i ? ' l' : ' m'))); ops.push('S'); }
     else if (it.t === 'clip') { const [x0, y0, x1, y1] = it.rect; ops.push('q ' + [x0, y0, x1 - x0, y1 - y0].map((v) => num(v * PT)).join(' ') + ' re W n'); }   // i18n-ignore: PDF operators
     else if (it.t === 'unclip') ops.push('Q');
     else if (it.t === 'text') {
@@ -387,18 +392,18 @@ export function setPdf(sheets, { paper = 'tabloid', title = '', attach = null } 
 export function sheetSvg(s, { paper = 'tabloid' } = {}) {
   const [PW, PH] = PAPERS[paper] || PAPERS.tabloid;
   const esc = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  const Y = (y) => (PH - y).toFixed(2), X = (x) => x.toFixed(2);
+  const Y = (y) => coord(PH - y), X = coord;
   const grey = (g) => { const v = Math.round((g || 0) * 255); return 'rgb(' + v + ',' + v + ',' + v + ')'; };
   const out = [`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${PW} ${PH}" width="${PW}mm" height="${PH}mm"><rect width="${PW}" height="${PH}" fill="#fff"/>`];
   let clips = 0;
   for (const it of s.items) {
     if (it.t === 'clip') { const [x0, y0, x1, y1] = it.rect, id = 'cc-crop-' + (clips++); out.push(`<clipPath id="${id}"><rect x="${X(x0)}" y="${Y(y1)}" width="${(x1 - x0).toFixed(2)}" height="${(y1 - y0).toFixed(2)}"/></clipPath><g clip-path="url(#${id})">`); continue; }
     if (it.t === 'unclip') { out.push('</g>'); continue; }
-    if (it.t === 'fill') out.push(`<path fill-rule="evenodd" fill="${grey(it.g)}" d="${it.polys.map((p) => 'M' + p.map((q) => X(q[0]) + ',' + Y(q[1])).join('L') + 'Z').join('')}"/>`);
-    else if (it.t === 'line') out.push(`<polyline fill="none" stroke="${grey(it.g)}" stroke-width="${it.w}" stroke-linecap="round" stroke-linejoin="round"${it.dash ? ' stroke-dasharray="' + it.dash.join(' ') + '"' : ''} points="${it.pts.map((q) => X(q[0]) + ',' + Y(q[1])).join(' ')}"/>`);
+    if (it.t === 'fill') out.push(`<path fill-rule="evenodd" fill="${it.color || grey(it.g)}" d="${it.polys.map((p) => 'M' + p.map((q) => X(q[0]) + ',' + Y(q[1])).join('L') + 'Z').join('')}"/>`);
+    else if (it.t === 'line') out.push(`<polyline fill="none" stroke="${it.color || grey(it.g)}" stroke-width="${it.w}" stroke-linecap="round" stroke-linejoin="round"${it.dash ? ' stroke-dasharray="' + it.dash.join(' ') + '"' : ''} points="${it.pts.map((q) => X(q[0]) + ',' + Y(q[1])).join(' ')}"/>`);
     else if (it.t === 'text') {
       const anchor = it.align === 'left' ? 'start' : it.align === 'right' ? 'end' : 'middle', rot = -(it.rot || 0) * 180 / Math.PI;
-      out.push(`<text x="${X(it.x)}" y="${Y(it.y)}" font-family="Helvetica, Arial, sans-serif" font-size="${(it.size / PT).toFixed(2)}" font-weight="${it.bold ? 700 : 400}" fill="${grey(it.g)}" text-anchor="${anchor}"${rot ? ` transform="rotate(${rot.toFixed(2)} ${X(it.x)} ${Y(it.y)})"` : ''}>${esc(it.s)}</text>`);
+      out.push(`<text x="${X(it.x)}" y="${Y(it.y)}" font-family="Helvetica, Arial, sans-serif" font-size="${(it.size / PT).toFixed(2)}" font-weight="${it.bold ? 700 : 400}" fill="${it.color || grey(it.g)}" text-anchor="${anchor}"${rot ? ` transform="rotate(${rot.toFixed(2)} ${X(it.x)} ${Y(it.y)})"` : ''}>${esc(it.s)}</text>`);
     }
   }
   out.push('</svg>');

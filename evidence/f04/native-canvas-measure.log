@@ -1,0 +1,8 @@
+(node:19907) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file://<F04_CHECKOUT>/app/ifc/api.js is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to <F04_CHECKOUT>/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+{
+  before: { n: 30, p50Ms: 0.055625000000020464, p95Ms: 0.08116700000002197 },
+  after: { n: 30, p50Ms: 1.9514580000000024, p95Ms: 2.0477500000000077 }
+}
