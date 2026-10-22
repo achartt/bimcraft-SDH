@@ -158,3 +158,16 @@ test('enlarged crop stays composed on paper and does not invent a ground line at
  for(const i of sh.items.filter(i=>i.t==='text'))assert.ok(i.y>10&&i.y<287,'text off paper: '+i.s);
  assert.ok(sh.views.every(v=>v.box[0]>=10&&v.box[1]>=28&&v.box[2]<=410&&v.box[3]<=287));
 });
+test('stacked levels retain storey-relative opening heights and independent cut layers',async()=>{
+ const m=await model(),{addLevel}=await import('../../../app/model-levels.js'),{drawWalls,placeOpening}=await import('../../../app/model-ops.js');
+ m.change(op(w=>addLevel(w,{name:'Upper',elevation:3300,height:3000})));
+ const lv=readLevels(m.w())[1];m.change(drawWalls({storey:lv.guid,typeKey:'wall-f05-exterior',height:2800,segs:[{a:[0,0],b:[6000,0]}]}));
+ const wall=readWalls(m.w()).at(-1);m.change(placeOpening({wall:wall.guid,typeKey:'win-fixed',offset:2700,width:1400,sill:900,height:1000}));
+ const v=await view(m,{box:null}),c=faces(v).find(c=>c.guid===wall.guid);
+ assert.deepEqual(v.warnings,[]);assert.ok(c.layers);assert.deepEqual(ys(c),[[3300,4200],[5200,6100]]);
+});
+test('overall elevation note measures the wall envelope without adding thickness along its length',async()=>{
+ const {straightElevationWidth}=await import('../../../app/wall-section-graphics.js'),m=await model(),walls=sectionModel(m.w(),readLevels(m.w())[0].id).walls;
+ const b=straightElevationWidth(walls,[0,1]);near(b.x1-b.x0,6000);
+ const e=straightElevationWidth(walls,[1,0]);near(e.x1-e.x0,1982.5625);
+});

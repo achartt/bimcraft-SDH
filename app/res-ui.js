@@ -53,7 +53,7 @@ import { newHandoffId, putHandoff } from './handoff.js';
 import { loadTin, readTerrain, readPads, readHardscape, finishedSurface, existingSurface, placeTerrain, changeTerrain, removeTerrain, placePad, changePad, removePads, placeHardscape, changeHardscape, removeHardscape,
   parsePointText, drawingContours, thinToGrid, toModel, autoOffset, landXml, readLandXmlSurfaces, padShape, PAD_DEFAULTS, HARD_KINDS } from './res-terrain.js';
 import { modelTriangles, projectView, elevationDirs } from './res-views.js';
-import { sectionModel } from './wall-section-graphics.js';
+import { sectionModel, straightElevationWidth } from './wall-section-graphics.js';
 import { readProjectedView, projectedBox } from './projected-views.js';
 import { readMaterials } from './project-materials.js';
 import { buildSet, setPdf, sheetSvg, PAPERS, readSectionLines, placeSectionLine, changeSectionLine, removeSectionLines, sectionDir } from './res-sheets.js';
@@ -983,7 +983,7 @@ export function mountRes(modelUi) {
       const settings=readProjectedView(w,'elevation:'+side);
       const view = { ...projectView(els, { dir, box:projectedBox(settings), ...sectionModel(w,g.id,k) }), scale:settings.scale, grids: gridsInView(gAxes, dir) };
       if(settings.issue)view.warnings=[{reason:settings.issue}];
-      view.notes = noted(view, { kind: 'elevation', dir, base: g.elevation, openings: facts, width: widthOn(dir) });
+      view.notes = noted(view, { kind: 'elevation', dir, base: g.elevation, openings: facts, width: straightElevationWidth(sectionModel(w,g.id,k).walls,dir)||widthOn(dir) });
       input.elevations.push({ ref: side, title: t('res.sh.elev.' + side), view });
     }
     for (const sl of R.secs) {
@@ -994,7 +994,7 @@ export function mountRes(modelUi) {
       const M = viewerToPlan(C, w.storeyWorld(sl.storey));
       const { o, dir } = sectionDir(sl);
       const settings=readProjectedView(w,'section:'+sl.guid);
-      const view = { ...projectView(modelTriangles(model, M, { skip }), { dir, cut: { o }, far: sl.depth, ...sectionModel(w,sl.storey,k), materials:cutMaterials, detail:settings.detail, scale:settings.scale||50, box:projectedBox(settings) }), scale:settings.scale, grids: gridsInView(gridsOn(sl.storey), dir) };
+      const view = { ...projectView(modelTriangles(model, M, { skip }), { dir, cut: { o }, far: sl.depth, ...sectionModel(w,sl.storey,k), materials:cutMaterials, detail:settings.detail, scale:settings.scale||50, box:projectedBox(settings) }), scale:settings.scale, groundY:g.elevation-(levels.find(l=>l.id===sl.storey)?.elevation??g.elevation), grids: gridsInView(gridsOn(sl.storey), dir) };
       if(settings.issue)view.warnings.push({reason:settings.issue});
       view.notes = noted(view, { kind: 'section', dir, base: levels.find((l) => l.id === sl.storey)?.elevation || 0 });
       input.sections.push({ ref: sl.guid, title: t('res.sec.name', { name: sl.name }), view });

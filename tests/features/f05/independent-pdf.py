@@ -7,7 +7,7 @@ from pypdf.generic import ContentStream
 PT=72/25.4
 root=Path(sys.argv[1] if len(sys.argv)>1 else '.cc-test/f05')
 reports=[]
-for filename,ratio in [('normal.pdf',20),('detail.pdf',5)]:
+for filename,ratio,expected,totalExpected,expectedHeight in [('normal.pdf',20,[19.05,12.7,139.7,12.7],209.55,850),('detail.pdf',5,[19.05,12.7,139.7,12.7],209.55,450),('edited-sheet.pdf',20,[25.4,12.7,139.7,12.7],215.9,950)]:
  reader=PdfReader(root/filename);assert len(reader.pages)==1
  page=reader.pages[0];assert abs(float(page.mediabox.width)-420*PT)<.001
  assert not page.get('/Resources',{}).get('/XObject'),'drawing contains raster images'
@@ -28,18 +28,17 @@ for filename,ratio in [('normal.pdf',20),('detail.pdf',5)]:
    polys=[];poly=[]
   if op==b'n':polys=[];poly=[]
  # Four material bands, each with lower/upper spans on normal; one lower span on detail.
- count=2 if filename=='normal.pdf' else 1
+ count=1 if filename=='detail.pdf' else 2
  first=[fills[i*count][1] for i in range(4)]
- expected=[19.05,12.7,139.7,12.7];errors=[]
+ errors=[]
  for p,width in zip(first,expected):
   actual=(max(x for x,y in p)-min(x for x,y in p))/PT*ratio
   errors.append(abs(actual-width));assert errors[-1]<.005,(filename,actual,width)
  siding,sheath,stud,inner=first
  total=(max(x for x,y in inner)-min(x for x,y in siding))/PT*ratio
  cavity=(min(x for x,y in sheath)-max(x for x,y in siding))/PT*ratio
- assert abs(total-209.55)<.005 and abs(cavity-25.4)<.005
+ assert abs(total-totalExpected)<.005 and abs(cavity-25.4)<.005
  lowerHeight=(max(y for x,y in siding)-min(y for x,y in siding))/PT*ratio
- expectedHeight=850 if count==2 else 450
  assert abs(lowerHeight-expectedHeight)<.005,(filename,lowerHeight)
  assert membranes and all(max(x for x,y in p)-min(x for x,y in p)<1e-8 for p in membranes)
  reports.append(dict(file=filename,ratio=ratio,maxLayerErrorMm=max(errors),totalMm=total,cavityMm=cavity,lowerCutHeightMm=lowerHeight,membranePaths=len(membranes),rasterImages=0))

@@ -43,6 +43,7 @@ try{
  server=await start({port:8024,host:'127.0.0.1',offline:true});page=await context.newPage();
  page.on('console',m=>{if(['error','warning'].includes(m.type()))report.console.push({type:m.type(),text:m.text()});});page.on('pageerror',e=>report.console.push({type:'pageerror',text:e.stack||e.message}));
  await open(page,'http://127.0.0.1:8024',path.join(root,'fixtures/f05/wall-views.ifc'));const initial=await snapshot(page);
+ check('overall elevation note uses the actual 6000 mm wall length',initial.elevation.notes.some(n=>n.t==='dim'&&Math.abs(n.b[0]-n.a[0]-6000)<.005));
  check('live cut layers and visible-only elevation',initial.view.cuts.filter(c=>c.layers).length===2&&initial.elevation.cuts.every(c=>!c.layers));
  await settings(page,'coarse');check('coarse envelope',!(await snapshot(page)).view.cuts.some(c=>c.layers));report.coarse=await measure(page,'F05 coarse');
  await settings(page,'medium');check('medium has exact layers without hatch',(await snapshot(page)).view.cuts.filter(c=>c.layers).every(c=>c.layers.every(l=>!l.hatch.length)));
