@@ -30,7 +30,8 @@ async function open(p,url,file){
 async function detail(p,value){await click(p,'[data-pb-range]');await p.locator('[data-pv-detail]').selectOption(value);await p.locator('[data-pv-scale]').selectOption('100');await p.locator('[data-pv-ok]').click();await settled(p);await p.waitForFunction(d=>window.bimcraftPlan.view.scene.detail===d,value);}
 async function frame(p,bounds){await p.evaluate(b=>{const v=window.bimcraftPlan.view,c=v.canvas.getBoundingClientRect(),bar=document.querySelector('[data-modelbar]').getBoundingClientRect();v.padTop=Math.max(0,bar.bottom-c.top)+12;v.fit(b||undefined);v.render();},bounds);}
 async function snapshot(p){return p.evaluate(async()=>{
- const base='/assets/apps/bimcraft/dev/',ed=window.bimcraftLive.editor,w=ed.placer();
+ const base='/assets/apps/bimcraft/dev/',ed=window.bimcraftLive.editor;
+ const {ModelWriter}=await import(base+'model-write.js'),w=new ModelWriter(ed.W,ed.api,ed.mid);
  const [{readWalls,locationLine},{readAssemblies},{readWallDimensions,resolveDimension},{readOpenings},{readMaterials}]=await Promise.all(['model-walls.js','wall-assemblies.js','wall-dimensions.js','model-openings.js','project-materials.js'].map(f=>import(base+f)));
  const walls=readWalls(w),dims=readWallDimensions(w);
  return {geometry:{walls,types:readAssemblies(w),openings:readOpenings(w),dims,values:dims.map(d=>resolveDimension(d,walls).value),anchors:walls.map(locationLine)},materials:readMaterials(w),detail:window.bimcraftPlan.view.scene.detail,layers:window.bimcraftPlan.view.scene.walls.map(w=>w.layers||null)};
@@ -40,7 +41,7 @@ async function measure(p,label){
  return p.evaluate(async label=>{
   const v=window.bimcraftPlan.view,{planPdf}=await import('/assets/apps/bimcraft/dev/model-pdf.js');
   const paint=[],frameIntervals=[],pdf=[];let prev=null;
-  for(let i=0;i<35;i++){const now=await new Promise(requestAnimationFrame);if(i>=5&&prev!==null)frameIntervals.push(now-prev);prev=now;const t=performance.now();v.render();if(i>=5)paint.push(performance.now()-t);}
+  for(let i=0;i<35;i++){const now=await new Promise(requestAnimationFrame);if(i>=5&&prev!==null)frameIntervals.push(now-prev);prev=now;const t=performance.now();v.draw();if(i>=5)paint.push(performance.now()-t);}
   for(let i=0;i<35;i++){const t=performance.now();planPdf(v.scene,{paper:'a3',units:'mm',scale:100});if(i>=5)pdf.push(performance.now()-t);}
   const stats=a=>{a.sort((a,b)=>a-b);return {n:a.length,p50Ms:a[Math.floor(a.length*.5)],p95Ms:a[Math.ceil(a.length*.95)-1]};};
   return {label,viewport:[innerWidth,innerHeight],dpr:devicePixelRatio,paintCpu:stats(paint),frameIntervals:stats(frameIntervals),planPdf:stats(pdf)};
@@ -101,7 +102,7 @@ try{
  check('actual downloaded IFC reopens with fine detail, material edits and unchanged geometry',reopened.detail==='fine');
  await frame(page,{x0:4300,y0:-500,x1:6100,y1:700});await page.screenshot({path:path.join(out,'reopened.png')});
  const isolated=await context.newPage();await open(isolated,'http://127.0.0.1:8022',path.join(root,'fixtures/f04/layered-plans.ifc'));const clean=await snapshot(isolated);assert.deepEqual(clean.materials,initial.materials);check('second project retains original material styles and coarse detail',clean.detail==='coarse');await isolated.close();
- check('no uncaught browser exceptions',!report.console.some(x=>x.type==='pageerror'));
+ check('no unexpected browser errors',report.console.every(x=>x.type!=='pageerror'&&x.text.includes('/bootstrap-icons/current/bootstrap-icons.min.css')));
  report.status='PASS';
 }catch(e){report.status='FAIL';report.error=e.stack||String(e);console.error(e);if(page){await page.screenshot({path:path.join(out,'failure.png')}).catch(()=>{});fs.writeFileSync(path.join(out,'failure.html'),await page.content().catch(()=>''));}process.exitCode=1;}
 finally{saveReport();console.log(JSON.stringify(report,null,2));await browser?.close();await new Promise(r=>server?server.close(r):r());await new Promise(r=>baselineServer?baselineServer.close(r):r());}
