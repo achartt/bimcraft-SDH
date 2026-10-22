@@ -1,0 +1,10 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+import fs from 'node:fs';import path from 'node:path';
+const dir=process.argv[2]||'evidence/f03/reference',reports=[];
+for(const file of fs.readdirSync(dir).filter(x=>x.endsWith('.cpuprofile'))){const p=JSON.parse(fs.readFileSync(path.join(dir,file))),nodes=new Map(p.nodes.map(n=>[n.id,n])),parent=new Map(),self=new Map(),inclusive=new Map();for(const n of p.nodes)for(const child of n.children||[])parent.set(child,n.id);
+ const key=id=>{const f=nodes.get(id)?.callFrame;return f?`${f.functionName||'(anonymous)'} — ${(f.url||'native').split('/').slice(-2).join('/').replaceAll('%20',' ')}:${f.lineNumber+1}`:'unknown';};let total=0;
+ for(let i=0;i<(p.samples||[]).length;i++){const us=p.timeDeltas?.[i]||0;total+=us;const id=p.samples[i],k=key(id);self.set(k,(self.get(k)||0)+us);const seen=new Set();for(let j=id;j!=null;j=parent.get(j)){const k=key(j);if(!seen.has(k))inclusive.set(k,(inclusive.get(k)||0)+us);seen.add(k);}}
+ const top=m=>[...m].sort((a,b)=>b[1]-a[1]).slice(0,20).map(([function_,us])=>({function:function_,sampledMs:us/1000,percent:100*us/total}));reports.push({file,samples:p.samples?.length||0,sampledMs:total/1000,self:top(self),inclusive:top(inclusive)});
+}
+fs.writeFileSync(path.join(dir,'profiles.json'),JSON.stringify(reports,null,2)+'\n');
+fs.writeFileSync(path.join(dir,'profiles.md'),['# Sampled CPU profiles','','Separate ten-cycle type edit + plan scene + save + undo. Inspector start/stop overhead is retained and labeled; this is not an operation wall-clock measurement. Sampling is approximate; inclusive entries overlap and must not be summed. Browser profiles, if present, cover one UI type edit.','',''+reports.map(r=>`## ${r.file}\n\n${r.samples} samples; ${r.sampledMs.toFixed(2)} ms sampled.\n\n| Self function | ms | % |\n|---|---:|---:|\n${r.self.slice(0,10).map(f=>`| ${f.function} | ${f.sampledMs.toFixed(2)} | ${f.percent.toFixed(1)} |`).join('\n')}\n\n| Inclusive stack | ms | % |\n|---|---:|---:|\n${r.inclusive.slice(0,15).map(f=>`| ${f.function} | ${f.sampledMs.toFixed(2)} | ${f.percent.toFixed(1)} |`).join('\n')}`).join('\n\n'),''].join('\n'));

@@ -1,0 +1,25 @@
+Run 39692674669 / job 119542416367: setup failed before measurements.
+2026-10-21T23:19:41.7979024Z HEAD is now at a1e841e Merge 763ff8a873f6ec11384d39561d8d1cbb9dc841ab into 656d46236ff32b444cbd5a2b4ebe5164858c3848
+2026-10-21T23:24:05.1119340Z libraries: 0 fetched, 0 already here, 110 failed
+2026-10-21T23:24:05.1120994Z   delaunator/5.1.0/LICENSE: fetch failed
+2026-10-21T23:24:05.1122407Z   delaunator/5.1.0/package.json: fetch failed
+2026-10-21T23:24:05.1142193Z   delaunator/5.1.0/index.js: fetch failed
+2026-10-21T23:24:05.1143515Z   geotiff/3.0.5/LICENSE: fetch failed
+2026-10-21T23:24:05.1144027Z   geotiff/3.0.5/geotiff.esm.min.js: fetch failed
+2026-10-21T23:24:05.1144697Z   geotiff/3.0.5/SOURCE.txt: fetch failed
+2026-10-21T23:24:05.1145261Z   laz-perf/0.0.7/LICENSE: fetch failed
+2026-10-21T23:24:05.1145842Z   laz-perf/0.0.7/laz-perf.wasm: fetch failed
+2026-10-21T23:24:05.1146489Z   laz-perf/0.0.7/laz-perf.js: fetch failed
+2026-10-21T23:24:05.1147077Z   laz-perf/0.0.7/SOURCE.txt: fetch failed
+2026-10-21T23:24:05.1147689Z   manifold-3d/3.5.4/LICENSE: fetch failed
+2026-10-21T23:24:05.1148249Z   manifold-3d/3.5.4/manifold.js: fetch failed
+2026-10-21T23:24:05.1148833Z   manifold-3d/3.5.4/manifold.d.ts: fetch failed
+2026-10-21T23:24:05.1149278Z   manifold-3d/3.5.4/manifold-global-types.d.ts: fetch failed
+2026-10-21T23:24:05.1149784Z   manifold-3d/3.5.4/manifold-encapsulated-types.d.ts: fetch failed
+2026-10-21T23:24:05.1150257Z   manifold-3d/3.5.4/SOURCE.txt: fetch failed
+2026-10-21T23:24:05.1150649Z   manifold-3d/3.5.4/manifold.wasm: fetch failed
+2026-10-21T23:24:05.1151012Z   noble-ciphers/2.4.0/LICENSE: fetch failed
+2026-10-21T23:24:05.1151648Z   noble-ciphers/2.4.0/aes.js: fetch failed
+2026-10-21T23:24:05.1152006Z   noble-ciphers/2.4.0/_polyval.js: fetch failed
+2026-10-21T23:24:05.1257587Z ##[error]Process completed with exit code 1.
+2026-10-21T23:24:05.3133057Z ##[warning]No files were found with the provided path: .cc-test/f03-ci/

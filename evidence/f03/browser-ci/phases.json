@@ -1,0 +1,731 @@
+{
+  "notes": [
+    "Each value sums spans of the same name within one retained sample. Missing spans are not zero.",
+    "Phases overlap: load-total contains parse-worker-to-adopt and mesh-and-batch; model-edit-and-dependencies can contain ifc-serialize. Do not sum phase medians or subtract them to infer UI time.",
+    "parse-worker-to-adopt includes loader close/setup, worker startup (if cold), scheduling, parsing and transfer until AdoptModel entry. It is not pure parser CPU.",
+    "mesh-and-batch includes synchronous mesh extraction and its scene-batching callback. load-total also includes spatial metadata and final batch work.",
+    "plan-canvas-draw measures synchronous Canvas drawing calls; plan-render-request measures only rAF scheduling, not compositor presentation. Feedback totals include scheduling, UI/3D rebuild and two rAF paint opportunities; inspect the retained timeline for uninstrumented work."
+  ],
+  "phases": [
+    {
+      "key": "small/context-cold-open",
+      "phase": "parse-worker-to-adopt",
+      "n": 30,
+      "missing": 0,
+      "p50": 17.70000000001164,
+      "p95": 31.5
+    },
+    {
+      "key": "small/context-cold-open",
+      "phase": "mesh-and-batch",
+      "n": 30,
+      "missing": 0,
+      "p50": 19.60000000000582,
+      "p95": 23.5
+    },
+    {
+      "key": "small/context-cold-open",
+      "phase": "load-total",
+      "n": 30,
+      "missing": 0,
+      "p50": 40,
+      "p95": 53
+    },
+    {
+      "key": "small/warm-open",
+      "phase": "parse-worker-to-adopt",
+      "n": 30,
+      "missing": 0,
+      "p50": 1.1000000000058208,
+      "p95": 12.89999999999418
+    },
+    {
+      "key": "small/warm-open",
+      "phase": "mesh-and-batch",
+      "n": 30,
+      "missing": 0,
+      "p50": 2.900000000008731,
+      "p95": 3.8999999999941792
+    },
+    {
+      "key": "small/warm-open",
+      "phase": "load-total",
+      "n": 30,
+      "missing": 0,
+      "p50": 4.5,
+      "p95": 16.5
+    },
+    {
+      "key": "small/selection-properties-feedback",
+      "phase": "plan-render-request",
+      "n": 30,
+      "missing": 0,
+      "p50": 0,
+      "p95": 0
+    },
+    {
+      "key": "small/selection-properties-feedback",
+      "phase": "plan-canvas-draw",
+      "n": 30,
+      "missing": 0,
+      "p50": 0.39999999999417923,
+      "p95": 0.5
+    },
+    {
+      "key": "small/wall-edit-feedback",
+      "phase": "model-edit-and-dependencies",
+      "n": 30,
+      "missing": 0,
+      "p50": 3.6000000000058208,
+      "p95": 4.399999999994179
+    },
+    {
+      "key": "small/wall-edit-feedback",
+      "phase": "plan-render-request",
+      "n": 30,
+      "missing": 0,
+      "p50": 0,
+      "p95": 0.09999999997671694
+    },
+    {
+      "key": "small/wall-edit-feedback",
+      "phase": "plan-canvas-draw",
+      "n": 30,
+      "missing": 0,
+      "p50": 0.6999999999825377,
+      "p95": 0.8000000000465661
+    },
+    {
+      "key": "small/wall-edit-feedback",
+      "phase": "ifc-serialize",
+      "n": 30,
+      "missing": 0,
+      "p50": 2.3999999999941792,
+      "p95": 3
+    },
+    {
+      "key": "small/wall-edit-feedback",
+      "phase": "parse-worker-to-adopt",
+      "n": 30,
+      "missing": 0,
+      "p50": 1,
+      "p95": 2.6000000000058208
+    },
+    {
+      "key": "small/wall-edit-feedback",
+      "phase": "mesh-and-batch",
+      "n": 30,
+      "missing": 0,
+      "p50": 2.599999999976717,
+      "p95": 3.7000000000116415
+    },
+    {
+      "key": "small/wall-edit-feedback",
+      "phase": "load-total",
+      "n": 30,
+      "missing": 0,
+      "p50": 4.100000000005821,
+      "p95": 5.600000000005821
+    },
+    {
+      "key": "small/type-edit-feedback",
+      "phase": "model-edit-and-dependencies",
+      "n": 30,
+      "missing": 0,
+      "p50": 14,
+      "p95": 15.700000000011642
+    },
+    {
+      "key": "small/type-edit-feedback",
+      "phase": "plan-render-request",
+      "n": 30,
+      "missing": 0,
+      "p50": 0,
+      "p95": 0.10000000000582077
+    },
+    {
+      "key": "small/type-edit-feedback",
+      "phase": "plan-canvas-draw",
+      "n": 30,
+      "missing": 0,
+      "p50": 0.6999999999825377,
+      "p95": 1.2000000000116415
+    },
+    {
+      "key": "small/type-edit-feedback",
+      "phase": "ifc-serialize",
+      "n": 30,
+      "missing": 0,
+      "p50": 2.8999999999941792,
+      "p95": 3.8000000000174623
+    },
+    {
+      "key": "small/type-edit-feedback",
+      "phase": "parse-worker-to-adopt",
+      "n": 30,
+      "missing": 0,
+      "p50": 1.1000000000058208,
+      "p95": 2.5
+    },
+    {
+      "key": "small/type-edit-feedback",
+      "phase": "mesh-and-batch",
+      "n": 30,
+      "missing": 0,
+      "p50": 2.2000000000116415,
+      "p95": 2.8999999999941792
+    },
+    {
+      "key": "small/type-edit-feedback",
+      "phase": "load-total",
+      "n": 30,
+      "missing": 0,
+      "p50": 4,
+      "p95": 5.7999999999883585
+    },
+    {
+      "key": "small/roof-regeneration-feedback",
+      "phase": "model-edit-and-dependencies",
+      "n": 30,
+      "missing": 0,
+      "p50": 3.400000000023283,
+      "p95": 4.2000000000116415
+    },
+    {
+      "key": "small/roof-regeneration-feedback",
+      "phase": "plan-render-request",
+      "n": 30,
+      "missing": 0,
+      "p50": 0,
+      "p95": 0
+    },
+    {
+      "key": "small/roof-regeneration-feedback",
+      "phase": "plan-canvas-draw",
+      "n": 30,
+      "missing": 0,
+      "p50": 0.5999999999767169,
+      "p95": 0.7999999999883585
+    },
+    {
+      "key": "small/roof-regeneration-feedback",
+      "phase": "ifc-serialize",
+      "n": 30,
+      "missing": 0,
+      "p50": 2.1999999999825377,
+      "p95": 2.6999999999825377
+    },
+    {
+      "key": "small/roof-regeneration-feedback",
+      "phase": "parse-worker-to-adopt",
+      "n": 30,
+      "missing": 0,
+      "p50": 1.1000000000058208,
+      "p95": 2.6000000000058208
+    },
+    {
+      "key": "small/roof-regeneration-feedback",
+      "phase": "mesh-and-batch",
+      "n": 30,
+      "missing": 0,
+      "p50": 2.2999999999883585,
+      "p95": 2.8999999999941792
+    },
+    {
+      "key": "small/roof-regeneration-feedback",
+      "phase": "load-total",
+      "n": 30,
+      "missing": 0,
+      "p50": 4.100000000005821,
+      "p95": 5.5
+    },
+    {
+      "key": "small/save-generation",
+      "phase": "ifc-serialize",
+      "n": 30,
+      "missing": 0,
+      "p50": 1.2999999999883585,
+      "p95": 1.5
+    },
+    {
+      "key": "medium/context-cold-open",
+      "phase": "parse-worker-to-adopt",
+      "n": 30,
+      "missing": 0,
+      "p50": 19.60000000000582,
+      "p95": 31
+    },
+    {
+      "key": "medium/context-cold-open",
+      "phase": "mesh-and-batch",
+      "n": 30,
+      "missing": 0,
+      "p50": 29.099999999976717,
+      "p95": 31.099999999976717
+    },
+    {
+      "key": "medium/context-cold-open",
+      "phase": "load-total",
+      "n": 30,
+      "missing": 0,
+      "p50": 52.29999999998836,
+      "p95": 61.09999999997672
+    },
+    {
+      "key": "medium/warm-open",
+      "phase": "parse-worker-to-adopt",
+      "n": 30,
+      "missing": 0,
+      "p50": 1.900000000023283,
+      "p95": 12
+    },
+    {
+      "key": "medium/warm-open",
+      "phase": "mesh-and-batch",
+      "n": 30,
+      "missing": 0,
+      "p50": 4.7999999999883585,
+      "p95": 6.800000000046566
+    },
+    {
+      "key": "medium/warm-open",
+      "phase": "load-total",
+      "n": 30,
+      "missing": 0,
+      "p50": 9.599999999976717,
+      "p95": 18.79999999998836
+    },
+    {
+      "key": "medium/selection-properties-feedback",
+      "phase": "plan-render-request",
+      "n": 30,
+      "missing": 0,
+      "p50": 0,
+      "p95": 0
+    },
+    {
+      "key": "medium/selection-properties-feedback",
+      "phase": "plan-canvas-draw",
+      "n": 30,
+      "missing": 0,
+      "p50": 0.5,
+      "p95": 0.7000000000116415
+    },
+    {
+      "key": "medium/wall-edit-feedback",
+      "phase": "model-edit-and-dependencies",
+      "n": 30,
+      "missing": 0,
+      "p50": 6.100000000034925,
+      "p95": 8.5
+    },
+    {
+      "key": "medium/wall-edit-feedback",
+      "phase": "plan-render-request",
+      "n": 30,
+      "missing": 0,
+      "p50": 0,
+      "p95": 0
+    },
+    {
+      "key": "medium/wall-edit-feedback",
+      "phase": "plan-canvas-draw",
+      "n": 30,
+      "missing": 0,
+      "p50": 0.9999999999417923,
+      "p95": 1.2000000000116415
+    },
+    {
+      "key": "medium/wall-edit-feedback",
+      "phase": "ifc-serialize",
+      "n": 30,
+      "missing": 0,
+      "p50": 4,
+      "p95": 5.600000000034925
+    },
+    {
+      "key": "medium/wall-edit-feedback",
+      "phase": "parse-worker-to-adopt",
+      "n": 30,
+      "missing": 0,
+      "p50": 1.900000000023283,
+      "p95": 2.8999999999650754
+    },
+    {
+      "key": "medium/wall-edit-feedback",
+      "phase": "mesh-and-batch",
+      "n": 30,
+      "missing": 0,
+      "p50": 3.800000000046566,
+      "p95": 4.599999999976717
+    },
+    {
+      "key": "medium/wall-edit-feedback",
+      "phase": "load-total",
+      "n": 30,
+      "missing": 0,
+      "p50": 6.100000000034925,
+      "p95": 7.5
+    },
+    {
+      "key": "medium/type-edit-feedback",
+      "phase": "model-edit-and-dependencies",
+      "n": 30,
+      "missing": 0,
+      "p50": 40.59999999997672,
+      "p95": 53.70000000001164
+    },
+    {
+      "key": "medium/type-edit-feedback",
+      "phase": "plan-render-request",
+      "n": 30,
+      "missing": 0,
+      "p50": 0,
+      "p95": 0.09999999997671694
+    },
+    {
+      "key": "medium/type-edit-feedback",
+      "phase": "plan-canvas-draw",
+      "n": 30,
+      "missing": 0,
+      "p50": 1,
+      "p95": 1.2000000000116415
+    },
+    {
+      "key": "medium/type-edit-feedback",
+      "phase": "ifc-serialize",
+      "n": 30,
+      "missing": 0,
+      "p50": 6.2999999999883585,
+      "p95": 7.2000000000116415
+    },
+    {
+      "key": "medium/type-edit-feedback",
+      "phase": "parse-worker-to-adopt",
+      "n": 30,
+      "missing": 0,
+      "p50": 1.7999999999883585,
+      "p95": 2.2999999999883585
+    },
+    {
+      "key": "medium/type-edit-feedback",
+      "phase": "mesh-and-batch",
+      "n": 30,
+      "missing": 0,
+      "p50": 3.7000000000116415,
+      "p95": 4.2000000000116415
+    },
+    {
+      "key": "medium/type-edit-feedback",
+      "phase": "load-total",
+      "n": 30,
+      "missing": 0,
+      "p50": 5.900000000023283,
+      "p95": 6.900000000023283
+    },
+    {
+      "key": "medium/roof-regeneration-feedback",
+      "phase": "model-edit-and-dependencies",
+      "n": 30,
+      "missing": 0,
+      "p50": 6.5,
+      "p95": 7.5
+    },
+    {
+      "key": "medium/roof-regeneration-feedback",
+      "phase": "plan-render-request",
+      "n": 30,
+      "missing": 0,
+      "p50": 0,
+      "p95": 0.09999999997671694
+    },
+    {
+      "key": "medium/roof-regeneration-feedback",
+      "phase": "plan-canvas-draw",
+      "n": 30,
+      "missing": 0,
+      "p50": 0.9000000000232831,
+      "p95": 1.1000000000349246
+    },
+    {
+      "key": "medium/roof-regeneration-feedback",
+      "phase": "ifc-serialize",
+      "n": 30,
+      "missing": 0,
+      "p50": 3.900000000023283,
+      "p95": 5.100000000034925
+    },
+    {
+      "key": "medium/roof-regeneration-feedback",
+      "phase": "parse-worker-to-adopt",
+      "n": 30,
+      "missing": 0,
+      "p50": 1.8999999999650754,
+      "p95": 2.099999999976717
+    },
+    {
+      "key": "medium/roof-regeneration-feedback",
+      "phase": "mesh-and-batch",
+      "n": 30,
+      "missing": 0,
+      "p50": 3.7000000000116415,
+      "p95": 4.5
+    },
+    {
+      "key": "medium/roof-regeneration-feedback",
+      "phase": "load-total",
+      "n": 30,
+      "missing": 0,
+      "p50": 5.900000000023283,
+      "p95": 6.7999999999883585
+    },
+    {
+      "key": "medium/save-generation",
+      "phase": "ifc-serialize",
+      "n": 30,
+      "missing": 0,
+      "p50": 3,
+      "p95": 3.2000000000116415
+    },
+    {
+      "key": "large/context-cold-open",
+      "phase": "parse-worker-to-adopt",
+      "n": 30,
+      "missing": 0,
+      "p50": 22.600000000093132,
+      "p95": 30.099999999976717
+    },
+    {
+      "key": "large/context-cold-open",
+      "phase": "mesh-and-batch",
+      "n": 30,
+      "missing": 0,
+      "p50": 45.600000000034925,
+      "p95": 50.40000000002328
+    },
+    {
+      "key": "large/context-cold-open",
+      "phase": "load-total",
+      "n": 30,
+      "missing": 0,
+      "p50": 72.29999999993015,
+      "p95": 82
+    },
+    {
+      "key": "large/warm-open",
+      "phase": "parse-worker-to-adopt",
+      "n": 30,
+      "missing": 0,
+      "p50": 20.199999999953434,
+      "p95": 24.900000000023283
+    },
+    {
+      "key": "large/warm-open",
+      "phase": "mesh-and-batch",
+      "n": 30,
+      "missing": 0,
+      "p50": 10.29999999993015,
+      "p95": 14.400000000023283
+    },
+    {
+      "key": "large/warm-open",
+      "phase": "load-total",
+      "n": 30,
+      "missing": 0,
+      "p50": 31.599999999976717,
+      "p95": 37.70000000006985
+    },
+    {
+      "key": "large/selection-properties-feedback",
+      "phase": "plan-render-request",
+      "n": 30,
+      "missing": 0,
+      "p50": 0,
+      "p95": 0
+    },
+    {
+      "key": "large/selection-properties-feedback",
+      "phase": "plan-canvas-draw",
+      "n": 30,
+      "missing": 0,
+      "p50": 1.099999999976717,
+      "p95": 1.400000000023283
+    },
+    {
+      "key": "large/wall-edit-feedback",
+      "phase": "model-edit-and-dependencies",
+      "n": 30,
+      "missing": 0,
+      "p50": 21,
+      "p95": 22.5
+    },
+    {
+      "key": "large/wall-edit-feedback",
+      "phase": "plan-render-request",
+      "n": 30,
+      "missing": 0,
+      "p50": 0,
+      "p95": 0.09999999997671694
+    },
+    {
+      "key": "large/wall-edit-feedback",
+      "phase": "plan-canvas-draw",
+      "n": 30,
+      "missing": 0,
+      "p50": 2,
+      "p95": 2.200000000069849
+    },
+    {
+      "key": "large/wall-edit-feedback",
+      "phase": "ifc-serialize",
+      "n": 30,
+      "missing": 0,
+      "p50": 8.899999999906868,
+      "p95": 11.300000000046566
+    },
+    {
+      "key": "large/wall-edit-feedback",
+      "phase": "parse-worker-to-adopt",
+      "n": 30,
+      "missing": 0,
+      "p50": 3.5,
+      "p95": 3.699999999953434
+    },
+    {
+      "key": "large/wall-edit-feedback",
+      "phase": "mesh-and-batch",
+      "n": 30,
+      "missing": 0,
+      "p50": 8.800000000046566,
+      "p95": 11
+    },
+    {
+      "key": "large/wall-edit-feedback",
+      "phase": "load-total",
+      "n": 30,
+      "missing": 0,
+      "p50": 13.599999999976717,
+      "p95": 15.400000000023283
+    },
+    {
+      "key": "large/type-edit-feedback",
+      "phase": "model-edit-and-dependencies",
+      "n": 30,
+      "missing": 0,
+      "p50": 189.69999999995343,
+      "p95": 194
+    },
+    {
+      "key": "large/type-edit-feedback",
+      "phase": "plan-render-request",
+      "n": 30,
+      "missing": 0,
+      "p50": 0,
+      "p95": 0.09999999997671694
+    },
+    {
+      "key": "large/type-edit-feedback",
+      "phase": "plan-canvas-draw",
+      "n": 30,
+      "missing": 0,
+      "p50": 2,
+      "p95": 2.199999999953434
+    },
+    {
+      "key": "large/type-edit-feedback",
+      "phase": "ifc-serialize",
+      "n": 30,
+      "missing": 0,
+      "p50": 13.20000000006985,
+      "p95": 15.70000000006985
+    },
+    {
+      "key": "large/type-edit-feedback",
+      "phase": "parse-worker-to-adopt",
+      "n": 30,
+      "missing": 0,
+      "p50": 3.6000000000931323,
+      "p95": 7.700000000069849
+    },
+    {
+      "key": "large/type-edit-feedback",
+      "phase": "mesh-and-batch",
+      "n": 30,
+      "missing": 0,
+      "p50": 8.29999999993015,
+      "p95": 18
+    },
+    {
+      "key": "large/type-edit-feedback",
+      "phase": "load-total",
+      "n": 30,
+      "missing": 0,
+      "p50": 12.800000000046566,
+      "p95": 24.29999999993015
+    },
+    {
+      "key": "large/roof-regeneration-feedback",
+      "phase": "model-edit-and-dependencies",
+      "n": 30,
+      "missing": 0,
+      "p50": 29,
+      "p95": 32.199999999953434
+    },
+    {
+      "key": "large/roof-regeneration-feedback",
+      "phase": "plan-render-request",
+      "n": 30,
+      "missing": 0,
+      "p50": 0,
+      "p95": 0.09999999997671694
+    },
+    {
+      "key": "large/roof-regeneration-feedback",
+      "phase": "plan-canvas-draw",
+      "n": 30,
+      "missing": 0,
+      "p50": 1.900000000023283,
+      "p95": 2.099999999976717
+    },
+    {
+      "key": "large/roof-regeneration-feedback",
+      "phase": "ifc-serialize",
+      "n": 30,
+      "missing": 0,
+      "p50": 9.400000000023283,
+      "p95": 11.20000000006985
+    },
+    {
+      "key": "large/roof-regeneration-feedback",
+      "phase": "parse-worker-to-adopt",
+      "n": 30,
+      "missing": 0,
+      "p50": 3.5,
+      "p95": 4.300000000046566
+    },
+    {
+      "key": "large/roof-regeneration-feedback",
+      "phase": "mesh-and-batch",
+      "n": 30,
+      "missing": 0,
+      "p50": 8.5,
+      "p95": 11.5
+    },
+    {
+      "key": "large/roof-regeneration-feedback",
+      "phase": "load-total",
+      "n": 30,
+      "missing": 0,
+      "p50": 13.899999999906868,
+      "p95": 16.199999999953434
+    },
+    {
+      "key": "large/save-generation",
+      "phase": "ifc-serialize",
+      "n": 30,
+      "missing": 0,
+      "p50": 7.599999999976717,
+      "p95": 8.300000000046566
+    }
+  ]
+}
