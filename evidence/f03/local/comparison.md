@@ -33,4 +33,5 @@ Nearest-rank percentiles; n<30 is insufficient. Memory is observed, not peak all
 | model/large/pdf | 30 | 1.20 | 1.50 | 325.4 | n/a |  |
 
 Unmeasured groups: 30. Missing timings and memory are unverified, never zero or passing.
+Source errors: 0. Error-bearing runs cannot certify UX targets.
 Raw data and environment metadata: model-raw.json

@@ -15,6 +15,10 @@ node tests/features/f03/profile-report.mjs evidence/f03/local
 The ZIP retains all raw samples and the three original CPU profiles losslessly. Summary
 JSON, comparison tables, fixture hashes and actual PDFs are also directly committed.
 
+For the retained browser run, follow `evidence/f03/browser-ci/README.md` to unpack the
+three lossless bundles and regenerate comparison, phase, CPU and timeline summaries.
+Keep its Linux platform separate from the Apple model baseline.
+
 ## Setup and one model workflow
 
 ```sh
@@ -55,11 +59,13 @@ npm start -- --port 8018 --host 127.0.0.1 --offline
 In another terminal in the same checkout:
 
 ```sh
-npm install --prefix .cc-test/f03-browser --no-save playwright@1.62.1
+npm install --prefix .cc-test/f03-browser --no-save playwright@1.62.1 bootstrap-icons@1.13.2
 node .cc-test/f03-browser/node_modules/playwright/cli.js install chromium
 F03_PLAYWRIGHT="$PWD/.cc-test/f03-browser/node_modules/playwright" \
   npm run bench:f03:browser -- --url http://127.0.0.1:8018 --out evidence/f03/reproduction
 node tests/features/f03/profile-report.mjs evidence/f03/reproduction
+node tests/features/f03/phase-report.mjs evidence/f03/reproduction
+node tests/features/f03/trace-report.mjs evidence/f03/reproduction
 npm run report:f03 -- evidence/f03/reproduction
 ```
 
@@ -70,22 +76,39 @@ denied listener startup and Chromium launch; tool-level escalation was rejected 
 session's disabled sandbox-approval policy. Running these commands in an ordinary terminal
 or an authorized runner is required there. No local browser pass is implied by model data.
 
-`.github/workflows/f03-performance.yml` runs the browser workflow on a provisional
+`.github/workflows/f03-performance.yml` offers manual `workflow_dispatch` collection on a provisional
 Linux/headless GitHub runner and uploads `f03-browser-evidence`, including raw samples,
 profiles, DevTools traces, screenshots, saved IFC and actual UI-downloaded PDFs. It has
-no timing gates. Linux and Apple results must remain separate reference platforms.
+no timing gates. Full collection is opt-in; the normal Tests workflow runs the fast F03
+smoke on every PR. The reference was captured by the same job before switching its
+trigger from PR updates to manual collection, avoiding full reruns for evidence/docs edits.
+Its vendor cache uses the same manifest key as the normal test workflow;
+`fetch-vendor` still checks every cached file. Linux and Apple results remain separate.
+
+The packed shell omits Bootstrap Icons, which is not in the application vendor manifest.
+The harness serves the official `bootstrap-icons@1.13.2` npm package at that shell URL in
+its own page only, with the version checked against `devshell/edition/kit.json`. npm
+verifies package integrity on install. `F03_ICON_PACKAGE` can point to that installed
+package elsewhere. No production stylesheet, response, font or error policy is changed.
+This setup workaround is recorded in browser environment metadata; console/page errors
+still fail the run. Keep network/package installation and font readiness outside timing.
 
 Browser instrumentation is installed by the harness into its own page only. It wraps
 existing method prototypes, tracks load/worker-adoption, mesh/batch, serialization,
-model/dependency and canvas-render intervals, and records `F03` user-timing markers.
+model/dependency, canvas redraw scheduling and actual `PlanView.draw` intervals, and records `F03` user-timing markers.
 The app imports no F03 module and needs no production flag or new global hook.
+Span collection adds instrumentation overhead; it is retained, not estimated away.
+Playwright command/transport scheduling can affect gesture cadence. These are controlled
+regression references, not laboratory input-to-display measurements.
 
 Open uses the existing `bimcraftLive.open` adapter with prepared bytes, excluding file
 chooser/disk time. Selection and edit completion use trusted pointer/keyboard events;
 Properties height/type/roof fields run the ordinary UI handlers. Setup selection for edits
 uses the existing `bimcraftVis.pick` test hook. Browser save/PDF repeated samples call the
-same editor/generator functions; PDF scene preparation is excluded. An additional ordinary
-plan-print button click downloads the actual UI PDF for review. These access choices do
+same editor/generator functions. Repeated PDF samples use the controlled A3 scene from
+the model benchmark, with scene preparation excluded. The ordinary plan-print button
+separately downloads the actual UI PDF (default Letter, automatic room labels/dimensions)
+for review; that single download is not a p95 full drawing-set measurement. These access choices do
 not certify menu accessibility. INT-01 clipped Annotate menu, INT-02 short dimension labels
 and INT-03 external-reader cavity appearance remain inherited limits.
 
@@ -103,10 +126,13 @@ and INT-03 external-reader cavity appearance remain inherited limits.
 - Model edits: public transaction including contract checks and dependency regeneration.
   Preparation, expected-value checks, undo/redo and save/reopen are outside the timer.
 - Browser feedback: event capture before handler until rebuild/Properties completion plus
-  double rAF (paint opportunity). This is an observable UI/frame proxy, not a physical
+  double rAF (paint opportunity). An initial rAF yield lets the ordinary event handler run before the completion check.
+  This is an observable UI/frame proxy, not a physical
   display presentation timestamp or hardware input-to-photon latency.
 - Pan/zoom: maximum rAF interval per 12-step trusted-input gesture; every interval is
-  retained. p95 of gesture maxima is deliberately stricter than p95 of pooled frames.
+  retained. The plan is fit before each gesture, outside timing, so cumulative pans do
+  not move the fixture offscreen. The harness verifies wall selection and pan/zoom state
+  changes. p95 of gesture maxima is deliberately stricter than p95 of pooled frames.
 - Mesh generation: fresh model, native envelope tessellation and vertex/index retrieval;
   Node uses `manifold:false`. It is not browser CSG/GPU performance. Validate finite
   vertices and triangle records after timing.
@@ -115,7 +141,10 @@ and INT-03 external-reader cavity appearance remain inherited limits.
   previous sizes, correctness work and inspector. Do not interpret it as per-model size,
   peak memory or a leak. No forced GC.
 - Browser memory: CDP renderer used JS heap only; excludes GPU, worker and native memory.
-  Neither metric is peak allocation. Missing measurements remain null/unverified.
+  Browser save observations include its untimed save/reopen verification; PDF observations
+  include untimed scene preparation. Memory brackets are therefore not isolated allocation
+  costs for the timed function. Neither metric is peak allocation. Missing measurements
+  remain null/unverified.
 - p50/p95: nearest rank `sorted[ceil(p*n)-1]`; at n=30 p95 is the second-highest sample.
   This is a provisional tail estimate, not a tight confidence interval. n<30 is flagged
   insufficient; p95 > 2x median is flagged noisy. No outlier removal.
@@ -144,3 +173,18 @@ its execution-count gate. Put the real Poppler tools on PATH rather than reducin
 The inherited comforts full-file comparison can fail across a FILE_NAME second boundary
 with zero rewritten walls; report it if observed, without excluding model records or
 relaxing F02's 0.005 mm bound / 0.001 mm regeneration gate.
+
+## Evidence review notes
+
+Phase summaries report per-sample sums by span name. Load contains parsing and mesh
+batching; model transactions may include serialization. These spans overlap, so their
+medians must not be added or subtracted to infer UI cost. The trace reporter clips nested
+main-thread events to the `f03-input` / `f03-feedback` interval. Raw DevTools traces retain
+worker and background events. Full CPU captures also include automation/profiler setup;
+`(program)` and idle time are not attributed to a specific application function.
+
+The first browser run is preserved under `evidence/f03/exploratory`: all samples completed,
+but missing shell icons failed its console gate. Its canvas scheduling span and cumulative
+pan behavior were also corrected before collecting the reference. A second attempt had
+zero measurements because the upstream vendor host was unavailable; the workflow now
+reuses the existing verified CI cache. Do not combine those attempts with the reference.

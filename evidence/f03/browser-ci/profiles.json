@@ -1,0 +1,629 @@
+[
+  {
+    "file": "large-browser.cpuprofile",
+    "samples": 676,
+    "sampledMs": 799.647,
+    "self": [
+      {
+        "function": "(program) — native:0",
+        "sampledMs": 362.584,
+        "percent": 45.34300760210443
+      },
+      {
+        "function": "lineObject — ifc/api.js:151",
+        "sampledMs": 77.765,
+        "percent": 9.724916119237614
+      },
+      {
+        "function": "planLoops — dev/model-rooms.js:23",
+        "sampledMs": 53.198,
+        "percent": 6.652685497475761
+      },
+      {
+        "function": "readPset — dev/model-write.js:249",
+        "sampledMs": 27.749,
+        "percent": 3.4701562064260854
+      },
+      {
+        "function": "(idle) — native:0",
+        "sampledMs": 25.703,
+        "percent": 3.2142933069216792
+      },
+      {
+        "function": "(garbage collector) — native:0",
+        "sampledMs": 23.127,
+        "percent": 2.8921511617001
+      },
+      {
+        "function": "toApi — ifc/api.js:440",
+        "sampledMs": 18.15,
+        "percent": 2.269751527861669
+      },
+      {
+        "function": "ofType — ifc/model.js:117",
+        "sampledMs": 12.764,
+        "percent": 1.596204325158476
+      },
+      {
+        "function": "getProgramInfoLog — native:0",
+        "sampledMs": 10.878,
+        "percent": 1.36035025454982
+      },
+      {
+        "function": "encode — native:0",
+        "sampledMs": 8.819,
+        "percent": 1.1028616376976341
+      },
+      {
+        "function": "readWalls — dev/model-walls.js:311",
+        "sampledMs": 7.448,
+        "percent": 0.9314109850971741
+      },
+      {
+        "function": "close — native:0",
+        "sampledMs": 7.435,
+        "percent": 0.9297852677493944
+      },
+      {
+        "function": "typedApi — ifc/api.js:469",
+        "sampledMs": 6.474,
+        "percent": 0.8096072391942944
+      },
+      {
+        "function": "dropTree — dev/model-write.js:180",
+        "sampledMs": 6.438,
+        "percent": 0.8051052526927507
+      },
+      {
+        "function": "replaceChildren — native:0",
+        "sampledMs": 6.398,
+        "percent": 0.8001030454688132
+      },
+      {
+        "function": "a — ifc/geo-ctx.js:33",
+        "sampledMs": 5.362,
+        "percent": 0.6705458783688303
+      },
+      {
+        "function": "dir — ifc/geo-ctx.js:109",
+        "sampledMs": 5.319,
+        "percent": 0.6651685056030974
+      },
+      {
+        "function": "wallNodes — dev/model-walls.js:109",
+        "sampledMs": 5.307,
+        "percent": 0.6636678434359161
+      },
+      {
+        "function": "scrollIntoView — native:0",
+        "sampledMs": 4.305,
+        "percent": 0.5383625524762802
+      },
+      {
+        "function": "defs — dev/model-write.js:233",
+        "sampledMs": 4.275,
+        "percent": 0.534610897058327
+      }
+    ],
+    "inclusive": [
+      {
+        "function": "(root) — native:0",
+        "sampledMs": 799.647,
+        "percent": 100
+      },
+      {
+        "function": "(program) — native:0",
+        "sampledMs": 362.584,
+        "percent": 45.34300760210443
+      },
+      {
+        "function": "submit — dev/wall-assemblies-ui.js:97",
+        "sampledMs": 256.506,
+        "percent": 32.07740415458321
+      },
+      {
+        "function": "button.data-assembly-save — dev/wall-assemblies-ui.js:37",
+        "sampledMs": 256.506,
+        "percent": 32.07740415458321
+      },
+      {
+        "function": "apply — dev/model-ui.js:942",
+        "sampledMs": 256.475,
+        "percent": 32.07352744398466
+      },
+      {
+        "function": "commit — dev/model-ui.js:938",
+        "sampledMs": 256.475,
+        "percent": 32.07352744398466
+      },
+      {
+        "function": "obj.<computed> — native:12",
+        "sampledMs": 234.639,
+        "percent": 29.342822520437142
+      },
+      {
+        "function": "A.commit.label — dev/wall-assemblies-ui.js:103",
+        "sampledMs": 200.665,
+        "percent": 25.094197814785772
+      },
+      {
+        "function": "modelChange — dev/ifc-edit.js:178",
+        "sampledMs": 200.665,
+        "percent": 25.094197814785772
+      },
+      {
+        "function": "(anonymous) — dev/model-ops.js:32",
+        "sampledMs": 193.23,
+        "percent": 24.16441254703638
+      },
+      {
+        "function": "run — dev/model-write.js:51",
+        "sampledMs": 193.23,
+        "percent": 24.16441254703638
+      },
+      {
+        "function": "(anonymous) — dev/model-ops.js:30",
+        "sampledMs": 193.23,
+        "percent": 24.16441254703638
+      },
+      {
+        "function": "(anonymous) — dev/model-ops.js:65",
+        "sampledMs": 188.981,
+        "percent": 23.633053084673612
+      },
+      {
+        "function": "readWalls — dev/model-walls.js:311",
+        "sampledMs": 139.818,
+        "percent": 17.48496524091255
+      },
+      {
+        "function": "updateWall — dev/model-walls.js:424",
+        "sampledMs": 129.052,
+        "percent": 16.138621166589758
+      },
+      {
+        "function": "lineObject — ifc/api.js:151",
+        "sampledMs": 110.924,
+        "percent": 13.871620852701254
+      },
+      {
+        "function": "readPset — dev/model-write.js:249",
+        "sampledMs": 107.822,
+        "percent": 13.483699682484897
+      },
+      {
+        "function": "rebuildNow — dev/bimcraft.js:3801",
+        "sampledMs": 92.904,
+        "percent": 11.618126498317382
+      },
+      {
+        "function": "planLoops — dev/model-rooms.js:23",
+        "sampledMs": 61.705,
+        "percent": 7.716529918826683
+      },
+      {
+        "function": "rebuilt — dev/model-ui.js:1340",
+        "sampledMs": 58.807,
+        "percent": 7.354120005452406
+      }
+    ]
+  },
+  {
+    "file": "medium-browser.cpuprofile",
+    "samples": 382,
+    "sampledMs": 462.556,
+    "self": [
+      {
+        "function": "(program) — native:0",
+        "sampledMs": 300.609,
+        "percent": 64.9886716419201
+      },
+      {
+        "function": "(idle) — native:0",
+        "sampledMs": 30.349,
+        "percent": 6.561151514627418
+      },
+      {
+        "function": "getProgramInfoLog — native:0",
+        "sampledMs": 13.707,
+        "percent": 2.963316874064978
+      },
+      {
+        "function": "lineObject — ifc/api.js:151",
+        "sampledMs": 9.187,
+        "percent": 1.9861378946549175
+      },
+      {
+        "function": "ofType — ifc/model.js:117",
+        "sampledMs": 8.408,
+        "percent": 1.8177258537344667
+      },
+      {
+        "function": "(garbage collector) — native:0",
+        "sampledMs": 8.37,
+        "percent": 1.809510632226152
+      },
+      {
+        "function": "close — native:0",
+        "sampledMs": 6.383,
+        "percent": 1.3799410233571718
+      },
+      {
+        "function": "planLoops — dev/model-rooms.js:23",
+        "sampledMs": 5.307,
+        "percent": 1.1473205406480513
+      },
+      {
+        "function": "readPset — dev/model-write.js:249",
+        "sampledMs": 4.25,
+        "percent": 0.9188076686930879
+      },
+      {
+        "function": "replaceChildren — native:0",
+        "sampledMs": 3.557,
+        "percent": 0.7689879711861916
+      },
+      {
+        "function": "encode — native:0",
+        "sampledMs": 3.221,
+        "percent": 0.6963481178495144
+      },
+      {
+        "function": "scrollIntoView — native:0",
+        "sampledMs": 3.201,
+        "percent": 0.6920243170556646
+      },
+      {
+        "function": "inPoly — dev/model-rooms.js:142",
+        "sampledMs": 3.199,
+        "percent": 0.6915919369762796
+      },
+      {
+        "function": "wallNodes — dev/model-walls.js:109",
+        "sampledMs": 3.176,
+        "percent": 0.6866195660633523
+      },
+      {
+        "function": "put — ifc/model.js:235",
+        "sampledMs": 2.327,
+        "percent": 0.5030742223644272
+      },
+      {
+        "function": "querySelector — native:0",
+        "sampledMs": 2.148,
+        "percent": 0.46437620525947126
+      },
+      {
+        "function": "placement — ifc/geo-ctx.js:177",
+        "sampledMs": 2.126,
+        "percent": 0.4596200243862365
+      },
+      {
+        "function": "(anonymous) — dev/wall-assemblies.js:16",
+        "sampledMs": 2.125,
+        "percent": 0.45940383434654397
+      },
+      {
+        "function": "a — ifc/geo-ctx.js:33",
+        "sampledMs": 2.125,
+        "percent": 0.45940383434654397
+      },
+      {
+        "function": "relMatrix — dev/model-write.js:92",
+        "sampledMs": 2.123,
+        "percent": 0.458971454267159
+      }
+    ],
+    "inclusive": [
+      {
+        "function": "(root) — native:0",
+        "sampledMs": 462.556,
+        "percent": 100
+      },
+      {
+        "function": "(program) — native:0",
+        "sampledMs": 300.609,
+        "percent": 64.9886716419201
+      },
+      {
+        "function": "obj.<computed> — native:12",
+        "sampledMs": 56.819,
+        "percent": 12.283701865287663
+      },
+      {
+        "function": "apply — dev/model-ui.js:942",
+        "sampledMs": 55.893,
+        "percent": 12.083509888532415
+      },
+      {
+        "function": "commit — dev/model-ui.js:938",
+        "sampledMs": 55.893,
+        "percent": 12.083509888532415
+      },
+      {
+        "function": "submit — dev/wall-assemblies-ui.js:97",
+        "sampledMs": 55.893,
+        "percent": 12.083509888532415
+      },
+      {
+        "function": "button.data-assembly-save — dev/wall-assemblies-ui.js:37",
+        "sampledMs": 55.893,
+        "percent": 12.083509888532415
+      },
+      {
+        "function": "A.commit.label — dev/wall-assemblies-ui.js:103",
+        "sampledMs": 40.003,
+        "percent": 8.64825015781873
+      },
+      {
+        "function": "modelChange — dev/ifc-edit.js:178",
+        "sampledMs": 40.003,
+        "percent": 8.64825015781873
+      },
+      {
+        "function": "rebuildNow — dev/bimcraft.js:3801",
+        "sampledMs": 36.714,
+        "percent": 7.937201117270125
+      },
+      {
+        "function": "run — dev/model-write.js:51",
+        "sampledMs": 33.62,
+        "percent": 7.268309134461557
+      },
+      {
+        "function": "(anonymous) — dev/model-ops.js:30",
+        "sampledMs": 33.62,
+        "percent": 7.268309134461557
+      },
+      {
+        "function": "(anonymous) — dev/model-ops.js:65",
+        "sampledMs": 32.557,
+        "percent": 7.038499122268439
+      },
+      {
+        "function": "(anonymous) — dev/model-ops.js:32",
+        "sampledMs": 32.557,
+        "percent": 7.038499122268439
+      },
+      {
+        "function": "(idle) — native:0",
+        "sampledMs": 30.349,
+        "percent": 6.561151514627418
+      },
+      {
+        "function": "readWalls — dev/model-walls.js:311",
+        "sampledMs": 26.154,
+        "percent": 5.654234298117417
+      },
+      {
+        "function": "rebuilt — dev/model-ui.js:1340",
+        "sampledMs": 21.233,
+        "percent": 4.590363112790667
+      },
+      {
+        "function": "updateWall — dev/model-walls.js:424",
+        "sampledMs": 19.158,
+        "percent": 4.141768780428748
+      },
+      {
+        "function": "setProgram — 0.186.1/three.module.js:18407",
+        "sampledMs": 18.098,
+        "percent": 3.9126073383547073
+      },
+      {
+        "function": "WebGLRenderer.renderBufferDirect — 0.186.1/three.module.js:17233",
+        "sampledMs": 18.098,
+        "percent": 3.9126073383547073
+      }
+    ]
+  },
+  {
+    "file": "small-browser.cpuprofile",
+    "samples": 373,
+    "sampledMs": 461.955,
+    "self": [
+      {
+        "function": "(program) — native:0",
+        "sampledMs": 346.396,
+        "percent": 74.98479289108246
+      },
+      {
+        "function": "(idle) — native:0",
+        "sampledMs": 26.479,
+        "percent": 5.7319435875788765
+      },
+      {
+        "function": "getProgramInfoLog — native:0",
+        "sampledMs": 23.001,
+        "percent": 4.979056401597558
+      },
+      {
+        "function": "close — native:0",
+        "sampledMs": 5.314,
+        "percent": 1.150328495199749
+      },
+      {
+        "function": "lineObject — ifc/api.js:151",
+        "sampledMs": 5.307,
+        "percent": 1.1488131960905283
+      },
+      {
+        "function": "(garbage collector) — native:0",
+        "sampledMs": 5.207,
+        "percent": 1.1271660659588054
+      },
+      {
+        "function": "replaceChildren — native:0",
+        "sampledMs": 4.502,
+        "percent": 0.9745537985301599
+      },
+      {
+        "function": "encode — native:0",
+        "sampledMs": 3.218,
+        "percent": 0.6966046476388393
+      },
+      {
+        "function": "ofType — ifc/model.js:117",
+        "sampledMs": 3.187,
+        "percent": 0.6898940372980052
+      },
+      {
+        "function": "scrollIntoView — native:0",
+        "sampledMs": 2.138,
+        "percent": 0.46281564221623317
+      },
+      {
+        "function": "WriteLine — ifc/api.js:195",
+        "sampledMs": 2.123,
+        "percent": 0.4595685726964748
+      },
+      {
+        "function": "(anonymous) — native:0",
+        "sampledMs": 1.623,
+        "percent": 0.3513329220378608
+      },
+      {
+        "function": "t — dev/i18n.js:100",
+        "sampledMs": 1.55,
+        "percent": 0.33553051704170317
+      },
+      {
+        "function": "viewport — js/app-phone.js:369",
+        "sampledMs": 1.188,
+        "percent": 0.2571679059648667
+      },
+      {
+        "function": "querySelector — native:0",
+        "sampledMs": 1.091,
+        "percent": 0.2361701897370956
+      },
+      {
+        "function": "storeyOf — dev/ifc-place.js:142",
+        "sampledMs": 1.086,
+        "percent": 0.23508783323050947
+      },
+      {
+        "function": "place — dev/coords-ui.js:170",
+        "sampledMs": 1.077,
+        "percent": 0.2331395915186544
+      },
+      {
+        "function": "wasm-function[631] — 3.5.4/manifold.wasm:1",
+        "sampledMs": 1.076,
+        "percent": 0.2329231202173372
+      },
+      {
+        "function": "el — dev/ui-util.js:8",
+        "sampledMs": 1.074,
+        "percent": 0.23249017761470273
+      },
+      {
+        "function": "ex — dev/family-starters.js:23",
+        "sampledMs": 1.071,
+        "percent": 0.23184076371075105
+      }
+    ],
+    "inclusive": [
+      {
+        "function": "(root) — native:0",
+        "sampledMs": 461.955,
+        "percent": 100
+      },
+      {
+        "function": "(program) — native:0",
+        "sampledMs": 346.396,
+        "percent": 74.98479289108246
+      },
+      {
+        "function": "setProgram — 0.186.1/three.module.js:18407",
+        "sampledMs": 28.114,
+        "percent": 6.0858741652325445
+      },
+      {
+        "function": "WebGLRenderer.renderBufferDirect — 0.186.1/three.module.js:17233",
+        "sampledMs": 28.114,
+        "percent": 6.0858741652325445
+      },
+      {
+        "function": "renderObject — 0.186.1/three.module.js:18192",
+        "sampledMs": 28.114,
+        "percent": 6.0858741652325445
+      },
+      {
+        "function": "renderObjects — 0.186.1/three.module.js:18165",
+        "sampledMs": 28.114,
+        "percent": 6.0858741652325445
+      },
+      {
+        "function": "renderScene — 0.186.1/three.module.js:18015",
+        "sampledMs": 28.114,
+        "percent": 6.0858741652325445
+      },
+      {
+        "function": "WebGLRenderer.render — 0.186.1/three.module.js:17674",
+        "sampledMs": 28.114,
+        "percent": 6.0858741652325445
+      },
+      {
+        "function": "(anonymous) — dev/viewer3d.js:162",
+        "sampledMs": 28.114,
+        "percent": 6.0858741652325445
+      },
+      {
+        "function": "(idle) — native:0",
+        "sampledMs": 26.479,
+        "percent": 5.7319435875788765
+      },
+      {
+        "function": "onFirstUse — 0.186.1/three.module.js:7022",
+        "sampledMs": 24.665,
+        "percent": 5.339264646989426
+      },
+      {
+        "function": "getProgramInfoLog — native:0",
+        "sampledMs": 23.001,
+        "percent": 4.979056401597558
+      },
+      {
+        "function": "rebuildNow — dev/bimcraft.js:3801",
+        "sampledMs": 22.403,
+        "percent": 4.849606563409856
+      },
+      {
+        "function": "obj.<computed> — native:12",
+        "sampledMs": 22.319,
+        "percent": 4.831422974099209
+      },
+      {
+        "function": "apply — dev/model-ui.js:942",
+        "sampledMs": 22.104,
+        "percent": 4.7848816443160045
+      },
+      {
+        "function": "commit — dev/model-ui.js:938",
+        "sampledMs": 22.104,
+        "percent": 4.7848816443160045
+      },
+      {
+        "function": "submit — dev/wall-assemblies-ui.js:97",
+        "sampledMs": 22.104,
+        "percent": 4.7848816443160045
+      },
+      {
+        "function": "button.data-assembly-save — dev/wall-assemblies-ui.js:37",
+        "sampledMs": 22.104,
+        "percent": 4.7848816443160045
+      },
+      {
+        "function": "A.commit.label — dev/wall-assemblies-ui.js:103",
+        "sampledMs": 14.649,
+        "percent": 3.171088092996071
+      },
+      {
+        "function": "modelChange — dev/ifc-edit.js:178",
+        "sampledMs": 14.649,
+        "percent": 3.171088092996071
+      }
+    ]
+  }
+]
