@@ -1,0 +1,66 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+// Read-only project documentation. No meshes, rounded labels, or material defaults enter totals.
+import { ids, val } from './ifc-util.js';
+import { readAssemblyRecords } from './wall-assemblies.js';
+import { readMaterials } from './project-materials.js';
+import { wallType, typeName } from './model-walls.js';
+import { fmtLen } from './model-units.js';
+const order=(a,b)=>String(a).localeCompare(String(b),'en');
+const text=v=>typeof v==='string'?v:JSON.stringify(v)??'';
+const display=n=>fmtLen(n,'mm');
+export const ASSEMBLY_NOTE='All authored wall types, including unused types. Layers: exterior to interior. Nominal dimensions in mm; not a quantity takeoff.';
+export const MATERIAL_NOTE='All project materials, including unused entries. Separate IDs remain separate. Air cavities are blank; membranes use a line symbol, with no implied width or volume.';
+export function assemblySchedules(w) {
+ const records=readAssemblyRecords(w), types=[...records], used=new Set();
+ // The existing IFC type key identifies authored starters. Tool presets alone are not authored records.
+ for(const id of ids(w.api,w.mid,'IFCWALL')) {const key=w.readPset(id,'CadCraft_Wall')?.TypeKey;if(key)used.add(key);}
+ for(const id of ids(w.api,w.mid,'IFCWALLTYPE')) {
+  if(records.some(r=>r.id===id))continue;
+  const line=w.api.GetLine(w.mid,id,false),sets=(line.HasPropertySets||[]).map(h=>w.api.GetLine(w.mid,h.value,false)).filter(p=>val(p?.Name)==='CadCraft_WallType');
+  if(!sets.length)continue;
+  const key=sets[0].HasProperties.map(h=>w.api.GetLine(w.mid,h.value,false)).find(p=>val(p.Name)==='Key')?.NominalValue?.value;
+  const t=wallType(key);
+  types.push(t?{...t,id,guid:val(line.GlobalId),name:val(line.Name)||typeName(t)}:{id,guid:val(line.GlobalId),key,issue:'unavailable',message:'Authored type has no supported assembly definition.'});
+ }
+ for(const key of used)if(!types.some(r=>r.key===key))types.push({key,issue:'missing-type',message:'Wall references a missing authored type.'});
+ types.sort((a,b)=>order(a.key,b.key)||order(a.guid,b.guid)||a.id-b.id);
+ let materials=[],libraryIssue='';try{materials=readMaterials(w);}catch(e){libraryIssue=e.message;}
+ const byId=new Map(materials.map(m=>[m.id,m])), refs=new Map(), cavities=new Set();
+ const assembly={title:'Wall assembly schedule',head:['#','Material','Material ID','Function','Core','Nominal (mm)','Designation'],rows:[],rowInfo:[],note:ASSEMBLY_NOTE,total:null,
+  csvHead:['record_kind','type_key','type_guid','assembly_name','usage','layer_exterior_to_interior','material_id','material_name','function','core','nominal_thickness_mm','cavity_ventilation','membrane','total_thickness_mm','core_thickness_mm','status','raw_record'],csvRows:[]};
+ const add=(cells,info={})=>{assembly.rows.push(cells);assembly.rowInfo.push(info);};
+ for(const r of types) {
+  const usage=used.has(r.key)?'Used':'Unused', identity=[r.key,r.guid].filter(Boolean).join(' / ');
+  if(r.issue){
+   add([`${r.key || '(missing key)'} / ${r.guid || '(missing GlobalId)'}: ${r.issue}. ${r.message}`],{group:true,issue:r.issue});
+   let raw;try{raw=JSON.parse(r.raw);}catch{/* Unparseable record is still represented in full in CSV. */}
+   const rawLayers=Array.isArray(raw?.layers)?raw.layers:[];
+   for(const [i,l]of rawLayers.entries())add([String(i+1),text(l?.mat),text(l?.materialId),text(l?.function),'Unverified','Unavailable','Unverified record'],{issue:r.issue});
+   assembly.csvRows.push(['diagnostic',r.key,r.guid,raw?.name,usage,'','','','','','','','','','',r.issue,r.raw||'']);continue;
+  }
+  const total=r.layers.reduce((s,l)=>s+l.t,0),core=r.layers.filter(l=>l.core).reduce((s,l)=>s+l.t,0);
+  add([`${r.name} | ${identity} | ${usage} | Total ${display(total)} mm; core ${display(core)} mm`],{group:true});
+  for(const [i,l]of r.layers.entries()) {
+   const cavity=l.kind==='cavity',m=cavity?null:byId.get(l.materialId),membrane=l.function==='membrane',status=cavity?'ok':m?'ok':libraryIssue?'unavailable-library':'missing-material';
+   const name=cavity?'Air cavity':m?.name||`Missing material (${l.materialId})`;
+   const designation=cavity?`Air cavity; ${l.ventilation}`:membrane?(l.t===0?'Membrane; zero nominal thickness':'Membrane; nominal thickness'):'Material';
+   const swatch=cavity?{kind:'cavity'}:m?{kind:membrane?'membrane':'material',...m}:{kind:'missing'};
+   add([String(i+1),name,cavity?'(no solid material)':l.materialId,l.function,l.core?'Core':'Non-core',display(l.t),designation+(status==='ok'?'':'; '+status)],{swatch,status});
+   assembly.csvRows.push(['layer',r.key,r.guid,r.name,usage,i+1,cavity?'':l.materialId,name,l.function,l.core,l.t,cavity?l.ventilation:'',membrane,'','',status,'']);
+   if(cavity)cavities.add(l.ventilation);else {if(!refs.has(l.materialId))refs.set(l.materialId,new Set());refs.get(l.materialId).add(membrane?'membrane':'material');}
+  }
+  assembly.csvRows.push(['assembly-summary',r.key,r.guid,r.name,usage,'','','','','','','','',total,core,'ok','']);
+ }
+ if(!types.length)add(['No authored wall types.'],{group:true});
+ const legend={title:'Project material legend',head:['Symbol','Material','Stable material ID','Use / status','Color / pattern'],rows:[],rowInfo:[],note:MATERIAL_NOTE,total:null,
+  csvHead:['material_id','material_name','symbol_kind','usage','color','pattern','pattern_color','status'],csvRows:[]};
+ const entry=(m,kind,usage,status='ok')=>{
+  legend.rows.push(['',m.name,m.id,usage+(status==='ok'?'':'; '+status),kind==='material'?`${m.color} / ${m.fill} / ${m.fillColor}`:kind==='membrane'?`${m.color} / membrane line`:'Unavailable']);
+  legend.rowInfo.push({swatch:{...m,kind},status});legend.csvRows.push([m.id,m.name,kind,usage,m.color||'',m.fill||'',m.fillColor||'',status]);
+ };
+ for(const m of materials.sort((a,b)=>order(a.id,b.id)))for(const kind of refs.get(m.id)||['material'])entry(m,kind,refs.has(m.id)?'Referenced by authored assembly':'Unused');
+ for(const [id,kinds]of [...refs].sort((a,b)=>order(a[0],b[0])))if(!byId.has(id))for(const kind of kinds)entry({id,name:`Missing material (${id})`},'missing',`Referenced as ${kind}`,'missing-material');
+ for(const ventilation of [...cavities].sort(order)){legend.rows.push(['','Air cavity','(no solid material)',ventilation,'Blank symbol; no solid volume']);legend.rowInfo.push({swatch:{kind:'cavity'}});legend.csvRows.push(['','Air cavity','cavity',ventilation,'','none','','ok']);}
+ if(libraryIssue){legend.rows.push(['','Material library unavailable','','',libraryIssue]);legend.rowInfo.push({issue:'unavailable-library'});legend.csvRows.push(['','','diagnostic','','','','',libraryIssue]);}
+ return {assemblies:assembly,materialLegend:legend};
+}

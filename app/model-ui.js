@@ -23,6 +23,8 @@ import { PlanView } from './model-planview.js';
 import { wallPlanGraphics, wallPlanEdges } from './wall-plan-graphics.js';
 import { readMaterials } from './project-materials.js';
 import { planCut, chainLoops, viewerToPlan, wallDims } from './model-plan.js';
+import { assemblySchedules } from './assembly-schedule.js';
+import { materialBackground } from './project-materials.js';
 import { schedules, scheduleCsv } from './model-schedule.js';
 import { planPdf } from './model-pdf.js';
 import { wallOutlines, wallTypes, wallType, typeThickness, typeName, typeAt, JUSTIFICATIONS, locationLine } from './model-walls.js';
@@ -312,32 +314,43 @@ export function mountModel(host) {
     const loops = new Map();
     for (const l of S.data?.levels || []) if ((S.data.derived?.spaces || []).some((x) => x.storey === l.id)) loops.set(l.id, l.id === S.level && S.loops ? S.loops : loopsOf(ed(), l.id));
     const all = schedules(S.data, loops, { fmtLen: (mm) => fmtLen(mm, S.units), fmtArea: (mm2) => fmtArea(mm2, S.units), t });
+    if (ed()) Object.assign(all, assemblySchedules(new ModelWriter(ed().W, ed().api, ed().mid)));
     for (const x of exts) Object.assign(all, x.schedules?.() || {});   // extensions' schedules (res-ui.js: the lumber cut list)
     return all;
   }
   function renderSchedule() {
     if (!ui.sched || !S.on || !S.data) return;
     const all = scheduleData(), sc = all[S.sched];
+    for (const key of ['assemblies','materialLegend']) if (!ui.schedKind.querySelector('option[value="'+key+'"]')) ui.schedKind.append(el('option', {value:key}, all[key].title));
     if (!sc) return;
     // a row picks what it lists
     const k = kb();
     const xs = exts.find((x) => x.scheduleKeys && (x.schedules?.() || {})[S.sched]);
     const keysOf = (i) => {
+      if (sc.rowInfo) return [];
       if (xs) return xs.scheduleKeys(S.sched, i) || [];
       if (S.sched === 'doors' || S.sched === 'windows') { const kind = S.sched === 'doors' ? 'door' : 'window'; const list = S.data.openings.filter((o) => o.kind === kind); const byRow = sc.rows[i][0]; const o = list.find((x) => x.mark === byRow); return o ? [k + o.id] : []; }
       if (S.sched === 'walls') { const name = sc.rows[i][0]; return S.data.walls.filter((w) => (projectWallType(w.typeKey) ? typeName(projectWallType(w.typeKey)) : w.typeName) === name).map((w) => k + w.id); }
       const sp = (S.data.derived?.spaces || []).find((x) => x.number === sc.rows[i][0]); return sp ? [k + sp.id] : [];
     };
     const table = el('table', {}, el('thead', {}, el('tr', {}, ...sc.head.map((h) => el('th', {}, h)))),
-      el('tbody', {}, ...sc.rows.map((r, i) => { const tr = el('tr', { 'data-msched-row': String(i) }, ...r.map((c) => el('td', {}, c))); tr.addEventListener('click', () => host.select(keysOf(i))); return tr; })),
+      el('tbody', {}, ...sc.rows.map((r, i) => {
+        const info=sc.rowInfo?.[i], group=info?.group;
+        const tr = el('tr', { 'data-msched-row': String(i) }, ...r.map((c,j) => {
+          const td=el(group?'th':'td', { ...(group?{colSpan:sc.head.length}:{}), style:sc.rowInfo?'white-space:pre-wrap;overflow-wrap:anywhere;max-width:260px;min-width:50px':'' }, c);
+          if(S.sched==='materialLegend'&&j===0&&info?.swatch){const m=info.swatch;td.append(el('span', {title:m.kind,'aria-label':m.kind+' symbol',style:`display:block;width:30px;height:14px;border:1px ${m.kind==='missing'?'dashed':'solid'} #777;${m.kind==='membrane'?`height:0;border:0;border-top:3px dashed ${m.color};`:m.kind==='material'?'background:'+materialBackground(m)+';':''}`}));}
+          return td;
+        }));
+        if(!sc.rowInfo)tr.addEventListener('click', () => host.select(keysOf(i))); return tr;
+      })),
       sc.total ? el('tfoot', {}, el('tr', {}, ...sc.head.map((_, i) => el('td', {}, sc.total[i] ?? '')))) : null);
-    ui.sched.replaceChildren(sc.rows.length ? table : el('p', { className: 'bc-muted' }, t('model.sch.none')));
+    ui.sched.replaceChildren(...(sc.note?[el('p',{className:'bc-muted','data-schedule-note':''},sc.note)]:[]), sc.rows.length ? table : el('p', { className: 'bc-muted' }, t('model.sch.none')));
   }
   ui.schedCsv?.addEventListener('click', () => {
     if (!S.data) return;
     const sc = scheduleData()[S.sched];
     const base = String(host.fileName?.() || 'model').replace(/\.ifc$/i, '');
-    host.download(base + ' ' + t('model.sch.' + S.sched).toLowerCase() + '.csv', '\ufeff' + scheduleCsv(sc), 'text/csv');   // i18n-ignore: a file name
+    host.download(base + ' ' + (sc.title || t('model.sch.' + S.sched)).toLowerCase() + '.csv', '\ufeff' + scheduleCsv(sc), 'text/csv');   // i18n-ignore: a file name
   });
   ui.print?.addEventListener('click', () => {
     if (!pv || !S.data) return;

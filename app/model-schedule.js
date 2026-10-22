@@ -63,5 +63,6 @@ const wallTypeName = (w) => (w ? ((w.assembly || wallType(w.typeKey)) ? typeName
 
 /** One schedule as CSV (the total row last). */
 export function scheduleCsv(s) {
+  if (s.csvHead) return tableCsv(s.csvHead, s.csvRows);
   return tableCsv(s.head, s.total ? [...s.rows, s.total.concat(Array(Math.max(0, s.head.length - s.total.length)).fill(''))] : s.rows);
 }

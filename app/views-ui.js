@@ -512,7 +512,8 @@ export function mountViewsBim(modelUi, o = {}) {
     function add(kind, ref) {
       const [pw, ph] = PAPERS[D.paper];
       const n = D.views.length;
-      D.views.push({ kind, ref, x: pw / 2 + (n % 3 - 1) * 20, y: ph / 2 + 10 - (n % 3) * 10, ratio: 0 });
+      const documentation=kind==='schedule'&&ref.startsWith('f06-');
+      D.views.push({ kind, ref, x: documentation?pw/2:pw / 2 + (n % 3 - 1) * 20, y: documentation?(ph+28)/2:ph / 2 + 10 - (n % 3) * 10, ratio: 0 });
       sel = D.views.length - 1;
       draw();
     }
