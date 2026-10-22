@@ -1,6 +1,7 @@
 # F05 - Layer-aware straight-wall sections and elevations
 
-Implemented bounded slice; draft PM review only. This does **not** complete the broader
+PM accepted the bounded slice with follow-ups on 2026-10-22; ready for integration review.
+Merge authorization remains separate. This does **not** complete the broader
 F05 roadmap card. Draft PR: https://github.com/achartt/bimcraft-SDH/pull/7 (main).
 No merge, deployment, roadmap edit, delegation or cross-chat message was performed.
 
@@ -11,9 +12,11 @@ No merge, deployment, roadmap edit, delegation or cross-chat message was perform
 - Checkout: `/Users/austinhartt/Documents/ChatGPT/BimCraft Test/bimcraft-f05`.
 - Approved base: `ff0344b46ca1c29962772528c23f62d175c6d2ea`.
 - Final code head: `ed1003d6d5c48e1efd50085291cdd8596bde20fb`.
-  Final delivery head is the documentation/evidence descendant recorded in PR #7's
-  description and the completion PM handoff. Use `git rev-parse HEAD` to identify it;
-  recording a document's own commit hash inside itself is self-referential.
+  PM-reviewed delivery: `2eecde15e2b0e503ae1b55b0ae05137308027126` (documentation/evidence
+  descendant with identical application, test, fixture and workflow trees). Subsequent
+  acceptance/follow-up documentation does not extend the validated application scope.
+  Use `git rev-parse HEAD` for the current branch head; recording a document's own commit
+  hash inside itself is self-referential.
 - Reserved preview: `http://127.0.0.1:8024/`; free at setup. Sandbox denied local
   listener startup (`EPERM`). No local preview is running; other previews were preserved.
 - Complete-history supplied bundle verified, then cloned into the previously absent
@@ -70,7 +73,41 @@ projected visible edges are thin. Level marks and notes are separate overlays.
 | 5. Persistence/isolation | PASS. UI Undo/Redo, actual browser IFC download/reopen and second-tab isolation. Node IFC4/IFC2X3 lifecycle tests and existing F02 reference tests retained. |
 | 6. Invalid/unsupported records | PASS within documented scope. Missing settings are read-only Coarse defaults. Unknown/corrupt/duplicate records refuse writes and remain unchanged. Missing section references refuse settings writes; invalid planes/depths refuse projection. Unsupported cuts use diagnosed envelope fallback. |
 | 7. Screen/vector/sheets | PASS for fixture scales. Shared SVG/PDF primitives, inspected actual browser downloads and enlarged detail. Independent pypdf path measurements below; no raster XObjects. Bounded regression evidence only. |
-| 8. Performance | MEASURED. Equivalent fixture/base/environment, five warmups and 30 retained raw samples. Generation, drawing/frame proxies and PDF time separated. Full drawing-set generation remains a noticeable synchronous operation; PERF-F04-01 stays open. |
+| 8. Performance | MEASURED. Equivalent fixture/base/environment, five warmups and 30 retained raw samples. Generation, drawing/frame proxies and PDF time separated. Full drawing-set generation remains a noticeable synchronous operation; PERF-F05-01 and the separate PERF-F04-01 stay open. |
+
+## PM acceptance and integration gate (2026-10-22)
+
+PM found no supported-scope correctness blocker in reviewed delivery
+`2eecde15e2b0e503ae1b55b0ae05137308027126` against approved main
+`ff0344b46ca1c29962772528c23f62d175c6d2ea`. The review accepts this bounded straight-wall
+slice with follow-ups; it does not authorize merge or deployment or complete the roadmap card.
+
+Fresh PM evidence, reported in this owner chat, is retained separately in the PM workspace
+at `reviews/F05-PM-2026-10-22/`. PM reported 655 baseline checks with zero failures
+(optional readers/source integrations explicitly unavailable), 18 focused F05 tests and
+four F03 harness tests passing. Mac Chromium 151 passed all 18 workflow checks, including
+edits, material-default isolation, Undo/Redo, actual IFC save/reopen, project isolation and
+another section. Four IFC outputs passed independent schema/EXPRESS validation, including
+IFC2X3. Regenerated and actual downloaded PDFs passed independent vector readback with
+the same 209.55/215.9 mm totals, 25.4 mm cavity, line-only membranes and approximately
+0.000002056 mm checked height error. PM inspected normal/detail browser images and the
+rendered edited PDF. These are PM results, distinct from the feature-owner runs below.
+
+The previously pending delivery-head F04 browser rerun was independently checked through
+GitHub after the PM review: completed successfully (last updated `2026-10-22T20:47:42Z`), including
+the browser workflow, same-machine measurements and independent browser PDF readback.
+All three delivery-head workflows now report success for the exact reviewed SHA:
+
+| Workflow | Delivery-head result |
+| --- | --- |
+| [Tests 39850333813](https://github.com/achartt/bimcraft-SDH/actions/runs/39850333813) | Completed, success |
+| [F05 browser 39850333823](https://github.com/achartt/bimcraft-SDH/actions/runs/39850333823) | Completed, success |
+| [F04 browser 39850333751](https://github.com/achartt/bimcraft-SDH/actions/runs/39850333751) | Completed, success; pending review gate cleared for this delivery |
+
+PR #7 was still draft, unmerged and mergeable when checked. Revalidate the eventual
+integrated commit. [PERF-F05-01](F05-FOLLOWUPS.md) records the medium, nonblocking
+drawing-set generation finding separately from F04's Fine-frame follow-up. No optimization
+was included in recording the review.
 
 ## Supported geometry and safe fallbacks
 
