@@ -5392,5 +5392,11 @@
   "dimension.status.unsupported": "Unresolved — unsupported reference or wall assembly version",
   "dimension.status.corrupt": "Unresolved — corrupt reference or wall assembly record",
   "dimension.status.invalid": "Unresolved — invalid reference settings",
-  "dimension.status.ambiguous": "Unresolved — duplicate dimension identity"
+  "dimension.status.ambiguous": "Unresolved — duplicate dimension identity",
+  "model.pv.detail": "Plan detail",
+  "model.pv.detail.coarse": "Coarse - wall envelope",
+  "model.pv.detail.medium": "Medium - layers and colors",
+  "model.pv.detail.fine": "Fine - layers, colors and patterns",
+  "model.err.vr.detail": "Choose Coarse, Medium or Fine plan detail.",
+  "model.pv.layers.unavailable": "Layer graphics unavailable for an unsupported assembly or material library. Envelope shown; inspect Wall assemblies and Material library."
 }

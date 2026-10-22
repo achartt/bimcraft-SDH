@@ -9,6 +9,7 @@
         "test:precision": "node --test tests/unit/wall-precision.test.mjs",
         "test:materials": "node --test tests/unit/material-library.test.mjs",
         "test:baseline": "node devshell/baseline.mjs",
+        "test:f04": "node --test tests/features/f04/graphics.test.mjs",
         "fixture:f01": "node tests/features/f01/fixture.mjs"
     },
     "engines": {

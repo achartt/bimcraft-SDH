@@ -1,4 +1,5 @@
 /* SPDX-License-Identifier: Apache-2.0 */
+import { layerPrimitives } from './wall-plan-graphics.js';
 import { dimensionFootprint } from './dimension-geometry.js';
 /**
  * model-planview.js — the plan view of one level (0.5 part 3, BM.2): a 2D canvas beside the 3D view, where the building
@@ -253,8 +254,15 @@ export class PlanView {
     // pointed-at wall gets its own outline on top
     const joint = !!this.scene.wallEdges;
     for (const w of this.scene.walls) {
+      if (w.layers) {
+        for (const it of layerPrimitives(w)) {
+          if (it.t === 'fill') { g.fillStyle = it.color; for (const p of it.polys) { path(p); g.fill(); } }
+          else { g.beginPath(); it.pts.forEach((p, i) => { const q = S(p); if (i) g.lineTo(q.x, q.y); else g.moveTo(q.x, q.y); }); g.strokeStyle = it.color; g.lineWidth = it.w * 5; g.setLineDash(it.dash ? it.dash.map(v => v * 3) : []); g.stroke(); }
+        }
+        g.setLineDash([]);
+      }
       for (const p of w.pieces || [w.poly]) {
-        path(p); g.fillStyle = sel(w.key) ? action : poche; g.globalAlpha = sel(w.key) ? 0.45 : 1; g.fill(); g.globalAlpha = 1;
+        path(p); if (!w.layers) { g.fillStyle = sel(w.key) ? action : poche; g.globalAlpha = sel(w.key) ? 0.45 : 1; g.fill(); g.globalAlpha = 1; }
         if (!joint) { g.strokeStyle = sel(w.key) || hov(w.key) ? action : ink; g.lineWidth = sel(w.key) ? 2.5 : 1.75; g.stroke(); }
       }
     }

@@ -1,0 +1,23 @@
+(node:19446) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file://<F04_CHECKOUT>/app/ifc/api.js is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to <F04_CHECKOUT>/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+{
+  label: 'after',
+  head: '656d46236ff32b444cbd5a2b4ebe5164858c3848',
+  node: 'v26.9.0',
+  platform: 'darwin',
+  arch: 'arm64',
+  cpu: 'Apple M5 Pro',
+  memory: 51539607552,
+  fixtureSha256: '00425e4c58cf0351ee0984f3630952f402e2011e3f3df2bf06b8c14c0732fb8a',
+  warmup: 5,
+  metrics: {
+    scene: { n: 30, p50Ms: 4.5071250000000305, p95Ms: 8.035582999999974 },
+    planPdf: { n: 30, p50Ms: 15.731415999999967, p95Ms: 16.591790999999944 },
+    sheetPdf: { n: 30, p50Ms: 15.98008399999992, p95Ms: 17.423958000000027 }
+  },
+  planBytes: 446185,
+  sheetBytes: 445154,
+  note: 'F04-only Node scene assembly and vector generation; no F03 instrumentation. Browser paint measured separately.'
+}
