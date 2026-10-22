@@ -1,0 +1,4 @@
+{"file": "seed.ifc", "schema": "IFC4", "schemaFindings": 0, "authoredWalls": 2, "stableIdentities": true, "cavitiesBlank": true, "membranesZero": true}
+{"file": "styled.ifc", "schema": "IFC4", "schemaFindings": 0, "authoredWalls": 2, "stableIdentities": true, "cavitiesBlank": true, "membranesZero": true}
+{"file": "edited.ifc", "schema": "IFC4", "schemaFindings": 0, "authoredWalls": 2, "stableIdentities": true, "cavitiesBlank": true, "membranesZero": true}
+{"file": "ifc2x3.ifc", "schema": "IFC2X3", "schemaFindings": 0, "authoredWalls": 1, "stableIdentities": true, "cavitiesBlank": true, "membranesZero": true}
