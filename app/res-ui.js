@@ -53,6 +53,9 @@ import { newHandoffId, putHandoff } from './handoff.js';
 import { loadTin, readTerrain, readPads, readHardscape, finishedSurface, existingSurface, placeTerrain, changeTerrain, removeTerrain, placePad, changePad, removePads, placeHardscape, changeHardscape, removeHardscape,
   parsePointText, drawingContours, thinToGrid, toModel, autoOffset, landXml, readLandXmlSurfaces, padShape, PAD_DEFAULTS, HARD_KINDS } from './res-terrain.js';
 import { modelTriangles, projectView, elevationDirs } from './res-views.js';
+import { sectionModel, straightElevationWidth } from './wall-section-graphics.js';
+import { readProjectedView, projectedBox } from './projected-views.js';
+import { readMaterials } from './project-materials.js';
 import { buildSet, setPdf, sheetSvg, PAPERS, readSectionLines, placeSectionLine, changeSectionLine, removeSectionLines, sectionDir } from './res-sheets.js';
 import { viewerToPlan } from './model-plan.js';
 import { DEVICES, symbolPlan, symbolScale, wallSpot, readDevices, placeDevice, changeDevice, linkLight, removeDevices, deviceSchedule, circuitSchedule, isLight, isSwitch } from './res-elec.js';
@@ -951,6 +954,8 @@ export function mountRes(modelUi) {
     const g = groundLevel() || levels[0];
     const Mg = viewerToPlan(C, w.storeyWorld(g.id));
     const els = modelTriangles(model, Mg, { skip });
+    let cutMaterials = null;
+    try { cutMaterials = readMaterials(w); } catch (e) { /* Layer diagnostics accompany envelope fallback. */ }
     const input = { plans: [], rcps: [], elevations: [], sections: [], schedules: [], framing: [] };
     interiorCtx.clear();
     for (const lv of levels.slice().filter((l) => (A.S.data.walls || []).some((x) => x.storey === l.id) || l.id === g.id)) {
@@ -969,14 +974,22 @@ export function mountRes(modelUi) {
     const widthOn = (dir) => { const r = [dir[1], -dir[0]], xs = []; for (const x of A.S.data.walls || []) for (const q of [x.a, x.b]) xs.push(q[0] * r[0] + q[1] * r[1] - x.t / 2, q[0] * r[0] + q[1] * r[1] + x.t / 2); /* the outside faces (square walls exactly) */ return xs.length ? { x0: Math.min(...xs), x1: Math.max(...xs) } : null; };
     const noted = (view, ctx) => { try { return viewNotes(view, { ...ctx, levels: lvls, fmt: fmtN }); } catch (e) { console.error(e); return []; } };
     for (const [side, dir] of Object.entries(elevationDirs)) {
-      const view = { ...projectView(els, { dir }), grids: gridsInView(gAxes, dir) };
-      view.notes = noted(view, { kind: 'elevation', dir, base: g.elevation, openings: facts, width: widthOn(dir) });
+      const settings=readProjectedView(w,'elevation:'+side);
+      const view = { ...projectView(els, { dir, box:projectedBox(settings), ...sectionModel(w,g.id,k) }), scale:settings.scale, grids: gridsInView(gAxes, dir) };
+      if(settings.issue)view.warnings=[{reason:settings.issue}];
+      view.notes = noted(view, { kind: 'elevation', dir, base: g.elevation, openings: facts, width: straightElevationWidth(sectionModel(w,g.id,k).walls,dir)||widthOn(dir) });
       input.elevations.push({ ref: side, title: t('res.sh.elev.' + side), view });
     }
     for (const sl of R.secs) {
+      if(!levels.some(l=>l.id===sl.storey)||![...sl.a,...sl.b,sl.depth].every(Number.isFinite)||Math.hypot(sl.b[0]-sl.a[0],sl.b[1]-sl.a[1])<100||sl.depth<0) {
+        input.sections.push({ref:sl.guid,title:t('res.sec.name',{name:sl.name}),view:{bounds:null,warnings:[{reason:t('f05.sectionInvalid')}]}});
+        continue;
+      }
       const M = viewerToPlan(C, w.storeyWorld(sl.storey));
       const { o, dir } = sectionDir(sl);
-      const view = { ...projectView(modelTriangles(model, M, { skip }), { dir, cut: { o }, far: sl.depth }), grids: gridsInView(gridsOn(sl.storey), dir) };
+      const settings=readProjectedView(w,'section:'+sl.guid);
+      const view = { ...projectView(modelTriangles(model, M, { skip }), { dir, cut: { o }, far: sl.depth, ...sectionModel(w,sl.storey,k), materials:cutMaterials, detail:settings.detail, scale:settings.scale||50, box:projectedBox(settings) }), scale:settings.scale, groundY:g.elevation-(levels.find(l=>l.id===sl.storey)?.elevation??g.elevation), grids: gridsInView(gridsOn(sl.storey), dir) };
+      if(settings.issue)view.warnings.push({reason:settings.issue});
       view.notes = noted(view, { kind: 'section', dir, base: levels.find((l) => l.id === sl.storey)?.elevation || 0 });
       input.sections.push({ ref: sl.guid, title: t('res.sec.name', { name: sl.name }), view });
     }

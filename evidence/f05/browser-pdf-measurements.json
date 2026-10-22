@@ -1,0 +1,32 @@
+[
+  {
+    "file": "normal.pdf",
+    "ratio": 20,
+    "maxLayerErrorMm": 3.2152058793144533e-13,
+    "totalMm": 209.5499999999999,
+    "cavityMm": 25.400000000000155,
+    "lowerCutHeightMm": 850.0000003888888,
+    "membranePaths": 4,
+    "rasterImages": 0
+  },
+  {
+    "file": "detail.pdf",
+    "ratio": 5,
+    "maxLayerErrorMm": 1.1368683772161603e-13,
+    "totalMm": 209.54999999999998,
+    "cavityMm": 25.399999999999956,
+    "lowerCutHeightMm": 449.99999958333325,
+    "membranePaths": 1,
+    "rasterImages": 0
+  },
+  {
+    "file": "edited-sheet.pdf",
+    "ratio": 20,
+    "maxLayerErrorMm": 3.2152058793144533e-13,
+    "totalMm": 215.90000000000015,
+    "cavityMm": 25.400000000000155,
+    "lowerCutHeightMm": 949.9999979444441,
+    "membranePaths": 4,
+    "rasterImages": 0
+  }
+]
