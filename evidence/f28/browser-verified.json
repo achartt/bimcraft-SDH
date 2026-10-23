@@ -1,6 +1,10 @@
 {
-  "status": "PASS",
+  "head": "bc221d6c3865f7169457e5ff8934c9e75920bb4f",
+  "cpu": "AMD EPYC 7763 64-Core Processor",
+  "node": "v22.23.3",
+  "platform": "linux",
   "checks": [
+    "established canvas has painted actual model pixels",
     "real IFC opens in opt-in live layout",
     "browser selection does not activate or select model elements",
     "floor plan activates real storey and drawing tab",
@@ -33,12 +37,108 @@
     "fallback opens the real assembly editor",
     "no application exceptions"
   ],
+  "errors": [],
+  "performanceIssues": [
+    "PERF-F04-01 OPEN",
+    "PERF-F05-01 OPEN"
+  ],
+  "notes": [
+    "Real UI for view activation, canvas picking, fields, shortcuts and save. setInputFiles supplies actual disk bytes to the existing file input. Read hooks inspect authoritative state and production camera/painter only.",
+    "Five warmups + 30 raw CPU render samples per layout; same IFC, detail and canvas dimensions. No GPU or optimization claim."
+  ],
+  "browser": "141.0.7390.37",
+  "fixtureSHA256": "00425e4c58cf0351ee0984f3630952f402e2011e3f3df2bf06b8c14c0732fb8a",
+  "before": {
+    "raw": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "n": 30,
+    "p50Ms": 0,
+    "p95Ms": 0,
+    "canvas": [
+      900,
+      600
+    ],
+    "detail": "fine"
+  },
+  "after": {
+    "raw": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "n": 30,
+    "p50Ms": 0,
+    "p95Ms": 0,
+    "canvas": [
+      900,
+      600
+    ],
+    "detail": "fine"
+  },
+  "status": "PASS",
   "base": "9667b3c48977ff772c2a4c4785238cb3c4603e0e",
-  "head": "832309805b556cbd50255f7e55f8a946d300b31a",
-  "run": "https://github.com/achartt/bimcraft-SDH/actions/runs/39972805876",
+  "run": "https://github.com/drsurfbum/bimcraft-SDH/actions/runs/39975724289",
   "independent": {
     "schemaFindings": 0,
     "walls": 9,
     "persistentDimensions": 2
-  }
+  },
+  "browserTimingValidity": "Zero-duration samples are inconclusive; the retained render() entry point does not measure completed paint. Use the separate same-environment Node workload report; both performance issues remain open."
 }
