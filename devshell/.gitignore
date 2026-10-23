@@ -1,2 +1,4 @@
 # libraries serve.mjs downloads by version
 vendor/
+# A local vendor cache may be a symlink; never commit that host path.
+/vendor

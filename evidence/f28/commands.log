@@ -1,0 +1,17 @@
+(node:68259) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///Users/austinhartt/Documents/ChatGPT/BimCraft%20Test/bimcraft-f28/app/workspace/commands.js is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /Users/austinhartt/Documents/ChatGPT/BimCraft Test/bimcraft-f28/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ quick access, ribbon and shortcuts can share exactly one action and live enablement (0.421958ms)
+✔ selection, view type, undo history and template restrictions have distinct reasons (0.134708ms)
+✔ shortcuts respect typing, contenteditable, dialogs, modifiers and prior cancellation (0.087667ms)
+✔ drawing closure and re-opening retain document ownership; a new editor resets tabs (0.090542ms)
+✔ scope evidence never auto-enables inherited, planned, audit or uncertain commands (0.103833ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 97.345375
