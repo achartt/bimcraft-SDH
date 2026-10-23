@@ -1,0 +1,124 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+/* F28 reviewed visual specification. Scoped chrome; the model canvases remain the original app nodes. */
+.ws-chrome,.ws-drawing-tabs,.ws-view-controls,.ws-empty-view{display:none}
+.ws-launch{font:12px "Segoe UI",Arial,sans-serif;padding:4px 9px;border:1px solid var(--line);background:var(--sheet);color:var(--ink);margin-left:auto;white-space:nowrap}
+body.has-live-workspace{height:100dvh!important;min-height:0!important;overflow:hidden!important}
+body.has-live-workspace>.app-bar{display:none}
+.bc.ws-active{
+ --ws-panel:278px;--ws-ink:#282d32;--ws-line:#bfc3c7;--ws-chrome:#f2f2f2;--ws-panel-bg:#fafafa;--ws-blue:#17669a;--ws-soft:#e0effa;--ws-muted:#687078;
+ display:grid!important;grid-template-columns:min(var(--ws-panel),48vw) 5px minmax(0,1fr)!important;
+ grid-template-rows:30px 29px 112px 29px minmax(0,1fr) 25px!important;
+ grid-template-areas:"title title title" "tabs tabs tabs" "ribbon ribbon ribbon" "options options options" "palettes resize stage" "status status status"!important;
+ height:100%!important;min-height:0!important;width:100%;overflow:hidden;color:var(--ws-ink);background:var(--ws-chrome);font:12px "Segoe UI",Arial,sans-serif;
+}
+[data-space="model"] .bc.ws-active{--ws-ink:#e1e6eb;--ws-line:#525c65;--ws-chrome:#262d35;--ws-panel-bg:#222930;--ws-blue:#89c7ed;--ws-soft:#324d60;--ws-muted:#aab5bf}
+.ws-active>.bc-left,.ws-active>.bc-right,.ws-active>[data-panel-grip],.ws-active>.cc-panel-resizer,.ws-active>.cc-panel-dock,.ws-active>.app-panel-grip{display:none!important}
+.ws-active>.ws-chrome{display:flex;min-width:0;min-height:0}
+.ws-active button,.ws-dialog button{font:inherit;color:inherit;background:transparent;border:1px solid transparent;border-radius:1px;cursor:pointer;padding:3px 6px;line-height:16px}
+.ws-active button:hover,.ws-dialog button:hover{border-color:#8db5d0;background:var(--ws-soft,#e0effa)}
+.ws-active button:focus-visible,.ws-active select:focus-visible,.ws-active input:focus-visible,.ws-active [tabindex]:focus-visible,.ws-dialog :focus-visible{outline:2px solid #0076b9;outline-offset:-2px}
+.ws-active [hidden],.ws-dialog [hidden]{display:none!important}
+.ws-active [aria-disabled="true"]{color:var(--ws-muted)}
+.ws-active [aria-disabled="true"] .ws-icon{opacity:.48}
+.ws-icon{display:block;width:23px;height:23px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}
+.ws-active .ws-titlebar{grid-area:title;align-items:center;gap:8px;padding:0 8px;background:color-mix(in srgb,var(--ws-chrome) 85%,var(--ws-muted));border-bottom:1px solid var(--ws-line);white-space:nowrap}
+.ws-brand{font-size:14px;font-weight:750;letter-spacing:-.3px;color:var(--ws-blue);display:flex;align-items:center;gap:5px}
+.ws-brand b{background:#245a78;color:white;border-radius:2px;padding:0 4px;font:700 17px Georgia}
+.ws-quick{display:flex;gap:1px;border-right:1px solid var(--ws-line);padding-right:8px}
+.ws-active .ws-quick .ws-tool{width:25px;min-width:25px;height:25px;display:grid;place-items:center;padding:2px}
+.ws-quick .ws-tool span{display:none}.ws-quick .ws-icon{width:17px;height:17px}
+.ws-project{flex:1;min-width:50px;text-align:center;text-overflow:ellipsis;overflow:hidden}
+.ws-review-badge{color:var(--ws-blue);background:var(--ws-soft);border:1px solid var(--ws-line);padding:1px 6px;font-size:10px}
+.ws-titlebar>button{font-size:11px;flex-shrink:0}
+.ws-active .ws-ribbon-tabs{grid-area:tabs;align-items:stretch;background:var(--ws-chrome);border-bottom:1px solid var(--ws-line);overflow-x:auto;scrollbar-width:thin;white-space:nowrap}
+.ws-ribbon-tabs button{padding:4px 11px;flex-shrink:0;border-bottom:0}
+.ws-ribbon-tabs button[aria-selected="true"]{background:var(--ws-panel-bg);border:1px solid var(--ws-line);border-bottom:0}
+.ws-ribbon-tabs .ws-file-tab{background:#2874a6;color:white;padding-inline:17px}
+.ws-ribbon-tabs .ws-context-tab{background:#dfebca;color:#345b26}
+.ws-active .ws-ribbon{grid-area:ribbon;overflow-x:auto;overflow-y:hidden;background:var(--ws-panel-bg);padding:3px 5px 0;scrollbar-width:thin}
+.ws-group{position:relative;display:flex;align-items:flex-start;border-right:1px solid var(--ws-line);flex-shrink:0;padding:0 5px 19px;gap:2px;height:104px}
+.ws-group-title{position:absolute;bottom:1px;left:0;right:0;text-align:center;font-size:11px;line-height:17px;color:var(--ws-muted);white-space:nowrap}
+.ws-group-title:after{content:'⌄';font-size:10px;margin-left:5px}
+.ws-active .ws-tool{position:relative;min-width:43px;max-width:82px;height:81px;padding:4px 5px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:3px;text-align:center;line-height:15px;white-space:normal;font-size:11px}
+.ws-tool .ws-icon{width:31px;height:32px;color:var(--ws-blue);stroke-width:1.3;margin-bottom:1px}
+.ws-stack{display:flex;flex-direction:column;gap:0}
+.ws-active .ws-stack .ws-tool,.ws-active .ws-tool.ws-compact{height:26px;min-width:83px;max-width:160px;flex-direction:row;gap:5px;justify-content:flex-start;padding:2px 4px;white-space:nowrap;text-align:left}
+.ws-stack .ws-tool .ws-icon,.ws-tool.ws-compact .ws-icon{width:18px;height:18px;margin:0;stroke-width:1.4}
+.ws-active .ws-options{grid-area:options;align-items:center;gap:12px;padding:3px 10px;background:var(--ws-chrome);border-block:1px solid var(--ws-line);white-space:nowrap;overflow:auto;scrollbar-width:thin}
+.ws-options strong{font-size:12px;font-weight:500}.ws-options>span{flex:1;color:var(--ws-muted);overflow:hidden;text-overflow:ellipsis;min-width:80px}
+.ws-options.ws-wall-options{background:#e7eedb;color:#345b26}
+.ws-active .ws-palettes{grid-area:palettes;display:grid;grid-template-rows:minmax(100px,var(--ws-props,50%)) 5px minmax(100px,1fr);background:var(--ws-panel-bg);overflow:hidden;border-right:1px solid var(--ws-line);min-height:0}
+.ws-properties,.ws-browser{min-height:0;min-width:0;display:flex;flex-direction:column;overflow:hidden}
+.ws-palette-heading{display:flex;align-items:center;justify-content:space-between;min-height:26px;padding:0 7px;background:var(--ws-chrome);font-size:12px;font-weight:600;border-bottom:1px solid var(--ws-line);flex-shrink:0}
+.ws-palette-heading button{font-size:10px;padding:1px 3px;font-weight:400}
+.ws-palette-scroll{overflow:auto;overscroll-behavior:contain;min-height:0;flex:1;scrollbar-width:thin}
+.ws-active .ws-vsplit{grid-area:resize;background:var(--ws-chrome);cursor:col-resize;touch-action:none}
+.ws-hsplit{background:var(--ws-line);cursor:row-resize;touch-action:none}
+.ws-vsplit:hover,.ws-hsplit:hover,[data-dragging="true"]{background:#8db5d0!important}
+.ws-active>.bc-stage{grid-area:stage!important;order:0;height:auto;min-height:0;min-width:0;border:0;background:var(--sheet)}
+.ws-active .bc-stage>[data-toolbar],.ws-active [data-modelbar],.ws-active [data-model-hint]{display:none!important}
+.ws-active .bc-stage>[data-canvas-wrap],.ws-active .bc-stage>[data-plan-wrap]{top:29px!important;bottom:30px!important;left:0!important;right:0!important}
+.ws-active .bc-stage.is-plan-only>[data-canvas-wrap]{visibility:hidden}
+.ws-active .ws-drawing-tabs{position:absolute;z-index:3;inset:0 0 auto;height:29px;display:flex;align-items:stretch;overflow-x:auto;scrollbar-width:thin;background:var(--ws-chrome);border-bottom:1px solid var(--ws-line)}
+.ws-drawing-tab{display:flex;white-space:nowrap;border-right:1px solid var(--ws-line);flex-shrink:0}
+.ws-drawing-tab [aria-selected="true"]{background:var(--ws-panel-bg);border-bottom:2px solid #2874a6;font-weight:600}
+.ws-drawing-tab button{padding:3px 8px}.ws-drawing-tab button+button{font-size:16px;padding-inline:5px}
+.ws-active .ws-view-controls{position:absolute;z-index:3;inset:auto 0 0;height:30px;display:flex;align-items:center;gap:8px;padding:0 7px;background:var(--ws-chrome);border-top:1px solid var(--ws-line);overflow-x:auto;scrollbar-width:thin;white-space:nowrap}
+.ws-view-controls label{display:flex;align-items:center;gap:5px;font-size:11px}
+.ws-view-controls .ws-tool.ws-compact{min-width:fit-content;max-width:none;flex-shrink:0}
+.ws-drawing-title{font-size:11px;max-width:140px;overflow:hidden;text-overflow:ellipsis;flex-shrink:0}
+.ws-active select{font:11px "Segoe UI",Arial,sans-serif;border:1px solid var(--ws-line);border-radius:0;padding:2px 3px;background:var(--ws-panel-bg);color:var(--ws-ink);min-width:65px;max-width:100%}
+.ws-active .ws-statusbar{grid-area:status;align-items:center;gap:16px;padding:0 8px;border-top:1px solid var(--ws-line);font-size:11px;white-space:nowrap;overflow:hidden}
+.ws-layout-label{color:var(--ws-muted);flex-shrink:0}.ws-status-slot{flex:1;overflow:hidden;min-width:0}
+.ws-active .ws-status-slot .bc-status{position:static;margin:0;padding:0;min-height:0;background:transparent;border:0;color:inherit;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ws-active .ws-status-slot .bc-status.is-error{color:var(--layer-red)}
+.ws-active .ws-empty-view{position:absolute;z-index:2;inset:29px 0 30px;display:flex;align-items:center;justify-content:center;flex-direction:column;background:var(--sheet);color:var(--ink);text-align:center;padding:20px;gap:10px}
+.ws-empty-view p{margin:0}.ws-no-view>[data-canvas-wrap],.ws-no-view>[data-plan-wrap]{visibility:hidden!important}
+.ws-active .bc-pb{padding:0;border:0}.ws-active .bc-pb>h2{display:none}
+.ws-browser-hint{font-size:10px;line-height:14px;color:var(--ws-muted);margin:0;padding:4px 7px;border-bottom:1px solid var(--ws-line)}
+.ws-active .bc-pb details{border:0;margin:0;padding:2px 4px}.ws-active .bc-pb summary{font-size:11px;padding:2px 0}
+.ws-active .bc-pb ul{margin:1px 0 3px;padding-left:14px;list-style:none}
+.ws-active .bc-pb li{display:flex;flex-wrap:wrap;align-items:center;gap:1px;min-width:0;font-size:11px}
+.ws-active .bc-pb .bc-pb-go{font-size:11px;padding:2px 4px;text-align:left;min-width:0;overflow-wrap:anywhere;max-width:100%;height:auto}
+.ws-active .bc-pb .bc-pb-ic{font-size:10px;white-space:nowrap;padding:1px 3px}
+.ws-browser-selected{background:var(--ws-soft)!important;outline:1px solid #8db5d0}
+.ws-active .bc-pb [aria-current="page"]{font-weight:700}
+.ws-active .bc-pb .bc-pb-actions{display:flex;flex-wrap:wrap;gap:2px;margin:2px 0}
+.ws-active .bc-pb .bc-pb-actions button{font-size:10px;line-height:14px;white-space:normal;padding:2px}
+.ws-active [data-props]{padding:7px;font:11px "Segoe UI",Arial,sans-serif;overflow-wrap:anywhere;color:var(--ws-ink)}
+.ws-active [data-props] p{font-size:11px;margin-block:4px}
+.ws-active [data-props] .bc-prop-name{font-size:13px;font-weight:600;margin:5px 0 9px}
+.ws-active [data-props] .bc-h{font-size:11px;padding:3px 0;border-bottom:1px solid var(--ws-line);margin:6px 0}
+.ws-active [data-props] .bc-dl,.ws-view-dl{display:grid;grid-template-columns:minmax(88px,.9fr) minmax(90px,1.1fr);margin:0;font:11px "Segoe UI",Arial,sans-serif;gap:0}
+.ws-active [data-props] .bc-dl dt,.ws-active [data-props] .bc-dl dd,.ws-view-dl dt,.ws-view-dl dd{font:inherit;margin:0;padding:4px 5px;border-bottom:1px solid var(--ws-line);min-width:0;overflow-wrap:anywhere;align-content:center}
+.ws-active [data-props] .bc-dl dt,.ws-view-dl dt{background:var(--ws-chrome)}
+.ws-active [data-props] .bc-input,.ws-active [data-props] .bc-mb-select{font:inherit;padding:3px;border:1px solid var(--ws-line);min-width:0;max-width:100%;width:100%;background:var(--ws-panel-bg);color:var(--ws-ink);border-radius:0}
+.ws-active [data-props] :disabled{opacity:.7;cursor:default}
+.ws-active [data-props] .bc-edit-hint,.ws-active [data-props] .bc-copy-all,.ws-active [data-props] .bc-model-props>.bc-sub{display:none}
+.ws-active [data-props] .bc-set{padding:0;margin:6px 0;border:0}.ws-active [data-props] summary{font-size:11px;background:var(--ws-chrome);padding:4px}
+.ws-active [data-props] button{font-size:11px;height:auto;text-align:left;overflow-wrap:anywhere;max-width:100%}
+.ws-prop-identity{display:flex;align-items:center;gap:10px;padding:12px 8px;border-bottom:1px solid var(--ws-line)}
+.ws-prop-identity .ws-icon{width:38px;height:38px;color:var(--ws-blue)}
+.ws-note{font-size:11px;line-height:16px;color:var(--ws-muted);padding:8px;margin:0}
+.ws-tooltip{position:fixed;z-index:100000;max-width:340px;padding:9px 11px;background:#fffef2;color:#30353b;border:1px solid #aca78a;font:12px/17px "Segoe UI",Arial,sans-serif;box-shadow:0 2px 6px #0002;pointer-events:none}
+.ws-tooltip[hidden]{display:none}
+.ws-dialog{font:13px/1.5 "Segoe UI",Arial,sans-serif;background:var(--sheet);color:var(--ink);border:1px solid var(--line);padding:20px;max-width:min(680px,90vw);max-height:85dvh;overflow:auto}
+.ws-dialog h2{font-size:16px;margin:0 0 12px}.ws-dialog button{border:1px solid var(--line);padding:5px 10px;margin:5px}
+.ws-dialog::backdrop{background:#17273166}.ws-evidence,.ws-inventory small{font-size:11px;overflow-wrap:anywhere;color:var(--ink-2)}
+.ws-inventory input{width:100%;padding:8px;margin-bottom:8px}.ws-inventory article{padding:9px 0;border-bottom:1px solid var(--line)}.ws-inventory article p{margin:4px 0}
+@media(max-width:1000px){.ws-review-badge{display:none}.ws-project{text-align:left}.ws-titlebar>button{font-size:10px}.ws-active .ws-view-controls{gap:6px}.ws-drawing-title{max-width:80px}}
+@media(max-width:760px){.bc.ws-active{--ws-panel:230px;font-size:11px}.ws-project{display:none}.ws-layout-label{display:none}.ws-titlebar{gap:4px!important}.ws-active .ws-titlebar>button{padding-inline:4px}.ws-active .ws-ribbon-tabs button{padding-inline:9px}.ws-active .ws-view-controls{overflow-x:auto}.ws-view-controls .ws-drawing-title{display:none}}
+
+.ws-active .ws-quick .ws-tool.ws-compact{min-width:25px;max-width:25px;width:25px;display:grid;place-items:center}
+.ws-active .ws-group{height:97px;padding-bottom:17px}
+.ws-active .ws-ribbon .ws-tool{height:75px}
+.ws-active .ws-ribbon .ws-stack .ws-tool{height:25px}
+
+.ws-active>.shell-dock-split,.ws-active .shell-grip{display:none!important}
+
+/* Keep the actual bound fields. In the live slice, supported instance constraints follow the retained type selector. */
+.ws-active .bc-model-props:has([data-mp-height]) .bc-mp-dl>*{order:10}
+.ws-active .bc-mp-dl>dt:has(+dd [data-mp-type]),.ws-active .bc-mp-dl>dd:has([data-mp-type]){order:0!important}
+.ws-active .bc-mp-dl>dt:has(+dd [data-mp-assembly]),.ws-active .bc-mp-dl>dd:has([data-mp-assembly]){order:1!important}
+.ws-active .bc-mp-dl>dt:has(+dd [data-mp-height]),.ws-active .bc-mp-dl>dd:has([data-mp-height]){order:2!important}
+.ws-active .bc-mp-dl>dt:has(+dd [data-mp-base]),.ws-active .bc-mp-dl>dd:has([data-mp-base]){order:3!important}

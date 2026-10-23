@@ -1,0 +1,59 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+/** A deliberately small adapter. Every caller gets the same live enablement and action. No DOM-button forwarding. */
+export function createCommands({ state, actions, explain = () => {} }) {
+  const definitions = {
+    open: { categories: ['document'], reason: s => s.busy ? 'Wait for the current operation.' : '' },
+    save: { categories: ['document'], reason: s => !s.document ? 'Open an IFC first.' : s.busy ? 'Wait for the current operation.' : !s.dirty ? 'There are no unsaved IFC changes.' : '' },
+    undo: { categories: ['document'], reason: s => !s.document ? 'Open an IFC first.' : s.busy ? 'Wait for the current operation.' : !s.canUndo ? 'There is nothing to undo.' : '' },
+    redo: { categories: ['document'], reason: s => !s.document ? 'Open an IFC first.' : s.busy ? 'Wait for the current operation.' : !s.canRedo ? 'There is nothing to redo.' : '' },
+    select: { categories: ['element'], reason: s => !s.document ? 'Open an IFC first.' : s.busy ? 'Wait for the current operation.' : !s.view ? 'Open a drawing first.' : '' },
+    clear: { categories: ['element'], reason: s => !s.document ? 'Open an IFC first.' : s.busy ? 'Wait for the current operation.' : !s.selection.length ? 'No element is selected.' : '' },
+    three: { categories: ['view'], reason: s => !s.document ? 'Open an IFC first.' : s.busy ? 'Wait for the current operation.' : '' },
+    plan: { categories: ['view'], reason: s => !s.document ? 'Open an IFC first.' : s.busy ? 'Wait for the current operation.' : !s.levels.length ? 'This IFC has no supported storey plans.' : '' },
+    range: { categories: ['floor-plan'], reason: s => !s.document ? 'Open an IFC first.' : s.busy ? 'Wait for the current operation.' : s.view?.kind !== 'plan' ? 'Activate a floor plan first. 3D has no View Range.' : '' },
+    detail: { categories: ['floor-plan'], reason: s => !s.document ? 'Open an IFC first.' : s.busy ? 'Wait for the current operation.' : s.view?.kind !== 'plan' ? 'Activate a floor plan first.' : s.settings?.template ? 'Controlled by view template “' + s.settings.template + '”. Use View Range to inspect template settings.' : '' },
+    scale: { categories: ['floor-plan'], reason: s => !s.document ? 'Open an IFC first.' : s.busy ? 'Wait for the current operation.' : s.view?.kind !== 'plan' ? 'Activate a floor plan first.' : s.settings?.template ? 'Controlled by view template “' + s.settings.template + '”. Use View Range to inspect template settings.' : '' },
+    fit: { categories: ['view'], reason: s => !s.document ? 'Open an IFC first.' : s.busy ? 'Wait for the current operation.' : !s.view ? 'Open a drawing first.' : '' },
+  };
+  function describe(id) {
+    const d = definitions[id];
+    if (!d || typeof actions[id] !== 'function') return { id, categories: [], enabled: false, reason: 'This command is not wired in F28-A.' };
+    const reason = d.reason(state());
+    return { id, categories: d.categories, enabled: !reason, reason };
+  }
+  function execute(id, value) {
+    const d = describe(id);
+    if (!d.enabled) { explain(d.reason); return false; }
+    return actions[id](value);
+  }
+  return { describe, execute, ids: Object.keys(definitions) };
+}
+
+export function isTextEntry(target) {
+  return !!target?.closest?.('input, textarea, select, [contenteditable]:not([contenteditable="false"]), dialog, [data-help-panel], [data-app-settings]');
+}
+export function shortcutCommand(event) {
+  if (event.defaultPrevented || event.altKey || isTextEntry(event.target)) return null;
+  const key = event.key.toLowerCase(), mod = event.ctrlKey || event.metaKey;
+  if (mod) {
+    if (key === 'o' && !event.shiftKey) return 'open';
+    if (key === 's' && !event.shiftKey) return 'save';
+    if (key === 'z') return event.shiftKey ? 'redo' : 'undo';
+    if (key === 'y') return 'redo';
+  } else if (key === 'escape') return 'clear';
+  else if (key === 'f' && !event.shiftKey) return 'fit';
+  return null;
+}
+
+/** Tabs belong to one editor session. Closing a drawing never closes its document. */
+export function createDrawingTabs() {
+  let document = null, active = null;
+  const tabs = new Map();
+  return {
+    reset(owner) { if (owner === document) return false; document = owner; tabs.clear(); active = null; return true; },
+    open(view) { tabs.set(view.id, { ...tabs.get(view.id), ...view }); active = view.id; },
+    close(id) { tabs.delete(id); if (active === id) active = [...tabs.keys()].at(-1) || null; return tabs.get(active) || null; },
+    get active() { return tabs.get(active) || null; },
+    get all() { return [...tabs.values()]; },
+  };
+}

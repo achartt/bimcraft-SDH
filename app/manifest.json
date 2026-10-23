@@ -2,7 +2,8 @@
   "app": "bimcraft",
   "css": [
     "bimcraft.css",
-    "frame/frame-panel.css"
+    "frame/frame-panel.css",
+    "workspace/workspace.css"
   ],
   "module": "bimcraft.js",
   "imports": {
