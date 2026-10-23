@@ -3,7 +3,7 @@ title: Pipes and ducts
 summary: Draw pipe and duct runs on the plan by their centre lines; the elbows, tees, reducers and transitions are made for you, the runs belong to systems with connected ports in the IFC file, and they show in plans, schedules and the takeoff.
 section: tasks
 order: 36
-keywords: pipe, pipes, piping, plumbing, duct, ducts, ductwork, hvac, mep, mechanical, elbow, tee, reducer, transition, fitting, fittings, valve, valves, gate valve, ball valve, globe valve, check valve, riser, slope, drain, sanitary, storm, vent, cold water, hot water, chilled water, heating, gas, fire protection, supply air, return air, exhaust, system, systems, port, ports, connector, connectors, fixture, basin, sink, toilet, airflow, cfm, friction, equal friction, sizing, schedule, takeoff
+keywords: pipe, pipes, piping, plumbing, duct, ducts, ductwork, hvac, mep, mechanical, elbow, tee, reducer, transition, fitting, fittings, valve, valves, gate valve, ball valve, globe valve, check valve, riser, slope, drain, sanitary, storm, vent, cold water, hot water, chilled water, heating, gas, fire protection, supply air, return air, exhaust, system, systems, port, ports, connector, connectors, fixture, fixtures, plumbing fixture, basin, sink, toilet, water closet, lavatory, kitchen sink, shower, laundry tub, fixture units, uhc, dfu, airflow, cfm, friction, equal friction, sizing, schedule, takeoff
 ---
 
 ## What you'll do
@@ -25,6 +25,12 @@ The pipe snaps like walls do, and to other runs: start on a pipe's end to carry 
 2. Type the width and height (a round duct's width is its diameter), and **At** for the centre line's height.
 3. To size it from the airflow, type the **Airflow** and the **Friction** rate and click {{ui:Size it}}. The duct is sized by equal friction, the method in the duct design chapter of the ASHRAE Handbook, and rounded up to a stocked size, so the friction comes out at or under the rate you typed. With no rate typed it uses 0.08 in. of water per 100 ft (0.8 Pa/m). A rectangular duct keeps the height you typed and gets a width; BimCraft says so when its sides are more than 4 to 1.
 4. Click the corners as for a pipe.
+
+## Plumbing fixtures
+
+{{ui:Build}} › {{ui:Place family}} offers five fixtures to start from, each with a drain and a cold-water connector: a **Water closet**, a **Lavatory**, a **Kitchen sink**, a **Shower tray** and a **Laundry tub**. Their front faces you as you place them and their back goes against the wall. Their drains are at the smallest fixture drain of NBR 8160 (DN 100 for the water closet, DN 50 for the kitchen sink, DN 40 for the others); water is DN 20. Change their sizes, or edit them, as any family: see [Families and their sizes](topic:families).
+
+A family says which fixture it is under {{ui:Plumbing fixture}} on the {{ui:Connectors}} tab of the family editor. Its drain is then counted in fixture units: 6 UHC for a water closet, 1 for a lavatory, 3 for a kitchen sink or a laundry tub, 2 for a shower (NBR 8160), or the drainage fixture units of IPC Table 709.1.
 
 ## From a fixture's connector
 

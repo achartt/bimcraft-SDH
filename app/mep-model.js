@@ -31,7 +31,7 @@
  *   mepLayout(runs) → { runs: Map(guid → { parts }), error? }   pure: what the runs make (parts with their ends)
  *   readRuns(w) · placeRun(spec) → op · changeRun(guid, ch) → op · removeRuns(guids) → op · addValve(guid, at, kind) → op
  *   regenMep(w, storey) · runSchedules(w) → { pipes, ducts, fittings } rows · pipeForFlow(mat, cls, q, vmax) · ductForFlow(…)
- *   readFixturePorts(w) → [{ id, owner, storey, p, dir, domain, system, size, flow, connected }]   the ports families wrote on
+ *   readFixturePorts(w) → [{ id, owner, storey, p, dir, domain, system, size, flow, fixture, connected }]   the ports families wrote on
  *     their elements (CadCraft_Connector; family-ops.js), in their storey's plan mm. A run whose end lies on one (within 0.6 mm)
  *     is connected to it when the run is made; joinPorts(w, storey, ports) connects new ports to touching free ones.
  *   Errors: mep.err.points, mep.err.size, mep.err.back (a run doubling back on itself), mep.err.short (a leg too short for its
@@ -612,7 +612,7 @@ export function readFixturePorts(w) {
     if (!st?.ObjectPlacement) continue;
     const at = placeIn(w, st.ObjectPlacement.value, id);
     out.push({ id, owner: el, storey, p: at.p, dir: at.dir, domain: ps.Domain === 'duct' ? 'duct' : 'pipe', system: String(ps.System || ''), size: (Number(ps.Size) || 0) * w.unitMm,
-      flow: ps.Flow === 'out' ? 'out' : 'in', key: String(ps.Key || ''), connected: joined.has(id) });
+      flow: ps.Flow === 'out' ? 'out' : 'in', key: String(ps.Key || ''), fixture: String(ps.Fixture || ''), connected: joined.has(id) });
   }
   return out;
 }

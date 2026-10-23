@@ -19,7 +19,8 @@
  *        removeFamily(key) · placeFamily({ storey, family, values, typeGuid, x, y, rot, guid }) · setFamilySize(guids, typeGuid) ·
  *        moveFamilyElement(guid, { x, y, rot }) · removeFamilyElements(guids)
  *   A family's connectors become ports of each element (IFC4: IfcDistributionPort nested on it, placed in its axes with Z the way
- *   out; IFC2X3: IfcDistributionPort + IfcRelConnectsPortToElement), each with CadCraft_Connector (Key, Domain, System, Size);
+ *   out; IFC2X3: IfcDistributionPort + IfcRelConnectsPortToElement), each with CadCraft_Connector (Key, Domain, System, Size,
+ *   Flow, and Fixture for a plumbing fixture);
  *   they are made again whenever the element is placed, resized or its family saved (and connected to the pipe or duct ends
  *   they touch, mep-model.js joinPorts), and go with the element.
  *   elementPorts(w, id) → port ids the family wrote on an element
@@ -29,7 +30,7 @@ import { op, changeOpenings } from './model-ops.js';
 import { readOpenings, regenOpenings, typeOf, DOOR_PSET, WINDOW_PSET } from './model-openings.js';
 import { readWalls } from './model-walls.js';
 import { DOOR_TYPES, WINDOW_TYPES, openingType } from './opening-types.js';
-import { STARTER_KEYS, STARTER_FURNITURE, starterRecipe } from './family-starters.js';
+import { STARTER_KEYS, STARTER_FURNITURE, STARTER_FIXTURES, starterRecipe } from './family-starters.js';
 import { readFamily, evaluateFamily, familyIndex, familyFor, storeFamily, sizeTypeFor, writeSizeMaps, sizeValues, sizeKey, sizeRows,
   typePset, setTypePset, SIZE_PSET, FAMILY_PSET, CONNECTOR_PSET, newFamilyKey, defaultSizeName, forgetFamilyIndex } from './family-model.js';
 import { PIPE_SYSTEMS, DUCT_SYSTEMS, joinPorts } from './mep-model.js';
@@ -113,11 +114,12 @@ export function openingFamilies(w, kind) {
   for (const [key, g] of familyIndex(w).groups) if (g.fam && g.fam.host === 'wall' && g.fam.kind === kind && !openingType(key)) out.push({ key, name: g.fam.name, starter: false });
   return out;
 }
-/** What Place family offers: the starter furniture, then the file's own families placed on a floor. */
+/** What Place family offers: the starter furniture and plumbing fixtures, then the file's own families placed on a floor. */
 export function unhostedFamilies(w) {
-  const out = STARTER_FURNITURE.map((key) => ({ key, name: (w ? familyFor(w, key) : starterRecipe(key)).name, starter: true }));
+  const starters = [...STARTER_FURNITURE, ...STARTER_FIXTURES];
+  const out = starters.map((key) => ({ key, name: (w ? familyFor(w, key) : starterRecipe(key)).name, starter: true }));
   if (!w) return out;
-  for (const [key, g] of familyIndex(w).groups) if (g.fam && g.fam.host !== 'wall' && !STARTER_FURNITURE.includes(key)) out.push({ key, name: g.fam.name, starter: false });
+  for (const [key, g] of familyIndex(w).groups) if (g.fam && g.fam.host !== 'wall' && !starters.includes(key)) out.push({ key, name: g.fam.name, starter: false });
   return out;
 }
 /** Placed unhosted family elements, in their storey's plan (mm, degrees). */
@@ -487,7 +489,7 @@ function writePorts(w, id, fam, values) {
       : w.make('IFCDISTRIBUTIONPORT', w.guid(), w.ownerHistory(), name, null, null, w.H(plp), null, flow);
     if (!w.v4) w.make('IFCRELCONNECTSPORTTOELEMENT', w.guid(), w.ownerHistory(), null, null, w.H(pid), w.H(id));
     w.upsertPset(pid, CONNECTOR_PSET, [['Key', 'IFCIDENTIFIER', c.id], ['Domain', 'IFCLABEL', c.domain], ['System', 'IFCLABEL', c.system],
-      ['Size', 'IFCPOSITIVELENGTHMEASURE', round(w.u(c.size))], ['Flow', 'IFCLABEL', c.flow]]);
+      ['Size', 'IFCPOSITIVELENGTHMEASURE', round(w.u(c.size))], ['Flow', 'IFCLABEL', c.flow], ...(fam.fixture ? [['Fixture', 'IFCLABEL', fam.fixture]] : [])]);
     made.push(pid);
   }
   if (w.v4 && made.length) w.make('IFCRELNESTS', w.guid(), w.ownerHistory(), null, null, w.H(id), made.map((p) => w.H(p)));

@@ -10,7 +10,8 @@
  *              click a segment's middle to add one there, Shift+click it to make it an arc, double-click a point to remove it).
  *   Booleans   [data-fe-tab="booleans"]: cut (difference) or join (union) two solids or Booleans.
  *   Connectors [data-fe-tab="connectors"] (families placed on a floor): where a pipe or duct joins the element — kind, system,
- *              x / y / z (numbers or expressions), the way out, size and flow; drawn on the preview as a ring and an arrow.
+ *              x / y / z (numbers or expressions), the way out, size and flow; drawn on the preview as a ring and an arrow;
+ *              and which plumbing fixture the family is [data-fe-fixture] (mep/fixtures.js), for its fixture units.
  *   Preview    the family written as IFC by the same code as the model (family-ifc.js) and drawn by cc-ifc [data-fe-view], with
  *              handles [data-fe-handles]: the size's (Width, Depth, Height) or the picked solid's faces; dragging a handle bound
  *              to a parameter changes the size previewed, a handle on a typed number changes the number.
@@ -20,6 +21,7 @@
 import * as FE from './family-edit.js';
 import { readFamily, evaluateFamily, inputParams, sizeValues, arcPoints, STYLES, CONTEXT_NAMES, CONNECTOR_DOMAINS, CONNECTOR_DIRS } from './family-model.js';
 import { PIPE_SYSTEMS, DUCT_SYSTEMS, systemLabel } from './mep-model.js';
+import { FIXTURE_KINDS } from './mep/fixtures.js';
 import { literal, formatNumber } from './expr.js';
 import { Viewer3D } from './viewer3d.js';
 import { toViewer } from './ifc-place.js';
@@ -319,8 +321,11 @@ export function openFamilyEditor({ root, t, units, recipe, values, starter = fal
         el('p', { className: 'bc-fe-row' }, btn({ 'data-fe-crm': c.id }, t('fam.ed.cremove'), () => change(FE.removeConnector(E.fam, c.id)), 'bi-trash')));
     });
     const kind = select({ 'data-fe-caddkind': '', 'aria-label': t('fam.ed.cdomain') }, CONNECTOR_DOMAINS.map((d) => [d, t('mep.part.' + d)]), 'pipe', () => {});
+    const fixture = select({ 'data-fe-fixture': '' }, [['', t('fam.fixture.none')], ...FIXTURE_KINDS.map((k) => [k, t('fam.fixture.' + k)])], E.fam.fixture || '', (v) => change(FE.setFixture(E.fam, v)));
     return [
       el('p', { className: 'bc-muted' }, t('fam.ed.cnote')),
+      el('div', { className: 'bc-fe-fields' }, el('label', {}, el('span', {}, t('fam.ed.fixture')), fixture)),
+      el('p', { className: 'bc-muted' }, t('fam.ed.fixture.note')),
       ...(list.length ? list : [el('p', { className: 'bc-muted' }, t('fam.ed.cnone'))]),
       el('div', { className: 'bc-fe-fields bc-fe-badd' }, el('label', {}, el('span', {}, t('fam.ed.cdomain')), kind),
         el('span', { className: 'bc-fe-baddgo' }, btn({ 'data-fe-cadd': '' }, t('fam.ed.cadd'), () => change(FE.addConnector(E.fam, { domain: kind.value })), 'bi-plus-lg'))),
