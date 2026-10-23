@@ -5,6 +5,7 @@ import { createDrawingTabs, isTextEntry } from './commands.js';
 import { node, icon, button } from './dom.js';
 import { fmtLen } from '../model-units.js';
 import { scalesFor } from '../res-sheets.js';
+import { mountWallWorkflow, INSTANCE_WALL_FIELDS } from './walls.js';
 
 /** F28-A owns chrome and layout only. Editors, canvases and extension nodes retain their identity and bindings. */
 export function mountWorkspace({ root, modelUi, views, commands, props, current, status }) {
@@ -13,7 +14,7 @@ export function mountWorkspace({ root, modelUi, views, commands, props, current,
   let active = false, frame = 0, tab = 'Architecture', wallContext = false, browserView = null, propertyMode = 'view';
   let documentToken = null, propsToken = null, tabSignature = '', viewPropsSignature = '', restricted = new Map();
   const cameras = new Map();
-  const A = modelUi.extend({ refresh: refreshSoon, settled: refreshSoon });
+  const A = modelUi.extend({ refresh: refreshSoon, settled: refreshSoon, toolChanged: refreshSoon });
   const propsHome = document.createComment('F28 Properties home'), browserHome = document.createComment('F28 Project Browser home');
   props.before(propsHome);
   let browser = null;
@@ -28,17 +29,18 @@ export function mountWorkspace({ root, modelUi, views, commands, props, current,
   const header = addChrome(node('header', { className: 'ws-titlebar' },
     node('span', { className: 'ws-brand' }, node('b', {}, 'B'), 'BimCraft'),
     node('div', { className: 'ws-quick', 'aria-label': 'Quick access' }, ['open', 'save', 'undo', 'redo'].map(id => tool(id, true))), title,
-    node('span', { className: 'ws-review-badge' }, 'F28-A · Live workspace'),
+    node('span', { className: 'ws-review-badge' }, 'F28-B · Live workspace'),
     button('Tool availability', { 'data-ws-inventory': '' }), button('Established layout', { 'data-ws-fallback': '' })));
   const ribbonTabs = addChrome(node('nav', { className: 'ws-ribbon-tabs', role: 'tablist', 'aria-label': 'Ribbon' }));
   const ribbon = addChrome(node('div', { className: 'ws-ribbon', role: 'tabpanel', id: 'ws-ribbon-panel', 'aria-label': 'Architecture tools' }));
   const options = addChrome(node('div', { className: 'ws-options' }, node('strong', {}, 'Modify'), node('span', { 'data-ws-options-text': '' }, 'Open an IFC to begin.'), tool('clear', true)));
-  const elementProps = node('div', { className: 'ws-element-props' }, node('p', { className: 'ws-note' }, 'F28-A: height and base offset are editable for one supported authored wall. Other fields are read-only; use Established layout for other supported actions.'));
+  const elementProps = node('div', { className: 'ws-element-props' }, node('p', { className: 'ws-note' }, 'Authored wall instances: type, location line, top/height, base offset and exterior orientation use existing transactions. Edit Type → Structure changes the shared wall type. Other properties remain read-only.'));
+  const placementProps = node('div', { className: 'ws-placement-props', 'data-ws-placement-props': '', hidden: true });
   const viewProps = node('div', { className: 'ws-view-props' });
   const propHeading = node('span', {}, 'Properties');
   const propPalette = node('section', { className: 'ws-properties', 'aria-label': 'Properties palette' },
     node('header', { className: 'ws-palette-heading' }, propHeading, button('View Properties', { 'data-ws-view-props': '' })),
-    node('div', { className: 'ws-palette-scroll', 'data-ws-properties-scroll': '' }, viewProps, elementProps));
+    node('div', { className: 'ws-palette-scroll', 'data-ws-properties-scroll': '' }, viewProps, elementProps, placementProps), node('div', { className: 'ws-props-units', 'data-ws-units-slot': '' }));
   const browserSlot = node('div', { className: 'ws-palette-scroll', 'data-ws-browser-scroll': '' });
   const browserPalette = node('section', { className: 'ws-browser', 'aria-label': 'Project Browser palette' },
     node('header', { className: 'ws-palette-heading' }, 'Project Browser'),
@@ -53,12 +55,13 @@ export function mountWorkspace({ root, modelUi, views, commands, props, current,
   const bottom = node('div', { className: 'ws-view-controls', 'aria-label': 'View controls' }, drawingTitle,
     node('label', {}, 'Scale ', scaleSelect), node('label', {}, 'Detail ', detailSelect), tool('range', true), tool('fit', true));
   const stageChrome = [drawingTabs, bottom, emptyView]; stage.append(...stageChrome);
-  const statusBar = addChrome(node('footer', { className: 'ws-statusbar' }, node('span', { className: 'ws-layout-label' }, 'Live IFC workspace · F28-A'), node('span', { 'data-ws-selection': '' }), node('span', { className: 'ws-status-slot' })));
+  const statusBar = addChrome(node('footer', { className: 'ws-statusbar' }, node('span', { className: 'ws-layout-label' }, 'Live IFC workspace · F28-B'), node('span', { 'data-ws-selection': '' }), node('span', { className: 'ws-status-slot' })));
   const realStatus = root.querySelector('[data-status]'), statusHome = document.createComment('F28 status home'); realStatus.before(statusHome);
-  const launch = button('Established layout · Try F28-A workspace', { className: 'ws-launch', 'data-ws-launch': '' });
+  const launch = button('Established layout · Try F28 workspace', { className: 'ws-launch', 'data-ws-launch': '' });
   (document.querySelector('.app-bar') || root).append(launch);
   launch.addEventListener('click', () => setActive(true));
   const tooltip = node('div', { className: 'ws-tooltip', id: 'ws-tool-explanation', role: 'tooltip', hidden: true }); root.append(tooltip);
+  const walls = mountWallWorkflow({ root, A, commands, defaults: placementProps, unitsHost: propPalette.querySelector('[data-ws-units-slot]'), options, status });
 
   function settingsSelect(key) {
     const select = node('select', { 'data-ws-setting': key, 'aria-label': key === 'detail' ? 'Detail Level' : 'View Scale' });
@@ -71,7 +74,8 @@ export function mountWorkspace({ root, modelUi, views, commands, props, current,
     const c = current();
     const view = tabs.active;
     return { ...c, document: c.editor, busy: c.busy || !!A.S.busy || !!A.S.reloading,
-      levels: c.editor === documentToken ? A.S.data?.levels || [] : [], view, settings: view?.kind === 'plan' ? views.workspaceSettings() : null };
+      levels: c.editor === documentToken ? A.S.data?.levels || [] : [], view, settings: view?.kind === 'plan' ? views.workspaceSettings() : null,
+      live: active, wall: walls.metadata() };
   }
   function refreshSoon() { if (!frame) frame = requestAnimationFrame(() => { frame = 0; refresh(); }); }
   function rememberCamera() {
@@ -133,9 +137,11 @@ export function mountWorkspace({ root, modelUi, views, commands, props, current,
     root.classList.toggle('ws-active', on); document.body.classList.toggle('has-live-workspace', on);
     launch.hidden = on;
     if (on) {
+      walls.setActive(true);
       elementProps.append(props); statusBar.querySelector('.ws-status-slot').append(realStatus);
       opened(); attachBrowser(); restrictProperties();
     } else {
+      A.setTool('select'); walls.setActive(false);
       rememberCamera(); propsHome.after(props); statusHome.after(realStatus);
       if (browserHome.parentNode && browser) browserHome.after(browser);
       restoreRestrictions(); tooltip.hidden = true;
@@ -244,7 +250,8 @@ export function mountWorkspace({ root, modelUi, views, commands, props, current,
     if (!active) return;
     for (const element of restricted.keys()) if (!element.isConnected) restricted.delete(element);
     for (const input of props.querySelectorAll('input, select, button, textarea')) {
-      const editable = input.matches('[data-mp-height], [data-mp-base]') && current().selection.length === 1;
+      const editable = input.matches(INSTANCE_WALL_FIELDS) && walls.metadata().supported;
+      if (editable && input.matches('[data-mp-assembly]') && !input.hasAttribute('data-ws-wall-label')) { input.dataset.wsWallLabel = input.textContent; input.textContent = 'Edit Type…'; }
       const textCopy = input.matches('.bc-copy');
       if (!editable && !textCopy && !restricted.has(input)) {
         restricted.set(input, { disabled: input.disabled, title: input.title, ariaDisabled: input.getAttribute('aria-disabled') });
@@ -253,7 +260,7 @@ export function mountWorkspace({ root, modelUi, views, commands, props, current,
         else input.disabled = true;
         input.title = why;
       }
-      if (editable) input.setAttribute('aria-label', input.matches('[data-mp-height]') ? 'Wall height' : 'Base offset');
+      if (editable && input.matches('[data-mp-height], [data-mp-base]')) input.setAttribute('aria-label', input.matches('[data-mp-height]') ? 'Wall height' : 'Base offset');
     }
     for (const dd of props.querySelectorAll('dd')) {
       const label = dd.previousElementSibling?.textContent;
@@ -261,6 +268,7 @@ export function mountWorkspace({ root, modelUi, views, commands, props, current,
     }
   }
   function restoreRestrictions() {
+    for (const b of props.querySelectorAll('[data-ws-wall-label]')) { b.textContent = b.dataset.wsWallLabel; delete b.dataset.wsWallLabel; }
     for (const [element, values] of restricted) { element.disabled = values.disabled; element.title = values.title; if (values.ariaDisabled === null) element.removeAttribute('aria-disabled'); else element.setAttribute('aria-disabled', values.ariaDisabled); delete element.dataset.wsReadonly; delete element.dataset.wsReason; }
     restricted.clear();
     for (const b of browser?.querySelectorAll('[data-ws-original-title]') || []) { b.removeAttribute('aria-disabled'); b.title = b.dataset.wsOriginalTitle; delete b.dataset.wsOriginalTitle; }
@@ -280,18 +288,19 @@ export function mountWorkspace({ root, modelUi, views, commands, props, current,
     title.textContent = (s.name || 'No IFC open') + (s.dirty ? ' *' : '');
     header.title = s.name || '';
     options.classList.toggle('ws-wall-options', wallContext);
-    options.querySelector('strong').textContent = wallContext ? 'Modify | Walls' : 'Modify';
-    options.querySelector('[data-ws-options-text]').textContent = s.busy ? 'Updating real model…' : wallContext ? 'Selected wall · Height and base offset are editable in Properties' : s.document ? 'Select an element. Open views from Project Browser.' : 'Open an IFC to begin.';
+    options.querySelector('strong').textContent = s.wall.placing ? 'Modify | Place Wall' : wallContext ? 'Modify | Walls' : 'Modify';
+    options.querySelector('[data-ws-options-text]').textContent = s.busy ? 'Updating real model…' : s.wall.placing ? 'New wall placement defaults' : wallContext ? 'Selected wall · Instance settings in Properties · Edit Type for shared structure' : s.document ? 'Select an element. Open views from Project Browser.' : 'Open an IFC to begin.';
+    options.classList.toggle('ws-placing', s.wall.placing);
     statusBar.querySelector('[data-ws-selection]').textContent = s.selection.length ? s.selection.length + ' element' + (s.selection.length === 1 ? '' : 's') + ' selected' : 'No element selected';
     drawingTitle.textContent = tabs.active?.name || 'No drawing';
     stage.classList.toggle('ws-no-view', !!s.document && !tabs.active);
     emptyView.hidden = !s.document || !!tabs.active;
-    elementProps.hidden = propertyMode !== 'element' || !s.selection.length;
-    viewProps.hidden = !elementProps.hidden;
-    propHeading.textContent = viewProps.hidden ? 'Properties · Element' : 'Properties · View';
+    elementProps.hidden = s.wall.placing || propertyMode !== 'element' || !s.selection.length;
+    viewProps.hidden = s.wall.placing || !elementProps.hidden;
+    propHeading.textContent = s.wall.placing ? 'Properties · New wall' : viewProps.hidden ? 'Properties · Element' : 'Properties · View';
     if (!viewProps.hidden) renderViewProperties();
     syncSelect(detailSelect, s.settings?.detail || 'coarse'); syncSelect(scaleSelect, s.settings?.scale || 0);
-    restrictProperties(); refreshTools(); renderDrawingTabs();
+    walls.refresh(); restrictProperties(); refreshTools(); renderDrawingTabs();
   }
   function propertiesChanged() { propsToken = props.firstChild; refreshSoon(); }
   function picked() { if (!snapshot().busy) { propertyMode = current().selection.length ? 'element' : 'view'; if (propertyMode === 'view') browserView = tabs.active; } refreshSoon(); }
@@ -332,7 +341,7 @@ export function mountWorkspace({ root, modelUi, views, commands, props, current,
       if (!a.enabled) explain(id); else { b.closest('dialog')?.close(); commands.execute(id); }
       return;
     }
-    if (b.hasAttribute('data-ws-view-props')) { showViewProperties(); return; }
+    if (b.hasAttribute('data-ws-view-props')) { if (A.S.tool === 'wall') A.setTool('select'); showViewProperties(); return; }
     if (b.dataset.wsDrawing) { const v = tabs.all.find(v => v.id === b.dataset.wsDrawing); if (v) activate(v); return; }
     if (b.dataset.wsClose) {
       rememberCamera(); const next = tabs.close(b.dataset.wsClose); if (next) activate(next); else { browserView = null; propertyMode = 'view'; refresh(); } return;
@@ -406,5 +415,6 @@ export function mountWorkspace({ root, modelUi, views, commands, props, current,
   return { get active() { return active; }, refresh: refreshSoon, opened, state: snapshot, propertiesChanged, picked,
     inspect: () => { const s = snapshot(); return { active, document: s.document ? s.name : null, busy: s.busy, dirty: s.dirty, selection: s.selection, view: s.view, tabs: tabs.all, settings: s.settings, propertyMode }; },
     selectTool: () => { A.setTool('select'); status('Select an element in the active view.'); },
-    activatePlan, activate3d: () => activate(threeView()), openRange, setSettings, fit, established: () => setActive(false) };
+    activatePlan, activate3d: () => activate(threeView()), openRange, setSettings, fit, established: () => setActive(false),
+    startWall: () => walls.start(), editType: () => walls.editType(), editStructure: () => walls.editStructure(), cancelWall: finish => { A.workspaceCancel(finish); refreshSoon(); } };
 }
