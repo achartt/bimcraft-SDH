@@ -115,3 +115,10 @@ body.has-live-workspace>.app-bar{display:none}
 .ws-active .ws-ribbon .ws-stack .ws-tool{height:25px}
 
 .ws-active>.shell-dock-split,.ws-active .shell-grip{display:none!important}
+
+/* Keep the actual bound fields. In the live slice, supported instance constraints follow the retained type selector. */
+.ws-active .bc-model-props:has([data-mp-height]) .bc-mp-dl>*{order:10}
+.ws-active .bc-mp-dl>dt:has(+dd [data-mp-type]),.ws-active .bc-mp-dl>dd:has([data-mp-type]){order:0!important}
+.ws-active .bc-mp-dl>dt:has(+dd [data-mp-assembly]),.ws-active .bc-mp-dl>dd:has([data-mp-assembly]){order:1!important}
+.ws-active .bc-mp-dl>dt:has(+dd [data-mp-height]),.ws-active .bc-mp-dl>dd:has([data-mp-height]){order:2!important}
+.ws-active .bc-mp-dl>dt:has(+dd [data-mp-base]),.ws-active .bc-mp-dl>dd:has([data-mp-base]){order:3!important}

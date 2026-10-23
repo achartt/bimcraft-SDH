@@ -17,7 +17,7 @@ export const catalog = {
       "name": "Open",
       "status": "implemented",
       "feature": null,
-      "scope": "Open IFC locally. This prototype opens sample content only.",
+      "scope": "Open an existing IFC through the application reader.",
       "evidence": "devshell/index.html [data-pick-file] and app/bimcraft.js",
       "icon": "folder"
     },
@@ -26,7 +26,7 @@ export const catalog = {
       "name": "Save as IFC",
       "status": "implemented",
       "feature": null,
-      "scope": "Application supports IFC saving; this prototype never writes a file.",
+      "scope": "Save the actual edited IFC through Save as / download; the original is untouched.",
       "evidence": "devshell/index.html [data-save]",
       "icon": "save"
     },
@@ -35,7 +35,7 @@ export const catalog = {
       "name": "Undo",
       "status": "implemented",
       "feature": null,
-      "scope": "Application undo exists; prototype changes are only session examples.",
+      "scope": "Undo existing editor transactions.",
       "evidence": "app/ifc-edit.js; devshell/index.html [data-undo]",
       "icon": "undo"
     },
@@ -44,7 +44,7 @@ export const catalog = {
       "name": "Redo",
       "status": "implemented",
       "feature": null,
-      "scope": "Application redo exists; prototype changes are only session examples.",
+      "scope": "Redo existing editor transactions.",
       "evidence": "app/ifc-edit.js; app/ui.inc [data-act=\"redo\"]",
       "icon": "redo"
     },
@@ -53,7 +53,7 @@ export const catalog = {
       "name": "Export PDF",
       "status": "implemented",
       "feature": null,
-      "scope": "Existing plan and sheet vector PDF; prototype shows an explanation only.",
+      "scope": "Existing plan and sheet vector PDF export. Not wired in F28-A.",
       "evidence": "app/model-pdf.js; app/res-sheets.js; F04-HANDOFF.md",
       "icon": "sheet"
     },
@@ -764,7 +764,7 @@ export const catalog = {
       "name": "Place View",
       "status": "implemented",
       "feature": null,
-      "scope": "Existing add-and-drag views on custom sheets, with per-view scale. Prototype uses a sample placement.",
+      "scope": "Existing add-and-drag views on custom sheets, with per-view scale. Not wired in F28-A.",
       "evidence": "app/views-ui.js openSheet/add/drag; app/res-sheets.js composeSheet",
       "icon": "place"
     },
@@ -1025,7 +1025,7 @@ export const catalog = {
       "name": "Delete",
       "status": "implemented",
       "feature": null,
-      "scope": "Existing selected-element deletion. Prototype clears its sample selection only.",
+      "scope": "Existing selected-element deletion. Not wired in F28-A.",
       "evidence": "app/model-ui.js; app/ui.inc [data-act=\"delete\"]",
       "icon": "delete"
     },
