@@ -243,8 +243,11 @@ export function mountWorkspace({ root, modelUi, views, commands, props, current,
       const editable = input.matches('[data-mp-height], [data-mp-base]') && current().selection.length === 1;
       const textCopy = input.matches('.bc-copy');
       if (!editable && !textCopy && !restricted.has(input)) {
-        restricted.set(input, { disabled: input.disabled, title: input.title });
-        input.disabled = true; input.title = 'Read-only in F28-A. Use Established layout for other supported property and type actions.';
+        restricted.set(input, { disabled: input.disabled, title: input.title, ariaDisabled: input.getAttribute('aria-disabled') });
+        const why = input.matches('[data-mp-assembly]') ? availability('assembly', commands, snapshot()).reason : 'Read-only in F28-A. Use Established layout for other supported property and type actions.';
+        if (input.tagName === 'BUTTON') { input.disabled = false; input.setAttribute('aria-disabled', 'true'); input.dataset.wsReadonly = why; input.dataset.wsReason = why; }
+        else input.disabled = true;
+        input.title = why;
       }
       if (editable) input.setAttribute('aria-label', input.matches('[data-mp-height]') ? 'Wall height' : 'Base offset');
     }
@@ -254,7 +257,7 @@ export function mountWorkspace({ root, modelUi, views, commands, props, current,
     }
   }
   function restoreRestrictions() {
-    for (const [element, values] of restricted) { element.disabled = values.disabled; element.title = values.title; }
+    for (const [element, values] of restricted) { element.disabled = values.disabled; element.title = values.title; if (values.ariaDisabled === null) element.removeAttribute('aria-disabled'); else element.setAttribute('aria-disabled', values.ariaDisabled); delete element.dataset.wsReadonly; delete element.dataset.wsReason; }
     restricted.clear();
     for (const b of browser?.querySelectorAll('[data-ws-original-title]') || []) { b.removeAttribute('aria-disabled'); b.title = b.dataset.wsOriginalTitle; delete b.dataset.wsOriginalTitle; }
     browser?.querySelector('[data-ws-browser-3d]')?.closest('li')?.remove();
@@ -335,6 +338,12 @@ export function mountWorkspace({ root, modelUi, views, commands, props, current,
     const key = e.target.dataset.wsSetting; if (!key) return;
     commands.execute(key, key === 'scale' ? Number(e.target.value) : e.target.value);
   });
+  // Retain real property buttons, but make unavailable actions focusable/touch-discoverable without invoking their handlers.
+  root.addEventListener('click', e => {
+    if (!active || !props.contains(e.target)) return;
+    const b = e.target.closest('[data-ws-readonly]'); if (!b) return;
+    e.preventDefault(); e.stopImmediatePropagation(); explain(b.matches('[data-mp-assembly]') ? 'assembly' : '', b.dataset.wsReadonly);
+  }, true);
   // Capture existing Project Browser actions only in the live layout. Retained fallback handlers stay untouched.
   root.addEventListener('click', e => {
     if (!active || !browser?.contains(e.target)) return;

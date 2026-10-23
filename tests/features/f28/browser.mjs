@@ -43,11 +43,12 @@ try{
  await page.evaluate(()=>{const v=bimcraftPlan.view;v.scene.detail='fine';v.canvas.parentElement.style.width='900px';v.canvas.parentElement.style.height='600px';v.resize();});
  report.before=await renderTiming(page);
  await open(page,fixture);check('real IFC opens in opt-in live layout',(await snap(page)).walls.length===9);
- const initial=await snap(page);await page.locator('[data-pb-plan]').first().dblclick();await settle(page);
+ const initial=await snap(page);await page.locator('[data-pb-plan]').first().click();check('browser selection does not activate or select model elements',(await snap(page)).ui.view.kind==='3d'&&(await snap(page)).ui.selection.length===0);await page.locator('[data-pb-plan]').first().press('Enter');await settle(page);
  check('floor plan activates real storey and drawing tab',(await snap(page)).ui.view.kind==='plan');
  await page.screenshot({path:path.join(out,'after-workspace.png')});
  const guid=await pickWall(page),selected=await snap(page);check('canvas and Properties select a real wall',selected.ui.selection.length===1&&selected.walls.some(w=>w.guid===guid));
  await page.screenshot({path:path.join(out,'selected-wall.png')});
+ await page.locator('[data-mp-assembly]').focus();await page.keyboard.press('Enter');await page.locator('.ws-dialog').waitFor({state:'visible'});check('unavailable Properties action explains on keyboard without editing',(await page.locator('.ws-dialog').textContent()).includes('Not wired in F28-A'));await page.locator('[data-ws-dismiss]').click();
  const w0=selected.walls.find(w=>w.guid===guid),input=page.locator('[data-mp-height]');
  await input.fill('not a length');await input.press('Enter');check('existing invalid-length feedback appears',await page.locator('[data-status]').getAttribute('class').then(s=>s.includes('is-error')));assert.deepEqual((await snap(page)).walls,selected.walls);
  await page.locator('[data-mp-height]').fill(String(w0.height+250)+' mm');await page.locator('[data-mp-height]').press('Enter');await settle(page);
@@ -57,7 +58,7 @@ try{
  const ranged=await snap(page);check('View Range cut belongs to authoritative view',ranged.ui.settings.cut===1400);
  await page.locator(button('undo')).click();await settle(page);check('Undo restores actual view state',(await snap(page)).ui.settings.cut!==1400);
  await page.locator(button('redo')).click();await settle(page);check('Redo restores actual view state',(await snap(page)).ui.settings.cut===1400);
- await pickWall(page);await page.locator('[data-mp-height]').focus();const history=await page.evaluate(()=>bimcraftLive.editor.changes.length);await page.keyboard.press('Control+z');check('model Undo does not fire in a field',(await page.evaluate(()=>bimcraftLive.editor.changes.length))===history);await page.keyboard.press('Tab');
+ await pickWall(page);await page.locator('[data-mp-height]').fill('3150 mm');await page.setViewportSize({width:1200,height:850});check('resize preserves unfinished field entry and focus',await page.locator('[data-mp-height]').evaluate(el=>document.activeElement===el&&el.value==='3150 mm'));await page.locator('[data-mp-height]').press('Escape');await page.setViewportSize({width:1440,height:1000});await page.locator('[data-mp-height]').focus();const history=await page.evaluate(()=>bimcraftLive.editor.changes.length);await page.keyboard.press('Control+z');check('model Undo does not fire in a field',(await page.evaluate(()=>bimcraftLive.editor.changes.length))===history);await page.keyboard.press('Tab');
  const camera=await page.evaluate(()=>{const p=bimcraftPlan.view;return[p.cx,p.cy,p.scale];});
  await page.locator('.ws-vsplit').focus();await page.keyboard.press('ArrowRight');await page.evaluate(()=>new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r))));assert.deepEqual(await page.evaluate(()=>{const p=bimcraftPlan.view;return[p.cx,p.cy,p.scale];}),camera);check('palette resize preserves plan camera');await pickWall(page);check('plan picking survives palette resize');
  await page.locator('[data-ws-drawing="3d:default"]').click();await settle(page);const camera3d=await page.evaluate(()=>{const v=bimcraftRes.api.host.viewer();return v?[...v.camera.position.toArray(),...v.controls.target.toArray()]:null;});
@@ -75,4 +76,8 @@ try{
  await page.locator('[data-ws-fallback]').first().click();check('fallback restores original Properties and Project Browser',await page.evaluate(()=>document.querySelector('.bc-right').contains(document.querySelector('[data-props]'))&&document.querySelector('.bc-left').contains(document.querySelector('[data-pb-sec]'))));await pickWall(page);await page.locator('[data-mp-assembly]').click();await page.locator('[data-assembly-editor]').waitFor({state:'visible'});check('fallback opens the real assembly editor');await page.keyboard.press('Escape');
  check('no application exceptions',report.errors.length===0);report.status='PASS';
 }catch(e){report.status='FAIL';report.error=e.stack||String(e);console.error(e);if(page)await page.screenshot({path:path.join(out,'failure.png')}).catch(()=>{});process.exitCode=1;}
-finally{fs.writeFileSync(path.join(out,'report.json'),JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify({status:report.status,checks:report.checks,error:report.error}));await browser?.close();await new Promise(r=>server?server.close(r):r());}
+finally{
+ // Optional tool-readable review frames for reviewers whose environments cannot materialize artifact ZIPs.
+ // Synthetic fixture screenshots only; ordinary evidence remains the Actions artifact.
+ if(process.env.F28_EMIT_REVIEW_FRAMES==='1')for(const name of ['before-established.png','after-workspace.png','selected-wall.png','narrow.png'])if(fs.existsSync(path.join(out,name))){const b=fs.readFileSync(path.join(out,name)).toString('base64'),n=Math.ceil(b.length/12000);for(let i=0;i<n;i++)console.log('F28_FRAME '+name+' '+i+'/'+n+' '+b.slice(i*12000,(i+1)*12000));}
+ fs.writeFileSync(path.join(out,'report.json'),JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify({status:report.status,checks:report.checks,error:report.error}));await browser?.close();await new Promise(r=>server?server.close(r):r());}
