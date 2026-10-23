@@ -4289,6 +4289,27 @@
   "mep.size": "Size",
   "mep.slope": "Slope",
   "mep.slope.min": "The plumbing code's minimum for this size: {min}",
+  "mep.role": "Drain",
+  "mep.role.branch": "Branch",
+  "mep.role.main": "Building drain",
+  "mep.fu": "Fixture units",
+  "mep.fu.br": "UHC",
+  "mep.fu.us": "DFU",
+  "mep.fu.code.br": "NBR 8160",
+  "mep.fu.code.us": "IPC",
+  "mep.fu.text": "{n} {unit}: needs {size} at least ({code})",
+  "mep.fu.none": "No plumbing fixture drains into it.",
+  "mep.fu.toobig": "{n} {unit}: more than the largest size of this pipe carries at this slope.",
+  "mep.sizedrains": "Size the drains",
+  "mep.sizedrains.label": {
+    "one": "{n} drain sized by its fixture units",
+    "other": "{n} drains sized by their fixture units"
+  },
+  "mep.sizedrains.none": "Every sanitary drain is already big enough for its fixture units.",
+  "mep.sizedrains.big": {
+    "one": "{n} drain carries more fixture units than its largest size can: use a steeper slope or another pipe.",
+    "other": "{n} drains carry more fixture units than their largest size can: use a steeper slope or another pipe."
+  },
   "mep.slope.under": "Flatter than the plumbing code's minimum for this size ({min})",
   "mep.shape": "Shape",
   "mep.diameter": "Diameter",

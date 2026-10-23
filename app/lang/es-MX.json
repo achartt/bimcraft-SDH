@@ -4417,6 +4417,27 @@
   "mep.size": "Tamaño",
   "mep.slope": "Pendiente",
   "mep.slope.min": "El mínimo del código de plomería para este tamaño: {min}",
+  "mep.role": "Desagüe",
+  "mep.role.branch": "Ramal",
+  "mep.role.main": "Colector del edificio",
+  "mep.fu": "Unidades de descarga",
+  "mep.fu.br": "UHC",
+  "mep.fu.us": "DFU",
+  "mep.fu.code.br": "NBR 8160",
+  "mep.fu.code.us": "IPC",
+  "mep.fu.text": "{n} {unit}: necesita {size} como mínimo ({code})",
+  "mep.fu.none": "Ningún mueble sanitario desagua en él.",
+  "mep.fu.toobig": "{n} {unit}: más de lo que lleva el tamaño mayor de esta tubería con esta pendiente.",
+  "mep.sizedrains": "Dimensionar los desagües",
+  "mep.sizedrains.label": {
+    "one": "{n} desagüe dimensionado por sus unidades de descarga",
+    "other": "{n} desagües dimensionados por sus unidades de descarga"
+  },
+  "mep.sizedrains.none": "Todos los desagües sanitarios ya son suficientes para sus unidades de descarga.",
+  "mep.sizedrains.big": {
+    "one": "{n} desagüe lleva más unidades de descarga de las que admite su tamaño mayor: use más pendiente u otra tubería.",
+    "other": "{n} desagües llevan más unidades de descarga de las que admite su tamaño mayor: use más pendiente u otra tubería."
+  },
   "mep.slope.under": "Más plana que el mínimo del código de plomería para este tamaño ({min})",
   "mep.shape": "Forma",
   "mep.diameter": "Diámetro",

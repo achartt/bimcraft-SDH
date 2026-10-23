@@ -3,7 +3,7 @@ title: Pipes and ducts
 summary: Draw pipe and duct runs on the plan by their centre lines; the elbows, tees, reducers and transitions are made for you, the runs belong to systems with connected ports in the IFC file, and they show in plans, schedules and the takeoff.
 section: tasks
 order: 36
-keywords: pipe, pipes, piping, plumbing, duct, ducts, ductwork, hvac, mep, mechanical, elbow, tee, reducer, transition, fitting, fittings, valve, valves, gate valve, ball valve, globe valve, check valve, riser, slope, drain, sanitary, storm, vent, cold water, hot water, chilled water, heating, gas, fire protection, supply air, return air, exhaust, system, systems, port, ports, connector, connectors, fixture, fixtures, plumbing fixture, basin, sink, toilet, water closet, lavatory, kitchen sink, shower, laundry tub, fixture units, uhc, dfu, airflow, cfm, friction, equal friction, sizing, schedule, takeoff, nbr, nbr 5648, nbr 5688, nbr 8160, pvc soldável, esgoto, dn
+keywords: pipe, pipes, piping, plumbing, duct, ducts, ductwork, hvac, mep, mechanical, elbow, tee, reducer, transition, fitting, fittings, valve, valves, gate valve, ball valve, globe valve, check valve, riser, slope, drain, sanitary, storm, vent, cold water, hot water, chilled water, heating, gas, fire protection, supply air, return air, exhaust, system, systems, port, ports, connector, connectors, fixture, fixtures, plumbing fixture, basin, sink, toilet, water closet, lavatory, kitchen sink, shower, laundry tub, fixture units, uhc, dfu, size the drains, drain sizing, building drain, branch, ramal, coletor, airflow, cfm, friction, equal friction, sizing, schedule, takeoff, nbr, nbr 5648, nbr 5688, nbr 8160, pvc soldável, esgoto, dn
 ---
 
 ## What you'll do
@@ -64,6 +64,20 @@ While drawing, type a new height in **At** and press {{key:Enter}}: the run goes
 
 Sanitary and storm drains start at the smallest slope the International Plumbing Code allows for their size: 1/4 in. per foot up to 2-1/2 in., 1/8 in. per foot from 3 to 6 in., 1/16 in. per foot from 8 in. Brazilian PVC drain pipe starts at the slope of NBR 8160: 2 % up to DN 75, 1 % from DN 100. Type another slope in the bar or in Properties: `1/4"/ft`, `2 %` or `1:50`. The run falls from its first point, so draw drains in the direction they flow. The plan shows the fall and an arrow. Properties warns when a drain is flatter than the code's minimum.
 
+## Size the drains by fixture units
+
+Pick a sanitary drain: **Fixture units** in Properties says how many it carries and the smallest size they need. Every plumbing fixture whose drain connector is on the run counts, and so does every drain that flows into it: draw drains in the direction they flow, each ending on the drain it flows into.
+
+- Drains in Brazilian PVC drain pipe count **UHC** and follow NBR 8160; the others count **DFU** and follow the International Plumbing Code.
+- **Drain**: a **Branch** is sized from the code's table for fixture branches; a **Building drain** from its table by slope, so its **Slope** matters.
+- A drain is never smaller than the fixture drains it serves (a water closet needs DN 100, or 3 in.), nor than a drain flowing into it.
+
+{{ui:Size the drains}} makes every sanitary drain of the model that is too small for its fixture units the size it needs, as one step you can undo. A drain drawn bigger than it needs is left as it is. When a drain carries more than the largest size of its pipe can at its slope, BimCraft says so: give it a steeper slope or another pipe.
+
+:::note
+The tables are those of horizontal drains. Stacks, vents and storm drains are not sized here: check them, and the whole design, against the code that applies to the project.
+:::
+
 ## Valves
 
 1. Choose {{ui:Valve}} and the kind: gate, ball, globe or check.
@@ -78,7 +92,7 @@ Pick any part of a run, in the plan or the 3D view. In Properties:
 - **System**, **Material**, **Class** and **Size** (pipes), or **Shape**, **Width**, **Height** (ducts).
 - **Height above the level** moves the whole run up or down.
 - **Slope** (pipes).
-- **Flow** with {{ui:Size it}}: for water, the smallest size that keeps the water at 8 ft/s (2.4 m/s), or 5 ft/s (1.5 m/s) for hot water; at 3 m/s for the Brazilian PVC water pipe (NBR 5626). For ducts, the velocity and friction rate of the duct as drawn. Drains are sized by fixture units, which BimCraft does not do yet: pick their size yourself.
+- **Flow** with {{ui:Size it}}: for water, the smallest size that keeps the water at 8 ft/s (2.4 m/s), or 5 ft/s (1.5 m/s) for hot water; at 3 m/s for the Brazilian PVC water pipe (NBR 5626). For ducts, the velocity and friction rate of the duct as drawn. Sanitary drains are sized by their fixture units instead: see **Size the drains by fixture units** below.
 
 Each change is one step of {{ui:Undo}}. {{key:Delete}} removes the whole run.
 

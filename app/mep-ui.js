@@ -14,10 +14,11 @@
  * a run ended on one goes down or up onto it. The run is connected to the element's port when it is made.
  * Plans: pipes under 150 mm as one line, larger pipes and ducts as two, in their system's colour; rises and drops marked;
  * size and system labels; a drain's fall. Runs show on every level their height range reaches (the plan's view range).
- * Properties edit a run; Delete removes it. Schedules: pipes, ducts, fittings and valves. The TakeoffCraft hand-off (res-ui.js
+ * Properties edit a run; Delete removes it. A sanitary run shows the fixture units it carries and the size they need (NBR 8160
+ * UHC for the Brazilian pipes, IPC DFU for the others), whether it is a branch or a building drain, and Size the drains. Schedules: pipes, ducts, fittings and valves. The TakeoffCraft hand-off (res-ui.js
  * makeTakeoff) gets them through `takeoffExtra`. Test hook: window.bimcraftMep = { state, api }.
  */
-import { readRuns, placeRun, changeRun, removeRuns, addValve, removeValve, mepLayout, sectionOf, runVertices, runDefaults, drainMinimum, along, runLength, readFixturePorts,
+import { readRuns, placeRun, changeRun, removeRuns, addValve, removeValve, mepLayout, sectionOf, runVertices, runDefaults, drainMinimum, along, runLength, readFixturePorts, drainPlan, sizeDrains,
   PIPE_SYSTEMS, DUCT_SYSTEMS, VALVE_KINDS, DUCT_SHAPES, systemLabel, pipeForFlow, ductForFlow, ductLoss, runSchedules } from './mep-model.js';
 import { MATERIALS, CLASSES, DEFAULT_CLASS, sizesFor, pipeSize, standardOf, BR_MAX_VELOCITY } from './mep/pipes.js';
 import { ModelWriter } from './model-write.js';
@@ -153,7 +154,7 @@ export function mountMep(modelUi) {
   function takeFrom(c) {
     if (c.domain === 'pipe') {
       const P = R.pipe;
-      if (PIPE_SYSTEMS[c.system] && c.system !== P.system) { const d = runDefaults('pipe', c.system); Object.assign(P, { system: d.system, mat: d.mat, cls: d.cls }); }
+      if (PIPE_SYSTEMS[c.system] && c.system !== P.system) { const d = runDefaults('pipe', c.system, undefined, standardOf(P.mat)); Object.assign(P, { system: d.system, mat: d.mat, cls: d.cls }); }
       // by nominal size (a table's keys are not in size order: "1", "2" come before "1/2")
       const sizes = sizesFor(P.mat, P.cls).map((s) => ({ s, p: pipeSize(P.mat, P.cls, s) })).filter((x) => x.p).map((x) => ({ ...x, dn: x.p.dn ?? x.p.nps * IN })).sort((a, b) => a.dn - b.dn);
       const pick = sizes.find((x) => x.dn >= c.size - 0.5) || sizes.at(-1);
@@ -376,6 +377,7 @@ export function mountMep(modelUi) {
       kit.field(t('mep.slope'), sl);
       const min = drainMinimum(r);
       if (min !== null) kit.rows.push(el('dt', {}, ''), el('dd', { className: r.slope + 1e-9 < min ? 'bc-input-err' : 'bc-muted', 'data-mp-mepmin': '' }, t(r.slope + 1e-9 < min ? 'mep.slope.under' : 'mep.slope.min', { min: fmtSlope(min, A.units()) })));
+      if (r.system === 'san') drainRows(r, kit, run);
     } else {
       kit.field(t('mep.shape'), kit.select(DUCT_SHAPES.map((s) => [s, t('mep.shape.' + s)]), r.shape, 'data-mp-mepshape', (v) => run({ shape: v, h: v === 'round' ? r.w : (v === 'oval' && !(r.w > r.h) ? r.w / 2 : r.h) })));
       kit.field(t(r.shape === 'round' ? 'mep.diameter' : 'mep.width'), kit.lenInput(r.w, 'data-mp-mepw', (mm) => run({ w: mm, ...(r.shape === 'round' ? { h: mm } : {}) }), { min: 50 }));
@@ -390,7 +392,7 @@ export function mountMep(modelUi) {
     const z0 = r.points[0][2];
     kit.field(t('mep.z'), kit.lenInput(z0, 'data-mp-mepz', (mm) => run({ points: r.points.map((q) => [q[0], q[1], q[2] + (mm - z0)]) }), { any: true }));
     kit.rows.push(el('dt', {}, t('mep.length')), el('dd', { 'data-mp-meplen': '' }, L(runLength(r)) + ' · ' + t('mep.parts', { n: r.parts.length })));
-    if (r.kind === 'pipe' && r.flow >= 0) {
+    if (r.kind === 'pipe' && r.system !== 'san' && r.flow >= 0) {
       const fb = el('input', { type: 'text', className: 'bc-input bc-num', value: r.flow ? String(r.flow) : '', 'data-mp-mepgpm': '', size: 6 });
       const go = kit.button(t('mep.sizeit'), 'data-mp-mepsizeit', () => {
         const q = Number(fb.value.replace(',', '.'));
@@ -406,6 +408,27 @@ export function mountMep(modelUi) {
     }
     r.valves.forEach((v, i) => kit.field(t('mep.valve.at', { kind: t('mep.valve.' + v.kind), at: L(v.s) }), kit.button(t('mep.valve.del'), 'data-mp-mepdelvalve', () => A.commit(removeValve(r.guid, i), meta))));
     return { title: t(r.kind === 'duct' ? 'mep.run.duct' : 'mep.run.pipe') + ' ' + sizeLabel(r.sec) + ' ' + systemLabel(r.kind, r.system) };
+  }
+
+  /** A sanitary run: branch or building drain, the fixture units it carries and the size they need, Size the drains. */
+  function drainRows(r, kit, run) {
+    kit.field(t('mep.role'), kit.select([['branch', t('mep.role.branch')], ['main', t('mep.role.main')]], r.role, 'data-mp-meprole', (v) => run({ role: v })));
+    let q = null;
+    try { q = drainPlan(W()).get(r.guid); } catch (e) { console.error(e); }
+    const std = standardOf(r.mat), unit = t('mep.fu.' + std);
+    const text = !q || (!q.units && !q.floor) ? t('mep.fu.none') : q.toobig ? t('mep.fu.toobig', { n: q.units, unit })
+      : t('mep.fu.text', { n: q.units, unit, size: sizeName(r.mat, r.cls, q.need), code: t('mep.fu.code.' + std) });
+    kit.rows.push(el('dt', {}, t('mep.fu')), el('dd', { className: q?.grow || q?.toobig ? 'bc-input-err' : 'bc-muted', 'data-mp-mepfu': '' }, text));
+    kit.field('', kit.button(t('mep.sizedrains'), 'data-mp-mepsizedrains', () => sizeAll()));
+  }
+  /** Every sanitary run too small for its fixture units made the size they need (one undo step). */
+  function sizeAll() {
+    let plan;
+    try { plan = [...drainPlan(W()).values()]; } catch (e) { console.error(e); return; }
+    const grow = plan.filter((q) => q.grow).length, big = plan.filter((q) => q.toobig).length;
+    if (!grow) { A.host.status(big ? t('mep.sizedrains.big', { n: big }) : t('mep.sizedrains.none'), !!big); return; }
+    A.commit(sizeDrains(), { label: t('mep.sizedrains.label', { n: grow }), verb: t('model.verb.changed') });
+    if (big) A.host.status(t('mep.sizedrains.big', { n: big }), true);
   }
 
   // ---- schedules ----
