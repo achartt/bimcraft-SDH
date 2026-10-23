@@ -37,6 +37,8 @@ try{
  const fixture=path.resolve('fixtures/f04/layered-plans.ifc');report.fixtureSHA256=crypto.createHash('sha256').update(fs.readFileSync(fixture)).digest('hex');
  await open(page,fixture,'established');await page.locator('[data-model-toggle]').click({force:true});await page.locator('[data-model-layout="plan"]').click({force:true});
  await page.waitForFunction(()=>globalThis.bimcraftPlan?.state.data?.walls.length===9&&!bimcraftPlan.state.busy&&!bimcraftPlan.state.reloading);
+ await page.locator('[data-model-fit]').click({force:true});await page.evaluate(()=>new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r))));
+ check('established canvas has painted actual model pixels',await page.evaluate(()=>{const v=bimcraftPlan.view,a=v.ctx.getImageData(0,0,v.canvas.width,v.canvas.height).data;let n=0;for(let i=0;i<a.length;i+=4)if(a[i+3]>0&&a[i]<100&&a[i+1]<100&&a[i+2]<100)n++;return n>500;}));
  await page.screenshot({path:path.join(out,'before-established.png')});
  await page.locator('[data-pb-range]').first().click({force:true});await page.locator('[data-pv-cut]').fill('1400 mm');await page.locator('[data-pv-detail]').selectOption('fine');await page.locator('[data-pv-scale]').selectOption('100');await page.locator('[data-pv-ok]').click();await page.waitForFunction(()=>!bimcraftPlan.state.busy&&!bimcraftPlan.state.reloading);
  // Same production painter and exact viewport size for comparable timing, independently of chrome occupied space.
@@ -80,5 +82,6 @@ try{
 finally{
  // Optional tool-readable review frames for reviewers whose environments cannot materialize artifact ZIPs.
  // Synthetic fixture screenshots only; ordinary evidence remains the Actions artifact.
+ if(process.env.F28_EMIT_REVIEW_FRAMES==='1')console.log('F28_REPORT '+JSON.stringify(report));
  if(process.env.F28_EMIT_REVIEW_FRAMES==='1')for(const name of ['before-established.png','after-workspace.png','selected-wall.png','narrow.png'])if(fs.existsSync(path.join(out,name))){const b=fs.readFileSync(path.join(out,name)).toString('base64'),n=Math.ceil(b.length/12000);for(let i=0;i<n;i++)console.log('F28_FRAME '+name+' '+i+'/'+n+' '+b.slice(i*12000,(i+1)*12000));}
  fs.writeFileSync(path.join(out,'report.json'),JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify({status:report.status,checks:report.checks,error:report.error}));await browser?.close();await new Promise(r=>server?server.close(r):r());}
