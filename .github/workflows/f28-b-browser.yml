@@ -1,0 +1,56 @@
+name: F28-B wall workspace acceptance
+on:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: f28-b-browser-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/cache@v4
+        with:
+          path: devshell/vendor
+          key: vendor-${{ hashFiles('devshell/vendor.json') }}
+      - run: npm run fetch-vendor
+      - name: Browser and independent IFC/PDF readers
+        run: |
+          npm install --prefix .cc-test/f28-b-browser-deps --no-package-lock playwright@1.56.1
+          .cc-test/f28-b-browser-deps/node_modules/.bin/playwright install --with-deps chromium
+          python -m venv .cc-test/f28-b-reader
+          .cc-test/f28-b-reader/bin/python -m pip install -r tests/features/f01/requirements-independent.txt -r tests/features/f04/requirements-independent.txt
+      - name: Wall command and model invariants
+        run: npm run test:f28
+      - name: Real wall workspace browser acceptance
+        env:
+          F28_EMIT_REVIEW_FRAMES: '1'
+        run: node tests/features/f28/walls-browser.mjs
+      - name: Independent actual downloaded IFC and exports
+        run: .cc-test/f28-b-reader/bin/python -I tests/features/f28/walls-independent.py
+      - name: Same-environment F04 and F05 geometry/export workloads
+        env:
+          F28_COMPARE_BASE: 0ccb30d735554b012cf21e02252ded4612fd2f54
+          F28_COMPARE_OUTPUT: evidence/f28-b/performance-node.json
+        run: node tests/features/f28/measure.mjs
+      - name: Retain evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: f28-b-browser
+          path: |
+            .cc-test/f28-b-browser/
+            evidence/f28-b/performance-node.json

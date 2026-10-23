@@ -51,7 +51,7 @@ try{
  await page.screenshot({path:path.join(out,'after-workspace.png')});
  const guid=await pickWall(page),selected=await snap(page);check('canvas and Properties select a real wall',selected.ui.selection.length===1&&selected.walls.some(w=>w.guid===guid));
  await page.screenshot({path:path.join(out,'selected-wall.png')});
- await page.locator('[data-mp-assembly]').focus();await page.keyboard.press('Enter');await page.locator('.ws-dialog').waitFor({state:'visible'});check('unavailable Properties action explains on keyboard without editing',(await page.locator('.ws-dialog').textContent()).includes('Not wired in F28-A'));await page.locator('[data-ws-dismiss]').click();
+ await page.locator('[data-mp-assembly]').focus();await page.keyboard.press('Enter');await page.locator('[data-ws-type-dialog]').waitFor({state:'visible'});check('Edit Type remains in the live workspace and explains shared effects',(await page.locator('[data-ws-type-effects]').textContent()).includes('existing wall instance')&&await page.locator('.bc').evaluate(el=>el.classList.contains('ws-active')));await page.locator('[data-ws-dismiss]').click();
  const w0=selected.walls.find(w=>w.guid===guid),input=page.locator('[data-mp-height]');
  await input.fill('not a length');await input.press('Enter');check('existing invalid-length feedback appears',await page.locator('[data-status]').getAttribute('class').then(s=>s.includes('is-error')));assert.deepEqual((await snap(page)).walls,selected.walls);
  await page.locator('[data-mp-height]').fill(String(w0.height+250)+' mm');await page.locator('[data-mp-height]').press('Enter');await settle(page);

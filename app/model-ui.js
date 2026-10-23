@@ -42,6 +42,7 @@ import { el } from './ui-util.js';
 import { ModelWriter } from './model-write.js';
 import { openingFamilies, readFamilies, setFamilySize, familyWriter } from './family-ops.js';   // 0.6 DC.114: families and their sizes
 import { familyFor, sizeValues, sizeKey } from './family-model.js';
+import { placementReference, placementPath } from './wall-placement.js';
 
 const CUT = 1200;   // mm above the level: where the plan cuts (4'-0")
 const RCP_CUT = 2300;   // 0.6 DC.117: where a ceiling plan cuts and looks up from (about 7'-6")
@@ -468,11 +469,18 @@ export function mountModel(host) {
     if (!ui.wallType) { if (ui.wallH && document.activeElement !== ui.wallH) ui.wallH.value = fmtLen(S.wall.height, S.units); return; }
     const types = wallTypes(famW());
     if (!types.some(x => x.key === S.wall.typeKey)) S.wall.typeKey = types[0].key;
-    ui.wallType.replaceChildren(...types.map((x) => el('option', { value: x.key, selected: x.key === S.wall.typeKey }, typeName(x) + ' (' + fmtLen(typeThickness(x), S.units) + ')')));
+    const signature = types.map(x => x.key + ':' + typeName(x) + ':' + typeThickness(x)).join('|');
+    if (ui.wallType.dataset.signature !== signature) {
+      ui.wallType.dataset.signature = signature;
+      ui.wallType.replaceChildren(...types.map((x) => el('option', { value: x.key, selected: x.key === S.wall.typeKey }, typeName(x) + ' (' + fmtLen(typeThickness(x), S.units) + ')')));
+    }
+    if (document.activeElement !== ui.wallType) ui.wallType.value = S.wall.typeKey;
     if (ui.wallType.dataset.bound) { if (ui.wallH && document.activeElement !== ui.wallH) ui.wallH.value = fmtLen(S.wall.height, S.units); return; }
     ui.wallType.dataset.bound = '1';
     ui.wallType.addEventListener('change', () => { endChain(); S.wall.typeKey = ui.wallType.value; drawOverlay(); });
-    for (const [input, key] of [[ui.wallRef, 'reference'], [ui.wallSide, 'side'], [ui.wallShape, 'shape']]) input?.addEventListener('change', () => { endChain(); S.wall[key] = input.value; if (ui.hint && S.tool === 'wall') ui.hint.textContent = t(S.wall.shape === 'arc' ? 'comforts.hint.arcwall' : 'model.hint.wall'); drawOverlay(); });
+    for (const [input, key] of [[ui.wallRef, 'reference'], [ui.wallSide, 'side'], [ui.wallShape, 'shape']]) input?.addEventListener('change', () => {
+      if ((key === 'shape' && input.value === 'arc' && S.wall.reference.startsWith('core')) || (key === 'reference' && input.value.startsWith('core') && S.wall.shape === 'arc')) { input.value = S.wall[key]; host.status('Core location-line placement is supported for straight walls. Use a center or finish-face reference for the established curved workflow.', true); return; }
+      endChain(); S.wall[key] = input.value; if (ui.hint && S.tool === 'wall') ui.hint.textContent = t(S.wall.shape === 'arc' ? 'comforts.hint.arcwall' : 'model.hint.wall'); drawOverlay(); });
     ui.wallTop.addEventListener('change', () => { S.wall.top = ui.wallTop.value; ui.wallH.hidden = S.wall.top !== 'fixed'; });
     ui.wallH.addEventListener('change', () => { const mm = parseLen(ui.wallH.value, S.units); if (mm > 100) S.wall.height = mm; else host.status(t('model.err.length'), true); ui.wallH.value = fmtLen(S.wall.height, S.units); });
     ui.wallH.hidden = S.wall.top !== 'fixed';
@@ -845,6 +853,23 @@ export function mountModel(host) {
     const closing = closesChain(pts, q, 1);
     const b = closing ? pts[0] : q;
     const type = projectWallType(S.wall.typeKey);
+    // Live straight placement uses all six existing location lines and the chosen exterior orientation.
+    // Legacy three-reference and curved behavior remains unchanged in the established layout.
+    if (root.classList.contains('ws-active') || S.wall.reference.startsWith('core')) {
+      let spec;
+      const side = S.wall.side;
+      try { spec = placementReference(S.wall.reference, type, side); } catch (e) { host.status(e.message, true); return; }
+      const above = levelAbove();
+      if (S.wall.top === 'level' && !above) { host.status(t('model.err.notop'), true); return; }
+      const top = S.wall.top === 'level' ? { topLevel: above.guid } : { height: S.wall.height };
+      const segs = placementPath([...pts, b], type, S.wall.reference, side);
+      pts.push(b);
+      commit(drawWallPath({ storey: level().guid, points: pts.slice(), guids: S.chain.guids, typeKey: S.wall.typeKey,
+        thickness: spec.thickness, reference: S.wall.reference, extSide: side, axisOffset: spec.axisOffset, justification: spec.justification, ...top }),
+        { label: typeName(type), verb: t('model.verb.drew'), preview: [segs.at(-1)], chain: S.chain });
+      if (closing) endChain();
+      drawOverlay(); return;
+    }
     const above = levelAbove();
     const top = S.wall.top === 'level' && above ? { topLevel: above.guid } : { height: S.wall.top === 'fixed' ? S.wall.height : level()?.height || 2438.4 };
     const seg = { a, b, t: typeThickness(type) };
@@ -942,7 +967,7 @@ export function mountModel(host) {
         const b = lst.snap.p, L = Math.hypot(b[0] - a[0], b[1] - a[1]);
         if (L >= 1) {
           const type = projectWallType(S.wall.typeKey), seg = { a, b, t: typeThickness(type) };
-          const path = wallPath([...pts, b], seg.t, S.wall.reference, S.wall.side);
+          const path = root.classList.contains('ws-active') ? placementPath([...pts, b], type, S.wall.reference, S.wall.side) : wallPath([...pts, b], seg.t, S.wall.reference, S.wall.side);
           o.walls.push(previewOutline(path.at(-1) || seg));
           const ang = Math.atan2(b[1] - a[1], b[0] - a[0]) * 180 / Math.PI;
           o.hud = { p: b, text: fmtLen(L, S.units) + '  ' + fmtAngle(ang) + (closesChain(pts, b, 1) ? '\n' + t('model.hud.close') : '') };
@@ -1362,6 +1387,9 @@ export function mountModel(host) {
   /** What an extension (extend()) may use. */
   const api = {
     S, root, host, t, ed, kb, commit, refresh, buildScene, drawOverlay, setTool, level, levelAbove, wallsHere, wallsOn, snapAt,
+    workspaceWallControls: () => ({ row: ui.wallOpts, type: ui.wallType, reference: ui.wallRef, side: ui.wallSide, shape: ui.wallShape, top: ui.wallTop, height: ui.wallH, typedRow: ui.typedRow, typed: ui.typed, units: ui.units }),
+    workspaceCancel(finishOnly = false) { if (S.chain) { endChain(); host.status(t('model.chain.ended')); } else if (!finishOnly) setTool('select'); for (const x of exts) x.toolChanged?.(S.tool); },
+    workspaceTyped(key) { ui.typed.focus(); ui.typed.value += key; },
     /** F28: prepare real browser data without creating/replacing a canvas or activating a drawing tool. */
     prepareWorkspace() {
       S.data = ed() ? snapshotModel(ed()) : null;
@@ -1415,6 +1443,7 @@ export function mountModel(host) {
       if (S.empty3d && n > 0) v.view('iso');
       S.empty3d = n === 0;
       if (S.on) refresh();
+      else if (root.classList.contains('ws-active')) { api.prepareWorkspace(); fillWallOpts(); }
       if (S.reselect && !S.queue.length) { try { const ks = S.reselect(); if (ks?.length) S.keepSel = ks; } catch (e) { /* gone */ } S.reselect = null; }
       if (S.keepSel && !S.queue.length) {
         const have = v?.allKeys?.() || new Set(), keys = S.keepSel.filter((k) => have.has(k));

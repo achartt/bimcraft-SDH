@@ -2,7 +2,7 @@
 import { assemblyDimensionLayout, drawAssemblyDimensions } from './assembly-preview.js';
 import { el } from './ui-util.js';
 import { ModelWriter } from './model-write.js';
-import { wallType, typeName, typeThickness } from './model-walls.js';
+import { wallType, typeName, typeThickness, readWalls } from './model-walls.js';
 import { validateAssembly, LAYER_FUNCTIONS, assertAssembliesEditable } from './wall-assemblies.js';
 import { saveWallAssembly } from './model-ops.js';
 import { readMaterials, normalizeLayer, VENTILATION, materialBackground } from './project-materials.js';
@@ -21,9 +21,14 @@ export function mountWallAssemblies(modelUi) {
       const dlg=el('dialog',{className:'bc-dialog','aria-label':t('title')},el('h2',{},t('title')),el('p',{role:'alert'},e.message),button(t('cancel'),()=>dlg.close()));
       dlg.addEventListener('close',()=>dlg.remove());A.root.append(dlg);dlg.showModal();return;
     }
-    if(!source) return;
+    if(!source) { A.host.status('The wall type is missing or unsupported.',true); return; }
     const recipe=structuredClone(source), editing=!!recipe.custom;
     let duplicate=!editing, materials=readMaterials(W(),recipe.layers);
+    const instanceCount=readWalls(W()).filter(w=>w.typeKey===key).length;
+    const effects=el('p',{'data-assembly-effects':'',role:'status'});
+    const describeEffects=()=>{effects.textContent=duplicate
+      ? `New wall type with a distinct identity. Assign to ${assign.length} selected wall(s); the other ${Math.max(0,instanceCount-assign.length)} original instance(s) keep their type. This type becomes the future placement default.`
+      : `Type-wide edit: all ${instanceCount} wall instance(s) using “${typeName(source)}” will update. Duplicate type to edit only the selected wall(s). This type becomes the future placement default.`;};
     recipe.layers=recipe.layers.map(normalizeLayer);
     const mt=k=>A.t('materials.'+k);
     const name=el('input',{className:'bc-input',value:editing?typeName(source):typeName(source)+' copy',maxlength:100,'aria-label':t('name'),'data-assembly-name':''});
@@ -88,8 +93,8 @@ export function mountWallAssemblies(modelUi) {
       rows.append(boundary(t('interiorSide')+' ↑'));
       totals();
     }
-    const copy=button(t('duplicate'),()=>{duplicate=true;name.value+=' copy';copy.disabled=true;save.textContent=t('savecopy');});
-    dlg.append(el('h2',{className:'bc-h'},t('title')),el('label',{className:'bc-dlg-field'},t('name'),name),el('label',{},exterior,' '+t('exterior')),el('p',{},t('order')),el('div',{style:'overflow-x:auto'},el('div',{style:'min-width:900px;padding:0 12px'},orientation,preview,dimensions)),membraneNote,total,el('div',{style:'overflow:auto'},el('table',{},el('thead',{},el('tr',{},...['material','thickness','function','core','actions'].map(k=>el('th',{},t(k))))),rows)),
+    const copy=button(t('duplicate'),()=>{duplicate=true;name.value+=' copy';copy.disabled=true;save.textContent=t('savecopy');describeEffects();},{'data-assembly-duplicate':''});
+    dlg.append(el('h2',{className:'bc-h'},t('title')),effects,el('label',{className:'bc-dlg-field'},t('name'),name),el('label',{},exterior,' '+t('exterior')),el('p',{},t('order')),el('div',{style:'overflow-x:auto'},el('div',{style:'min-width:900px;padding:0 12px'},orientation,preview,dimensions)),membraneNote,total,el('div',{style:'overflow:auto'},el('table',{'data-assembly-layers':''},el('thead',{},el('tr',{},...['material','thickness','function','core','actions'].map(k=>el('th',{},t(k))))),rows)),
       button(t('add'),()=>{const m=materials.find(m=>m.id==='material-gypsum') || materials[0];recipe.layers.push(normalizeLayer({mat:m.legacyName,materialId:m.id,t:m.defaultThickness,function:m.defaultThickness===0?'membrane':'finish',core:false}));draw();}),button(t('addMembrane'),()=>{const m=materials.find(m=>m.id==='material-membrane') || materials[0];recipe.layers.push(normalizeLayer({mat:m.legacyName,materialId:m.id,t:0,function:'membrane',core:false}));draw();}),button(mt('addCavity'),()=>{recipe.layers.push(normalizeLayer({mat:'air',kind:'cavity',t:25.4,function:'substrate',core:false}));draw();}),button(mt('title'),()=>openMaterialLibrary(A,()=>{materials=readMaterials(W(),recipe.layers);draw();})),el('p',{className:'bc-muted'},mt('defaults')),el('p',{className:'bc-muted'},t('scope')),error,
       el('p',{className:'bc-lib-actions'},...(editing?[copy]:[]),button(t('cancel'),()=>dlg.close()),save));
     dlg.addEventListener('close',()=>dlg.remove());
@@ -103,7 +108,7 @@ export function mountWallAssemblies(modelUi) {
         A.commit(ed=>{if(ed!==editor) throw new Error(t('changed'));const r=operation(ed);A.S.wall.typeKey=input.key;dlg.close();return r;},{label:input.name,verb:A.t('model.verb.changed'),onError:e=>{save.disabled=false;error.textContent=e.message;}});
       }catch(e){error.textContent=e.message;}
     }
-    draw();A.root.append(dlg);dlg.showModal();
+    describeEffects();draw();A.root.append(dlg);dlg.showModal();
   }
   A=modelUi.extend({openAssembly});
   const row=A.root.querySelector('[data-mopts="wall"]');
