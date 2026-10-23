@@ -50,7 +50,7 @@ import { t as tr } from './i18n.js';
 import { pipeSize, bendRadius, drainSlope, DEFAULT_CLASS, sizesFor, SYSTEM_MATERIALS, standardOf } from './mep/pipes.js';
 import { sizeSection, sectionLoss } from './mep/sizing.js';
 import { CONNECTOR_PSET } from './family-model.js';
-import { drainNetwork, smallestSize, upstreamFirst } from './mep/drainage.js';
+import { drainNetwork, smallestSize, upstreamFirst, MAIN_MIN_DN } from './mep/drainage.js';
 
 export const RUN_PSET = 'CadCraft_MepRun';
 const SYS_PSET = 'CadCraft_MepSystem';
@@ -770,8 +770,8 @@ export function drainPlan(w) {
   for (const g of upstreamFirst(net)) {
     const { r } = by.get(g), n = net.get(g), std = standardOf(r.mat), units = std === 'br' ? n.uhc : n.dfu;
     const sizes = sizesFor(r.mat, r.cls).map((key) => ({ key, nominal: nominalOf(pipeSize(r.mat, r.cls, key)) }));
-    // never smaller than what flows into it (sized first), nor than the fixture drains it serves
-    let floor = std === 'br' ? n.minDn : n.minIn;
+    // never smaller than what flows into it (sized first), nor than the fixture drains it serves; a Brazilian building drain DN 100
+    let floor = std === 'br' ? Math.max(n.minDn, r.role === 'main' ? MAIN_MIN_DN : 0) : n.minIn;
     for (const u of n.up) { const q = plan.get(u); if (q && q.std === std) floor = Math.max(floor, q.after); }
     const now = nominalOf(pipeSize(r.mat, r.cls, r.size));
     const need = units > 0 || floor > 0 ? smallestSize(std, sizes, units, { slope: r.slope, role: r.role, floor }) : null;

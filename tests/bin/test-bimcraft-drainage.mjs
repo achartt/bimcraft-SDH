@@ -99,6 +99,20 @@ B.ed.modelChange(M.changeRun(lavRun.guid, { size: '75' }), { label: 'Change' });
 B.ed.modelChange(M.sizeDrains(), { label: 'Size the drains' });
 ok(M.readRuns(B.W()).find((r) => r.guid === lavRun.guid).size === '75', 'a drain bigger than it needs is never made smaller');
 
+// a Brazilian building drain is DN 100 at least, even carrying one lavatory
+{
+  const text = N.newBuilding({ name: 'Lav', levels: N.stackLevels(1, 3000, () => 'Ground'), fileName: 'l.ifc', now: new Date('2026-10-23T12:00:00Z') });
+  const eng = await quiet(IfcModel.create)(WebIFC, null);
+  await quiet((b) => eng.load(b))(new TextEncoder().encode(text));
+  const ed = new IfcEditor(WebIFC, eng), L1 = OPS.snapshotModel(ed).levels[0].guid, W = () => new ModelWriter(WebIFC, ed.api, ed.mid);
+  ed.modelChange(FO.placeFamily({ storey: L1, family: 'fam-lavatory', x: 0, y: 0 }), { label: 'Lavatory' });
+  ed.modelChange(M.placeRun({ storey: L1, kind: 'pipe', system: 'san', mat: 'pvc-esg', cls: 'SN', size: '40', slope: 0.02, role: 'main', points: [[0, 450, 500], [0, 3000, 500]] }), { label: 'Drain' });
+  const q = [...M.drainPlan(W()).values()][0];
+  ok(q.units === 1 && q.need === '100' && q.grow, 'a building drain in PVC drain pipe carrying 1 UHC: DN 100 (the smallest building drain of NBR 8160)', JSON.stringify(q));
+  ed.modelChange(M.changeRun(M.readRuns(W())[0].guid, { role: 'branch' }), { label: 'Role' });
+  ok([...M.drainPlan(W()).values()][0].need === '40', 'the same run as a branch: DN 40');
+}
+
 console.log('== the same bathroom in US PVC (IPC)');
 B = await bathroom('pvc', '40', '2', '1-1/2');
 runs = M.readRuns(B.W());

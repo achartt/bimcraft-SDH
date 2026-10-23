@@ -70,7 +70,7 @@ Pick a sanitary drain: **Fixture units** in Properties says how many it carries 
 
 - Drains in Brazilian PVC drain pipe count **UHC** and follow NBR 8160; the others count **DFU** and follow the International Plumbing Code.
 - **Drain**: a **Branch** is sized from the code's table for fixture branches; a **Building drain** from its table by slope, so its **Slope** matters.
-- A drain is never smaller than the fixture drains it serves (a water closet needs DN 100, or 3 in.), nor than a drain flowing into it.
+- A drain is never smaller than the fixture drains it serves (a water closet needs DN 100, or 3 in.), nor than a drain flowing into it. Under NBR 8160 a building drain is DN 100 at least.
 
 {{ui:Size the drains}} makes every sanitary drain of the model that is too small for its fixture units the size it needs, as one step you can undo. A drain drawn bigger than it needs is left as it is. When a drain carries more than the largest size of its pipe can at its slope, BimCraft says so: give it a steeper slope or another pipe.
 

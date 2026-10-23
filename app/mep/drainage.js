@@ -10,7 +10,8 @@
  *   International Plumbing Code 2021 (DFU, inches): Table 710.1(2) horizontal fixture branches 1-1/2: 3, 2: 6, 2-1/2: 12, 3: 20,
  *     4: 160, 5: 360, 6: 620, 8: 1400, 10: 2500, 12: 3900; Table 710.1(1) building drains by slope 1/16 / 1/8 / 1/4 / 1/2 in. per
  *     foot (2: — / — / 21 / 26 … 4: — / 180 / 216 / 250 … 8: 1400 / 1600 / 1920 / 2300).
- *   A drain is never smaller than the fixture drains it serves (a water closet: DN 100 / 3 in.) nor than a drain flowing into it.
+ *   A drain is never smaller than the fixture drains it serves (a water closet: DN 100 / 3 in.) nor than a drain flowing into it;
+ *   under NBR 8160 a building drain ("coletor predial") is DN 100 at least (MAIN_MIN_DN).
  *   A size a branch table does not list is looked up in the building-drain table at the run's slope (and the other way round).
  *
  *   drainNetwork(runs, fixtures) → Map(guid → { uhc, dfu, minDn, minIn, up: [guid], down: guid | null, fixtures: [ids] })
@@ -33,6 +34,7 @@ const IPC_MAIN = {
   1.25: [0, 0, 1, 1], 1.5: [0, 0, 3, 3], 2: [0, 0, 21, 26], 2.5: [0, 0, 24, 31], 3: [0, 36, 42, 50], 4: [0, 180, 216, 250], 5: [0, 390, 480, 575],
   6: [0, 700, 840, 1000], 8: [1400, 1600, 1920, 2300], 10: [2500, 2900, 3500, 4200], 12: [3900, 4600, 5600, 6700],
 };
+export const MAIN_MIN_DN = 100;   // NBR 8160: the building drain's smallest DN
 export const DRAIN_TABLES = { br: { branch: NBR_BRANCH, main: NBR_MAIN, slopes: NBR_MAIN_SLOPES }, us: { branch: IPC_BRANCH, main: IPC_MAIN, slopes: IPC_MAIN_SLOPES } };
 
 /** Fixture units a size carries: a branch from the branch table (else the main table), a building drain the other way round. */
