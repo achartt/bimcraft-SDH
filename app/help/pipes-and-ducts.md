@@ -3,7 +3,7 @@ title: Pipes and ducts
 summary: Draw pipe and duct runs on the plan by their centre lines; the elbows, tees, reducers and transitions are made for you, the runs belong to systems with connected ports in the IFC file, and they show in plans, schedules and the takeoff.
 section: tasks
 order: 36
-keywords: pipe, pipes, piping, plumbing, duct, ducts, ductwork, hvac, mep, mechanical, elbow, tee, reducer, transition, fitting, fittings, valve, valves, gate valve, ball valve, globe valve, check valve, riser, slope, drain, sanitary, storm, vent, cold water, hot water, chilled water, heating, gas, fire protection, supply air, return air, exhaust, system, systems, port, ports, airflow, cfm, friction, equal friction, sizing, schedule, takeoff
+keywords: pipe, pipes, piping, plumbing, duct, ducts, ductwork, hvac, mep, mechanical, elbow, tee, reducer, transition, fitting, fittings, valve, valves, gate valve, ball valve, globe valve, check valve, riser, slope, drain, sanitary, storm, vent, cold water, hot water, chilled water, heating, gas, fire protection, supply air, return air, exhaust, system, systems, port, ports, connector, connectors, fixture, basin, sink, toilet, airflow, cfm, friction, equal friction, sizing, schedule, takeoff
 ---
 
 ## What you'll do
@@ -25,6 +25,15 @@ The pipe snaps like walls do, and to other runs: start on a pipe's end to carry 
 2. Type the width and height (a round duct's width is its diameter), and **At** for the centre line's height.
 3. To size it from the airflow, type the **Airflow** and the **Friction** rate and click {{ui:Size it}}. The duct is sized by equal friction, the method in the duct design chapter of the ASHRAE Handbook, and rounded up to a stocked size, so the friction comes out at or under the rate you typed. With no rate typed it uses 0.08 in. of water per 100 ft (0.8 Pa/m). A rectangular duct keeps the height you typed and gets a width; BimCraft says so when its sides are more than 4 to 1.
 4. Click the corners as for a pipe.
+
+## From a fixture's connector
+
+Elements placed from a family with connectors (a basin's drain and tap, an air terminal's neck: see [Edit a family](topic:family-editor)) show their free connectors as points while {{ui:Pipe}} or {{ui:Duct}} is on, and the pointer snaps to them.
+
+- **Start on a connector**: the run takes its system and size (the pipe of the bar's material at or just above the connector's size; a round duct of its diameter). When the connector points down or up, as a drain under a basin does, the run first goes straight down or up to the height in **At**, then on along your clicks.
+- **End on a connector**: the run goes down or up onto it and ends there.
+
+The run is connected to the element in the IFC file, so other programs see the fixture as part of its system. An element placed later with a connector on the end of a run is connected to it too. A run moved away from a connector is no longer connected to it.
 
 ## The fittings, made for you
 

@@ -3,7 +3,8 @@
 /**
  * test-bimcraft-connectors.mjs — connectors on families: the recipe reads and refuses them (family-model.js), the editor's
  * changes keep them right (family-edit.js), and every placed element gets them as IfcDistributionPort (family-ops.js) that
- * follow its size, its family and its deletion, one undo step each. On a new building made here (IFC4, mm); no other files.
+ * follow its size, its family and its deletion, one undo step each; pipe runs drawn from a connector, or an element placed
+ * where a run ends, are connected to its port (mep-model.js). On a new building made here (IFC4, mm); no other files.
  *   node bin/test-bimcraft-connectors.mjs [--verbose]
  */
 import fs from 'node:fs';
@@ -30,6 +31,7 @@ const N = await imp('new-model.js');
 const FM = await imp('family-model.js');
 const FE = await imp('family-edit.js');
 const FO = await imp('family-ops.js');
+const M = await imp('mep-model.js');
 
 let pass = 0, fail = 0;
 const ok = (c, m, detail = '') => { if (c) { pass++; if (VERBOSE) console.log('  ok   ' + m); } else { fail++; console.log('  FAIL ' + m + (detail ? ' (' + detail + ')' : '')); } };
@@ -162,6 +164,42 @@ const eng2 = await quiet(IfcModel.create)(WebIFC, null);
 ed.undo();
 const m2 = await quiet((b) => eng2.load(b))(ed.save());
 ok(m2.elements >= 1, 'the file with ports opens again (' + m2.elements + ' elements)');
+
+// ============================================================================================ runs from connectors
+console.log('== pipe runs and connectors (mep-model.js)');
+const C = await building();
+const L1c = C.levels[0].guid;
+C.ed.modelChange(FO.importFamily(basin()), { label: 'Import' });
+C.ed.modelChange(FO.placeFamily({ storey: L1c, family: 'fam-testbasin', x: 1000, y: 1000, rot: 0, guid: 'basin0000000000000002' }), { label: 'Place' });
+let fx = M.readFixturePorts(C.w());
+const drain = fx.find((q) => q.key === 'c2');
+ok(fx.length === 2 && drain && near(drain.p[0], 1000) && near(drain.p[1], 1200) && near(drain.dir[2], -1, 1e-9) && drain.system === 'san' && near(drain.size, 40) && drain.flow === 'out' && !drain.connected,
+  'readFixturePorts: the basin\'s drain at (1000, 1200, 0) in its level, pointing down, sanitary, 40 mm, out, free', JSON.stringify(drain));
+// a drain from the basin: down 400, then along x (as the Pipe tool draws it when started on the connector)
+const n1 = C.ed.changes.length;
+C.ed.modelChange(M.placeRun({ storey: L1c, kind: 'pipe', system: 'san', mat: 'pvc', cls: '40', size: '1-1/2', slope: 0, points: [[1000, 1200, 0], [1000, 1200, -400], [3000, 1200, -400]] }), { label: 'Pipe run' });
+fx = M.readFixturePorts(C.w());
+let tx = dec(C.ed.save());
+ok(C.ed.changes.length === n1 + 1 && fx.find((q) => q.key === 'c2').connected && !fx.find((q) => q.key === 'c1').connected, 'a drain drawn from the connector: one undo step; the drain port is connected, the tap is still free');
+const drainId = fx.find((q) => q.key === 'c2').id;
+ok(new RegExp('IFCRELCONNECTSPORTS[(][^;]*#' + drainId + '[,)]').test(tx) && danglingRefs(tx).length === 0, 'IfcRelConnectsPorts names the basin\'s drain port');
+// a second basin placed where a cold-water run already ends: connected when placed
+C.ed.modelChange(M.placeRun({ storey: L1c, kind: 'pipe', system: 'cw', mat: 'copper', cls: 'L', size: '1/2', points: [[5125, 4000, 550], [5125, 1400, 550]] }), { label: 'Pipe run' });
+C.ed.modelChange(FO.placeFamily({ storey: L1c, family: 'fam-testbasin', x: 5000, y: 1000, rot: 0, guid: 'basin0000000000000003' }), { label: 'Place' });
+fx = M.readFixturePorts(C.w());
+const tap2 = fx.find((q) => q.owner !== drain.owner && q.key === 'c1');
+ok(tap2 && near(tap2.p[0], 5125) && near(tap2.p[1], 1400) && tap2.connected, 'a basin placed with its tap on the end of a cold-water run: connected to it', JSON.stringify(tap2));
+// the run deleted: the connector is free again, nothing dangling
+const cwRun = M.readRuns(C.w()).find((r) => r.system === 'cw');
+C.ed.modelChange(M.removeRuns([cwRun.guid]), { label: 'Delete' });
+fx = M.readFixturePorts(C.w());
+tx = dec(C.ed.save());
+ok(!fx.find((q) => q.id === tap2.id).connected && danglingRefs(tx).length === 0, 'the run deleted: the basin\'s tap is free again, nothing left dangling');
+C.ed.undo();
+ok(M.readFixturePorts(C.w()).find((q) => q.id === tap2.id)?.connected, 'undo: connected again');
+// moved off: a run no longer touching is not connected when it is made again
+C.ed.modelChange(M.changeRun(M.readRuns(C.w()).find((r) => r.system === 'san').guid, { points: [[1000, 1300, 0], [1000, 1300, -400], [3000, 1300, -400]] }), { label: 'Change' });
+ok(!M.readFixturePorts(C.w()).find((q) => q.key === 'c2' && q.owner === drain.owner).connected, 'the drain run moved 100 off the connector: no longer connected');
 
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

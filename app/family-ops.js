@@ -20,7 +20,8 @@
  *        moveFamilyElement(guid, { x, y, rot }) · removeFamilyElements(guids)
  *   A family's connectors become ports of each element (IFC4: IfcDistributionPort nested on it, placed in its axes with Z the way
  *   out; IFC2X3: IfcDistributionPort + IfcRelConnectsPortToElement), each with CadCraft_Connector (Key, Domain, System, Size);
- *   they are made again whenever the element is placed, resized or its family saved, and go with the element.
+ *   they are made again whenever the element is placed, resized or its family saved (and connected to the pipe or duct ends
+ *   they touch, mep-model.js joinPorts), and go with the element.
  *   elementPorts(w, id) → port ids the family wrote on an element
  *   familyFile(w, key) → the recipe with its sizes (a .ccfamily.json)
  */
@@ -31,7 +32,7 @@ import { DOOR_TYPES, WINDOW_TYPES, openingType } from './opening-types.js';
 import { STARTER_KEYS, STARTER_FURNITURE, starterRecipe } from './family-starters.js';
 import { readFamily, evaluateFamily, familyIndex, familyFor, storeFamily, sizeTypeFor, writeSizeMaps, sizeValues, sizeKey, sizeRows,
   typePset, setTypePset, SIZE_PSET, FAMILY_PSET, CONNECTOR_PSET, newFamilyKey, defaultSizeName, forgetFamilyIndex } from './family-model.js';
-import { PIPE_SYSTEMS, DUCT_SYSTEMS } from './mep-model.js';
+import { PIPE_SYSTEMS, DUCT_SYSTEMS, joinPorts } from './mep-model.js';
 import { round } from './model-write.js';
 import { classesFor } from './ifc-place.js';
 import { ids, val, deleteLine } from './ifc-util.js';
@@ -490,6 +491,9 @@ function writePorts(w, id, fam, values) {
     made.push(pid);
   }
   if (w.v4 && made.length) w.make('IFCRELNESTS', w.guid(), w.ownerHistory(), null, null, w.H(id), made.map((p) => w.H(p)));
+  // a pipe or duct already ending where a connector now is gets connected to it
+  const storey = w.storeyOfId(id);
+  if (storey && made.length) joinPorts(w, storey, made);
   return made;
 }
 
