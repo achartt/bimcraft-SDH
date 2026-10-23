@@ -2908,6 +2908,7 @@
   "model.pb.newtpl": "New template",
   "model.pb.links": "Links",
   "model.pb.linksgo": "Linked models",
+  "model.pv.button": "View range",
   "model.pv.open": "View range of {level}",
   "model.pv.title": "View range: {level}",
   "model.pv.template": "View template",

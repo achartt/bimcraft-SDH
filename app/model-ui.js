@@ -988,7 +988,7 @@ export function mountModel(host) {
   async function scheduleRebuild(selectKey) {
     if (S.busy) { S.again = true; return; }
     S.busy = true;
-    try { await host.rebuild(null); } catch (e) { console.error(e); host.status(t('model.err.failed', { why: e.message || e }), true); } finally { S.busy = false; S.reloading = false; }
+    try { await host.rebuild(null); } catch (e) { console.error(e); host.status(t('model.err.failed', { why: e.message || e }), true); } finally { S.busy = false; S.reloading = false; for (const x of exts) x.settled?.(); }
     // what was clicked meanwhile, then once more if it changed anything
     const q = S.queue.splice(0);
     for (const [run, meta] of q) apply0(run, meta);
@@ -1013,7 +1013,7 @@ export function mountModel(host) {
 
   // ---- keys (capture: the plan's own keys win while Draw is on) ----
   document.addEventListener('keydown', (e) => {
-    if (!S.on || e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey) return;
+    if (!S.on || root.classList.contains('ws-active') || e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey) return;
     const tgt = e.target;
     if (tgt.closest?.('dialog, [data-help-panel], [data-app-settings]') || document.querySelector('dialog[open]')) return;   // i18n-ignore: CSS selectors
     if (tgt === ui.typed) return;
@@ -1338,6 +1338,26 @@ export function mountModel(host) {
   /** What an extension (extend()) may use. */
   const api = {
     S, root, host, t, ed, kb, commit, refresh, buildScene, drawOverlay, setTool, level, levelAbove, wallsHere, wallsOn, snapAt,
+    /** F28: prepare real browser data without creating/replacing a canvas or activating a drawing tool. */
+    prepareWorkspace() {
+      S.data = ed() ? snapshotModel(ed()) : null;
+      if (S.data?.levels.length && !S.data.levels.some(l => l.id === S.level)) S.level = (S.data.levels.find(l => Math.abs(l.elevation) < 1) || S.data.levels[0]).id;
+      for (const x of exts) x.refresh?.();
+    },
+    /** F28: a floor plan uses the existing PlanView and picking transform; a restored camera is in model mm. */
+    activateWorkspaceView(levelId, camera = null) {
+      if (levelId === null) { show(false); return; }
+      const same = S.on && S.level === levelId && S.kind === 'plan' && !S.callout;
+      S.layout = 'plan';
+      if (!same) showKind(levelId, 'plan');
+      applyLayout();
+      requestAnimationFrame(() => {
+        if (!pv || !S.on || S.level !== levelId) return;
+        pv.resize();
+        if (camera) { Object.assign(pv, camera); pv.render(); }
+        else if (!same) fitPlan();
+      });
+    },
     /** Snap as the Wall tool does, from a point of the extension's own (0.6: outlines drawn by hand): angles, Shift, lengths. */
     snapFrom: (p, e, from) => snapPoint(p, snapCtx(), { tol: pv.pxToMm(SNAP_PX), from, ortho: !!e?.shiftKey, step: 15, round: from ? round() : 0 }),
     pv: () => pv, units: () => S.units, round, selectedKeys, renderProps: () => renderProps(), loopsOf: (st) => loopsOf(ed(), st), fitPlan, mergeJournals,

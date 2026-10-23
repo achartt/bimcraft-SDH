@@ -58,6 +58,7 @@ const CSS = `
 .bc-pb li > .bc-pb-go:hover, .bc-pb li > .bc-pb-go:focus-visible { color: var(--action); text-decoration: underline; }
 .bc-pb .bc-pb-tag { font-size: .75rem; color: var(--ink-2); }
 .bc-pb .bc-pb-ic { background: none; border: 0; color: var(--ink-2); padding: .1rem .3rem; }
+.bc-pb [data-pb-range], .bc-pb [data-pb-rcprange] { flex-shrink: 0; font: inherit; font-size: var(--fs-sm, .875rem); border: 1px solid currentColor; border-radius: .25rem; padding: .2rem .4rem; }
 .bc-pb .bc-pb-ic:hover { color: var(--action); }
 .bc-pb-actions { display: flex; flex-wrap: wrap; gap: .3rem; padding-left: .9rem; margin-bottom: .3rem; }
 .bc-pv-cats { display: grid; grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr)); gap: .1rem .6rem; margin: .25rem 0; }
@@ -283,11 +284,11 @@ export function mountViewsBim(modelUi, o = {}) {
       const v = R.views.get(l.id);
       return row({ 'data-pb-plan': l.guid, 'aria-current': l.id === A.S.level && A.S.on && A.S.kind !== 'rcp' ? 'true' : null }, l.name, () => goPlan(l.id),
         v?.template ? el('span', { className: 'bc-pb-tag' }, v.template) : null,
-        el('button', { type: 'button', className: 'bc-pb-ic', 'data-pb-range': l.guid, title: t('model.pv.open', { level: l.name }), 'aria-label': t('model.pv.open', { level: l.name }), onClick: () => openRange(l.guid) }, icon('bi-sliders')));
+        el('button', { type: 'button', className: 'bc-pb-ic', 'data-pb-range': l.guid, title: t('model.pv.open', { level: l.name }), 'aria-label': t('model.pv.open', { level: l.name }), onClick: () => openRange(l.guid) }, icon('bi-sliders'), ' ' + t('model.pv.button')));
     });
     // 0.6 DC.117: every level's reflected ceiling plan
     const rcps = levels.map((l) => row({ 'data-pb-rcp': l.guid, 'aria-current': l.id === A.S.level && A.S.on && A.S.kind === 'rcp' ? 'true' : null }, l.name, () => A.showKind(l.id, 'rcp'),
-      el('button', { type: 'button', className: 'bc-pb-ic', 'data-pb-rcprange': l.guid, title: t('model.pv.rcpopen', { level: l.name }), 'aria-label': t('model.pv.rcpopen', { level: l.name }), onClick: () => openRange(l.guid, 'rcp') }, icon('bi-sliders'))));
+      el('button', { type: 'button', className: 'bc-pb-ic', 'data-pb-rcprange': l.guid, title: t('model.pv.rcpopen', { level: l.name }), 'aria-label': t('model.pv.rcpopen', { level: l.name }), onClick: () => openRange(l.guid, 'rcp') }, icon('bi-sliders'), ' ' + t('model.pv.button'))));
     const openSet = () => A.root.querySelector('[data-res-sheetsopen]')?.click();
     const graphicButton=(key)=>el('button',{type:'button',className:'bc-pb-ic','data-pb-projected':key,title:t('f05.settings'),'aria-label':t('f05.settings'),onClick:()=>openProjected(key)},icon('bi-sliders'));
     const elevs = ['north', 'east', 'south', 'west'].map((s) => row({ 'data-pb-elev': s }, t('res.sh.elev.' + s), openSet,graphicButton('elevation:'+s)));
@@ -683,7 +684,25 @@ export function mountViewsBim(modelUi, o = {}) {
     refresh() { read(); render(); renderChip(); },
   });
   mountDrafting(modelUi, { viewKey, viewName });   // 0.6 DC.117 (d)
-  const api = { openRange, openTemplate, openSheet, render, rangeOf, startCrop, startCallout, openCallout, editCallout, viewKey, backToParent };
+  /** F28-A: the bottom bar and Properties share the authoritative effective settings and transaction. */
+  function workspaceSettings(levelId = A.S.level) {
+    const lv = levelOf(levelId);
+    if (!lv) return null;
+    const v = R.views.get(lv.id);
+    return { ...effectiveView(v || null, R.templates, lv.height || 3000, 'plan'), detail: v?.detail || 'coarse', ...rangeOf(lv.id) };
+  }
+  function setWorkspaceSettings(patch) {
+    const lv = levelOf(A.S.level), current = workspaceSettings();
+    if (!lv || !A.S.on || A.S.kind !== 'plan' || A.S.callout) return t('model.needs.ifc');
+    if (current?.template) return t('model.pv.tpl.note', { name: current.template });
+    if (patch.detail !== undefined && !PLAN_DETAILS.includes(patch.detail)) return t('model.err.vr.order');
+    if (patch.scale !== undefined && (!Number.isFinite(patch.scale) || patch.scale < 0 || patch.scale > 10000)) return t('model.err.vr.order');
+    const ch = {};
+    if (patch.detail !== undefined) ch.detail = patch.detail;
+    if (patch.scale !== undefined) ch.scale = patch.scale;
+    return run(setPlanView(lv.guid, ch), { label: t('model.pv.what', { level: lv.name }), verb: t('model.verb.changed') });
+  }
+  const api = { openRange, openTemplate, openSheet, render, rangeOf, startCrop, startCallout, openCallout, editCallout, viewKey, backToParent, workspaceSettings, setWorkspaceSettings };
   if (typeof window !== 'undefined') window.bimcraftViews = { state: R, api };   // for tests
   return api;
 }

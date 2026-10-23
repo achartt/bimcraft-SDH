@@ -1,7 +1,7 @@
 {
     "name": "bimcraft",
     "private": true,
-    "description": "BimCraft — BIM review & editing (the CadCraft family)",
+    "description": "BimCraft \u2014 BIM review & editing (the CadCraft family)",
     "scripts": {
         "start": "node devshell/serve.mjs",
         "test": "node devshell/test.mjs",
@@ -21,7 +21,9 @@
         "bench:f05": "node tests/features/f05/measure.mjs",
         "test:f06": "node --test tests/features/f06/schedules.test.mjs",
         "fixture:f06": "node tests/features/f06/fixture.mjs",
-        "bench:f06": "node tests/features/f06/measure.mjs"
+        "bench:f06": "node tests/features/f06/measure.mjs",
+        "test:f28": "node --test tests/features/f28/*.test.mjs",
+        "bench:f28": "node tests/features/f28/measure.mjs"
     },
     "engines": {
         "node": ">=20.19"
