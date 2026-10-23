@@ -54,7 +54,7 @@ try{
  baselineServer=await(await import(pathToFileURL(path.join(dir,'devshell/serve.mjs')))).start({port:8036,host:'127.0.0.1',offline:true});
  browser=await chromium.launch({headless:true,args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});report.browser=browser.version();
  const ctx=await browser.newContext({viewport:{width:1440,height:1000},deviceScaleFactor:1,acceptDownloads:true});
- await ctx.addInitScript(()=>localStorage.setItem('bimcraft.model.units','mm'));
+ await ctx.addInitScript(()=>{if(location.protocol==='http:'&&location.hostname==='127.0.0.1')localStorage.setItem('bimcraft.model.units','mm');});
  ctx.on('page',p=>{p.on('pageerror',e=>report.errors.push(e.stack||e.message));p.on('console',m=>{if(['warning','error'].includes(m.type()))report.console.push({type:m.type(),text:m.text()});});});
  const fixture=path.resolve('fixtures/f04/layered-plans.ifc'),baseline=await ctx.newPage();await open(baseline,fixture,8036);report.before=await measure(baseline);await baseline.screenshot({path:path.join(out,'before-f28-a.png')});await baseline.close();
  page=await ctx.newPage();
