@@ -22,6 +22,8 @@ export function mountWallWorkflow({ root, A, commands, defaults, unitsHost, opti
   let mounted = false, typeContext = null, validationData = null, validationEditor = null, placementError = '', placementType = null, placementKey = null;
   const writer = () => new ModelWriter(A.ed().W, A.ed().api, A.ed().mid);
   const typeField = ui.type.closest('label');
+  const originalShape = { disabled: ui.shape.disabled, title: ui.shape.title, arcDisabled: ui.shape.querySelector('[value="arc"]').disabled };
+  const originalTop = { disabled: ui.top.querySelector('[value="level"]').disabled, title: ui.top.querySelector('[value="level"]').title };
   const slot = node('div', { className: 'ws-wall-options', 'data-ws-wall-options': '', hidden: true });
   const note = node('p', { className: 'ws-note' }, 'Placement defaults for new straight walls. Selecting or editing an instance does not assign these defaults to it.');
   const topNote = node('p', { className: 'ws-note', 'data-ws-top-reason': '' });
@@ -62,7 +64,8 @@ export function mountWallWorkflow({ root, A, commands, defaults, unitsHost, opti
       ui.shape.disabled = true; ui.shape.title = 'Straight placement in this slice. Use Established layout for supported curved placement.';
     } else {
       for (const [element, home] of [...homes].reverse()) if (home.parentNode) { home.after(element); home.remove(); }
-      homes.clear(); ui.shape.querySelector('[value="arc"]').disabled = false; ui.shape.disabled = false; ui.shape.title = '';
+      homes.clear(); ui.shape.querySelector('[value="arc"]').disabled = originalShape.arcDisabled; ui.shape.disabled = originalShape.disabled; ui.shape.title = originalShape.title;
+      Object.assign(ui.top.querySelector('[value="level"]'), originalTop);
     }
   }
   function refresh() {

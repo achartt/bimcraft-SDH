@@ -40,6 +40,7 @@ jobs:
           F28_EMIT_REVIEW_FRAMES: '1'
         run: node tests/features/f28/walls-browser.mjs
       - name: Independent actual downloaded IFC and exports
+        if: ${{ always() && hashFiles('.cc-test/f28-b-browser/saved.ifc') != '' && hashFiles('.cc-test/f28-b-browser/assemblies.csv') != '' && hashFiles('.cc-test/f28-b-browser/plan.pdf') != '' }}
         run: .cc-test/f28-b-reader/bin/python -I tests/features/f28/walls-independent.py
       - name: Same-environment F04 and F05 geometry/export workloads
         env:
