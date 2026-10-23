@@ -63,6 +63,8 @@ jobs:
         run: |
           .cc-test/tools/bimcraft-test/venv/bin/python -I tests/features/f05/independent.py
           .cc-test/tools/bimcraft-test/venv/bin/python -I tests/features/f05/independent-pdf.py
+      - name: F06 independent schedule and export acceptance
+        run: .cc-test/tools/bimcraft-test/venv/bin/python -I tests/features/f06/independent.py
       - name: npm test
         if: always()
         run: npm test -- --oracles

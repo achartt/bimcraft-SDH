@@ -1,0 +1,110 @@
+(node:90540) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///Users/austinhartt/Documents/ChatGPT/BimCraft%20Test/bimcraft-f06/app/ifc/api.js is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /Users/austinhartt/Documents/ChatGPT/BimCraft Test/bimcraft-f06/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ fixture is deterministic, with explicit cores, duplicate material names and used/unused types (27.359167ms)
+✖ ordered layers independently match fixture widths, functions, core flags, cavity and membrane records (1.166584ms)
+✔ all library materials appear by ID, repeated use deduplicates by ID and duplicate names stay distinct (0.587541ms)
+✔ rename and style/default edit updates every relevant row and swatch without resizing or changing anchors (1.4565ms)
+✖ layer edits, reordering and assembly rename propagate into derived placed sheets (2.958583ms)
+✔ Undo redo and IFC4 save/reopen preserve schedule data and existing sheet references, isolated from second project (4.062167ms)
+✔ CSV preserves all layers, exact mm numbers and existing escaping for quotes commas newlines and accents (0.650125ms)
+✔ zero membranes are dashed lines and cavities have blank bounded swatches with no fill (0.857416ms)
+✔ read-only generation never changes saved IFC bytes (1.203959ms)
+✔ missing material remains explicit without invented style, nominal widths still come from valid recipe (0.506417ms)
+✔ unsupported recipe remains identifiable with all raw layers, no fabricated total and no read rewrite (0.94475ms)
+✔ corrupt recipe thickness is unavailable rather than coerced or silently omitted (0.470166ms)
+✖ unsupported library is diagnosed; no guessed material names or styles (0.2625ms)
+✔ large fixture pagination retains every layer and text, with bounded readable vector pages (52.619458ms)
+✔ long unbroken stable IDs and line breaks continue without dropping characters (0.149833ms)
+✖ same data drives SVG PDF and automatic drawing set, all continuation references survive placement (3.484958ms)
+ℹ tests 16
+ℹ suites 0
+ℹ pass 12
+ℹ fail 4
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 233.643
+
+✖ failing tests:
+
+test at tests/features/f06/schedules.test.mjs:23:1
+✖ ordered layers independently match fixture widths, functions, core flags, cavity and membrane records (1.166584ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+
+    [
+      [
+  +     209.54999999999998,
+  -     209.55,
+        139.7
+      ],
+      [
+        155.575,
+        127
+
+      at TestContext.<anonymous> (file:///Users/austinhartt/Documents/ChatGPT/BimCraft%20Test/bimcraft-f06/tests/features/f06/schedules.test.mjs:23:482)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [ [ 209.54999999999998, 139.7 ], [ 155.575, 127 ] ],
+    expected: [ [ 209.55, 139.7 ], [ 155.575, 127 ] ],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at tests/features/f06/schedules.test.mjs:26:1
+✖ layer edits, reordering and assembly rename propagate into derived placed sheets (2.958583ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+
+  + 215.89999999999998
+  - 215.9
+        ^
+
+      at TestContext.<anonymous> (file:///Users/austinhartt/Documents/ChatGPT/BimCraft%20Test/bimcraft-f06/tests/features/f06/schedules.test.mjs:26:399)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 215.89999999999998,
+    expected: 215.9,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/features/f06/schedules.test.mjs:34:1
+✖ unsupported library is diagnosed; no guessed material names or styles (0.2625ms)
+  TypeError [Error]: w.project is not a function
+      at file:///Users/austinhartt/Documents/ChatGPT/BimCraft%20Test/bimcraft-f06/tests/features/f06/schedules.test.mjs:34:136
+      at file:///Users/austinhartt/Documents/ChatGPT/BimCraft%20Test/bimcraft-f06/app/model-ops.js:32:102
+      at ModelWriter.run (file:///Users/austinhartt/Documents/ChatGPT/BimCraft%20Test/bimcraft-f06/app/model-write.js:54:17)
+      at file:///Users/austinhartt/Documents/ChatGPT/BimCraft%20Test/bimcraft-f06/app/model-ops.js:32:14
+      at IfcEditor.modelChange (file:///Users/austinhartt/Documents/ChatGPT/BimCraft%20Test/bimcraft-f06/app/ifc-edit.js:179:15)
+      at Object.change (file:///Users/austinhartt/Documents/ChatGPT/BimCraft%20Test/bimcraft-f06/tests/features/f04/fixture.mjs:37:103)
+      at TestContext.<anonymous> (file:///Users/austinhartt/Documents/ChatGPT/BimCraft%20Test/bimcraft-f06/tests/features/f06/schedules.test.mjs:34:112)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+
+test at tests/features/f06/schedules.test.mjs:37:1
+✖ same data drives SVG PDF and automatic drawing set, all continuation references survive placement (3.484958ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+
+    assert.ok(sheetSvg(placed,{paper:'letter'}).includes('Air cavity'))
+
+      at TestContext.<anonymous> (file:///Users/austinhartt/Documents/ChatGPT/BimCraft%20Test/bimcraft-f06/tests/features/f06/schedules.test.mjs:37:441)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }

@@ -1,0 +1,6 @@
+{"file": "saved.ifc", "schemaFindings": 0, "types": 2, "membranes": 3, "cavityWidths": [25.4, 38.1], "csvComparedToAuthoritativeRecords": true}
+{"file": "drawing-set.pdf", "pages": 6, "minFontPt": 6.0, "vectorOnly": true, "dashedPaths": 5}
+{"file": "edited-assembly-sheet.pdf", "pages": 1, "minFontPt": 7.0, "vectorOnly": true, "dashedPaths": 0}
+{"file": "initial-assembly-sheet.pdf", "pages": 1, "minFontPt": 7.0, "vectorOnly": true, "dashedPaths": 0}
+{"file": "legend-page1.pdf", "pages": 1, "minFontPt": 7.0, "vectorOnly": true, "dashedPaths": 1}
+{"csvRows": 14, "layerRows": 12, "escaping": true}

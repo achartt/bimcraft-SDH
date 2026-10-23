@@ -1,0 +1,152 @@
+TAP version 13
+# (node:93623) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///Users/austinhartt/Documents/ChatGPT/BimCraft%20Test/bimcraft-f06/app/ifc-util.js is not specified and it doesn't parse as CommonJS.
+# Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+# To eliminate this warning, add "type": "module" to /Users/austinhartt/Documents/ChatGPT/BimCraft Test/bimcraft-f06/package.json.
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: fixture is deterministic, with explicit cores, duplicate material names and used/unused types
+ok 1 - fixture is deterministic, with explicit cores, duplicate material names and used/unused types
+  ---
+  duration_ms: 18.3045
+  type: 'test'
+  ...
+# Subtest: ordered layers independently match fixture widths, functions, core flags, cavity and membrane records
+ok 2 - ordered layers independently match fixture widths, functions, core flags, cavity and membrane records
+  ---
+  duration_ms: 0.725166
+  type: 'test'
+  ...
+# Subtest: all library materials appear by ID, repeated use deduplicates by ID and duplicate names stay distinct
+ok 3 - all library materials appear by ID, repeated use deduplicates by ID and duplicate names stay distinct
+  ---
+  duration_ms: 0.570125
+  type: 'test'
+  ...
+# Subtest: rename and style/default edit updates every relevant row and swatch without resizing or changing anchors
+ok 4 - rename and style/default edit updates every relevant row and swatch without resizing or changing anchors
+  ---
+  duration_ms: 1.365667
+  type: 'test'
+  ...
+# Subtest: layer edits, reordering and assembly rename propagate into derived placed sheets
+ok 5 - layer edits, reordering and assembly rename propagate into derived placed sheets
+  ---
+  duration_ms: 4.221834
+  type: 'test'
+  ...
+# Subtest: Undo redo and IFC4 save/reopen preserve schedule data and existing sheet references, isolated from second project
+ok 6 - Undo redo and IFC4 save/reopen preserve schedule data and existing sheet references, isolated from second project
+  ---
+  duration_ms: 3.984584
+  type: 'test'
+  ...
+# Subtest: CSV preserves all layers, exact mm numbers and existing escaping for quotes commas newlines and accents
+ok 7 - CSV preserves all layers, exact mm numbers and existing escaping for quotes commas newlines and accents
+  ---
+  duration_ms: 0.620333
+  type: 'test'
+  ...
+# Subtest: zero membranes are dashed lines and cavities have blank bounded swatches with no fill
+ok 8 - zero membranes are dashed lines and cavities have blank bounded swatches with no fill
+  ---
+  duration_ms: 0.528709
+  type: 'test'
+  ...
+# Subtest: read-only generation never changes saved IFC bytes
+ok 9 - read-only generation never changes saved IFC bytes
+  ---
+  duration_ms: 1.5175
+  type: 'test'
+  ...
+# Subtest: missing material remains explicit without invented style, nominal widths still come from valid recipe
+ok 10 - missing material remains explicit without invented style, nominal widths still come from valid recipe
+  ---
+  duration_ms: 0.462667
+  type: 'test'
+  ...
+# Subtest: unsupported recipe remains identifiable with all raw layers, no fabricated total and no read rewrite
+ok 11 - unsupported recipe remains identifiable with all raw layers, no fabricated total and no read rewrite
+  ---
+  duration_ms: 0.556458
+  type: 'test'
+  ...
+# Subtest: corrupt recipe thickness is unavailable rather than coerced or silently omitted
+ok 12 - corrupt recipe thickness is unavailable rather than coerced or silently omitted
+  ---
+  duration_ms: 0.3605
+  type: 'test'
+  ...
+# Subtest: unsupported library is diagnosed; no guessed material names or styles
+ok 13 - unsupported library is diagnosed; no guessed material names or styles
+  ---
+  duration_ms: 0.394833
+  type: 'test'
+  ...
+# Subtest: large fixture pagination retains every layer and text, with bounded readable vector pages
+ok 14 - large fixture pagination retains every layer and text, with bounded readable vector pages
+  ---
+  duration_ms: 53.339125
+  type: 'test'
+  ...
+# Subtest: long unbroken stable IDs and line breaks continue without dropping characters
+ok 15 - long unbroken stable IDs and line breaks continue without dropping characters
+  ---
+  duration_ms: 0.236125
+  type: 'test'
+  ...
+# Subtest: same data drives SVG PDF and automatic drawing set, all continuation references survive placement
+ok 16 - same data drives SVG PDF and automatic drawing set, all continuation references survive placement
+  ---
+  duration_ms: 3.547208
+  type: 'test'
+  ...
+# Subtest: new authored starter types are included, uninstantiated tool presets are excluded
+ok 17 - new authored starter types are included, uninstantiated tool presets are excluded
+  ---
+  duration_ms: 1.341
+  type: 'test'
+  ...
+# Subtest: a material used both physically and as a membrane retains separate explanatory symbols by one stable ID
+ok 18 - a material used both physically and as a membrane retains separate explanatory symbols by one stable ID
+  ---
+  duration_ms: 0.817042
+  type: 'test'
+  ...
+# Subtest: unplaced continuation pages are explicit; automatic sets retain them all
+ok 19 - unplaced continuation pages are explicit; automatic sets retain them all
+  ---
+  duration_ms: 0.510542
+  type: 'test'
+  ...
+# Subtest: duplicate recipe containers diagnose ambiguous identities without merging or rewriting
+ok 20 - duplicate recipe containers diagnose ambiguous identities without merging or rewriting
+  ---
+  duration_ms: 0.453667
+  type: 'test'
+  ...
+# Subtest: IFC2X3 schedule and sheet references preserve membranes omitted from physical layer sets
+ok 21 - IFC2X3 schedule and sheet references preserve membranes omitted from physical layer sets
+  ---
+  duration_ms: 2.332041
+  type: 'test'
+  ...
+# Subtest: empty project explicitly has no authored types while available starter materials are identified as unused
+ok 22 - empty project explicitly has no authored types while available starter materials are identified as unused
+  ---
+  duration_ms: 0.287667
+  type: 'test'
+  ...
+# Subtest: ambiguous authored starter type identities get diagnostics rather than plausible duplicate totals
+ok 23 - ambiguous authored starter type identities get diagnostics rather than plausible duplicate totals
+  ---
+  duration_ms: 1.165042
+  type: 'test'
+  ...
+1..23
+# tests 23
+# suites 0
+# pass 23
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 225.201875

@@ -1,0 +1,50 @@
+name: F06 browser acceptance
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: f06-browser-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/cache@v4
+        with:
+          path: devshell/vendor
+          key: vendor-${{ hashFiles('devshell/vendor.json') }}
+      - name: Verify pinned vendors
+        run: npm run fetch-vendor
+      - name: Browser and independent readers
+        run: |
+          npm install --prefix .cc-test/f06-browser-deps --no-package-lock playwright@1.56.1
+          .cc-test/f06-browser-deps/node_modules/.bin/playwright install --with-deps chromium
+          python -m venv .cc-test/f06-reader
+          .cc-test/f06-reader/bin/python -m pip install -r tests/features/f01/requirements-independent.txt -r tests/features/f04/requirements-independent.txt
+      - name: Generate deterministic stress fixture and run F06 tests
+        run: npm run test:f06
+      - name: Actual browser workflow and exports
+        run: node tests/features/f06/browser.mjs
+      - name: Independent actual IFC PDF CSV acceptance
+        run: .cc-test/f06-reader/bin/python -I tests/features/f06/independent.py .cc-test/f06-browser
+      - name: Retain evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: f06-browser
+          path: .cc-test/f06-browser/
