@@ -1,0 +1,33 @@
+2026-10-22T23:43:21.4835509Z # pass 23
+2026-10-22T23:43:21.4835620Z # fail 0
+2026-10-22T23:43:23.4567184Z PASS fixture opens with all twelve ordered layers
+2026-10-22T23:43:23.5537202Z PASS screen states order units and scope
+2026-10-22T23:43:23.9376620Z PASS expanded schedule shows all seven readable columns
+2026-10-22T23:43:24.1373312Z PASS actual download assemblies.csv
+2026-10-22T23:43:24.2334678Z PASS screen legend includes duplicate names by distinct IDs
+2026-10-22T23:43:24.3396633Z PASS expanded legend is available
+2026-10-22T23:43:24.5580351Z PASS actual download materials.csv
+2026-10-22T23:43:25.2553393Z PASS actual download legend-page1.pdf
+2026-10-22T23:43:25.3484887Z PASS sheet placement saved
+2026-10-22T23:43:25.6710799Z PASS actual download initial-assembly-sheet.pdf
+2026-10-22T23:43:26.1163935Z PASS real layer reorder and edit update schedule
+2026-10-22T23:43:26.2005115Z PASS Undo restores schedule
+2026-10-22T23:43:26.3280478Z PASS Redo restores reordered schedule
+2026-10-22T23:43:26.6318120Z PASS material rename style/default updates by ID without resizing
+2026-10-22T23:43:27.2050399Z PASS actual download edited-assembly-sheet.pdf
+2026-10-22T23:43:27.3733887Z PASS actual download edited-assemblies.csv
+2026-10-22T23:43:27.3961893Z PASS actual download saved.ifc
+2026-10-22T23:43:28.5622828Z PASS actual downloaded IFC reopens with data styles and sheet references
+2026-10-22T23:43:29.9394709Z PASS second project isolated
+2026-10-22T23:43:30.2971622Z PASS actual download drawing-set.pdf
+2026-10-22T23:43:32.3974382Z PASS larger project has 210 layer rows
+2026-10-22T23:43:32.6569129Z PASS no unexpected browser errors
+2026-10-22T23:43:35.5413040Z {"file": "saved.ifc", "schemaFindings": 0, "types": 2, "membranes": 3, "cavityWidths": [25.4, 38.1], "csvComparedToAuthoritativeRecords": true}
+2026-10-22T23:43:35.5413895Z {"file": "drawing-set.pdf", "pages": 6, "minFontPt": 6.0, "vectorOnly": true, "dashedPaths": 5}
+2026-10-22T23:43:35.5414596Z {"file": "edited-assembly-sheet.pdf", "pages": 1, "minFontPt": 7.0, "vectorOnly": true, "dashedPaths": 0}
+2026-10-22T23:43:35.5417592Z {"file": "initial-assembly-sheet.pdf", "pages": 1, "minFontPt": 7.0, "vectorOnly": true, "dashedPaths": 0}
+2026-10-22T23:43:35.5418255Z {"file": "legend-page1.pdf", "pages": 1, "minFontPt": 7.0, "vectorOnly": true, "dashedPaths": 1}
+2026-10-22T23:43:35.5418740Z {"csvRows": 14, "layerRows": 12, "escaping": true}
+2026-10-22T23:43:37.3208474Z SHA256 digest of uploaded artifact zip is d1fb0693029db53ab84d251eeb7b611b60f9316f5d6ded125bb547eafca92aca
+2026-10-22T23:43:38.0314842Z Artifact f06-browser.zip successfully finalized. Artifact ID 12467331684
+2026-10-22T23:43:38.0315815Z Artifact f06-browser has been successfully uploaded! Final size is 1460752 bytes. Artifact ID is 12467331684

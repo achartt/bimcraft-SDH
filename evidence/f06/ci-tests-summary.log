@@ -1,0 +1,63 @@
+2026-10-22T23:42:56.2090682Z PASS precision: 7 passed, 0 failed; 0 skip/availability notices
+2026-10-22T23:42:56.4152561Z PASS materials: 8 passed, 0 failed; 0 skip/availability notices
+2026-10-22T23:42:57.1214288Z PASS model: 124 passed, 0 failed; 4 skip/availability notices
+2026-10-22T23:42:57.9954178Z PASS comforts: 103 passed, 0 failed; 3 skip/availability notices
+2026-10-22T23:42:58.3787426Z PASS views2: 104 passed, 0 failed; 1 skip/availability notices
+2026-10-22T23:43:00.4065713Z PASS res: 197 passed, 0 failed; 13 skip/availability notices
+2026-10-22T23:43:00.4068105Z SKIP terrain live source comparison: civilcraft app absent at /home/runner/work/bimcraft-SDH/bimcraft-SDH/.cc-test/public_html/assets/apps/civilcraft; bundled integrity checked separately
+2026-10-22T23:43:00.4069340Z SKIP electrical live source comparison: cadcraft app absent at /home/runner/work/bimcraft-SDH/bimcraft-SDH/.cc-test/public_html/assets/apps/cadcraft; bundled integrity checked separately
+2026-10-22T23:43:00.4070540Z   SKIP RC.8 cross-app reader, quantities, estimate and pack sync: TakeoffCraft directory absent at /home/runner/work/bimcraft-SDH/bimcraft-SDH/.cc-test/public_html/assets/apps/takeoffcraft/dev
+2026-10-22T23:43:02.9744843Z PASS f02-contract: 21 passed, 0 failed; 0 skip/availability notices
+2026-10-22T23:43:04.1610359Z PASS f04-graphics: 13 passed, 0 failed; 0 skip/availability notices
+2026-10-22T23:43:05.2873528Z PASS f05-sections: 18 passed, 0 failed; 0 skip/availability notices
+2026-10-22T23:43:05.6808237Z PASS f06-schedules: 23 passed, 0 failed; 0 skip/availability notices
+2026-10-22T23:43:05.8428048Z PASS fixture: 1 passed, 0 failed; 0 skip/availability notices
+2026-10-22T23:43:07.3624251Z PASS source-sync-contract: 44 passed, 0 failed; 0 skip/availability notices
+2026-10-22T23:43:08.4697259Z PASS runner-contract: 19 passed, 0 failed; 0 skip/availability notices
+2026-10-22T23:43:25.2745787Z # pass 4
+2026-10-22T23:43:25.2745902Z # fail 0
+2026-10-22T23:44:23.7688167Z {"file": "fixtures/f02/mm-local.ifc", "schemaFindings": 0, "walls": 3, "dimensions": 18, "maxPointMm": 8.776391459191729e-07, "maxDimensionMm": 7.433873179252259e-07, "maxShapeMm": 4.547473508864641e-13}
+2026-10-22T23:44:23.7689012Z {"file": ".cc-test/f02/mm-local.ifc", "schemaFindings": 0, "walls": 3, "dimensions": 18, "maxPointMm": 4.207925528932193e-06, "maxDimensionMm": 4.70572013000492e-06, "maxShapeMm": 5.000000783184078e-06}
+2026-10-22T23:44:23.7689751Z {"file": "fixtures/f02/mm-translated.ifc", "schemaFindings": 0, "walls": 3, "dimensions": 18, "maxPointMm": 8.77757399137863e-07, "maxDimensionMm": 7.434282451868057e-07, "maxShapeMm": 4.547473508864641e-13}
+2026-10-22T23:44:23.7690501Z {"file": ".cc-test/f02/mm-translated.ifc", "schemaFindings": 0, "walls": 3, "dimensions": 18, "maxPointMm": 4.208011306080039e-06, "maxDimensionMm": 4.705740138888359e-06, "maxShapeMm": 5.000000783184078e-06}
+2026-10-22T23:44:23.7691269Z {"file": "fixtures/f02/m-local.ifc", "schemaFindings": 0, "walls": 3, "dimensions": 18, "maxPointMm": 0.0013137290529362678, "maxDimensionMm": 0.0008500411408931541, "maxShapeMm": 0.00045599999998557905}
+2026-10-22T23:44:23.7691992Z {"file": ".cc-test/f02/m-local.ifc", "schemaFindings": 0, "walls": 3, "dimensions": 18, "maxPointMm": 0.0020386012624830437, "maxDimensionMm": 0.0009286677004638477, "maxShapeMm": 0.0007249999998748535}
+2026-10-22T23:44:23.7692723Z {"file": "fixtures/f02/m-translated.ifc", "schemaFindings": 0, "walls": 3, "dimensions": 18, "maxPointMm": 0.0013137290496748498, "maxDimensionMm": 0.0008500410476699471, "maxShapeMm": 0.0014559999999619322}
+2026-10-22T23:44:23.7693458Z {"file": ".cc-test/f02/m-translated.ifc", "schemaFindings": 0, "walls": 3, "dimensions": 18, "maxPointMm": 0.002038601116923757, "maxDimensionMm": 0.0009286674903705716, "maxShapeMm": 0.001094000000023243}
+2026-10-22T23:44:23.7694199Z {"file": "fixtures/f02/inch-local.ifc", "schemaFindings": 0, "walls": 3, "dimensions": 18, "maxPointMm": 2.351536521533574e-05, "maxDimensionMm": 2.405996519883047e-05, "maxShapeMm": 1.7600000319362152e-05}
+2026-10-22T23:44:23.7694940Z {"file": ".cc-test/f02/inch-local.ifc", "schemaFindings": 0, "walls": 3, "dimensions": 18, "maxPointMm": 0.00015766053177913348, "maxDimensionMm": 4.864887660005479e-05, "maxShapeMm": 4.599999920174014e-05}
+2026-10-22T23:44:23.7696606Z {"file": "fixtures/f02/inch-translated.ifc", "schemaFindings": 0, "walls": 3, "dimensions": 18, "maxPointMm": 2.452050620058463e-05, "maxDimensionMm": 2.4060020223259926e-05, "maxShapeMm": 1.7600000319362152e-05}
+2026-10-22T23:44:23.7700027Z {"file": ".cc-test/f02/inch-translated.ifc", "schemaFindings": 0, "walls": 3, "dimensions": 18, "maxPointMm": 0.000152045692501128, "maxDimensionMm": 4.864879883825779e-05, "maxShapeMm": 4.599999920174014e-05}
+2026-10-22T23:44:23.7702013Z {"file": "fixtures/f02/foot-local.ifc", "schemaFindings": 0, "walls": 3, "dimensions": 18, "maxPointMm": 0.0003418758837977731, "maxDimensionMm": 0.00023599999985890463, "maxShapeMm": 0.00010079999998424682}
+2026-10-22T23:44:23.7704034Z {"file": ".cc-test/f02/foot-local.ifc", "schemaFindings": 0, "walls": 3, "dimensions": 18, "maxPointMm": 0.0009997899378986735, "maxDimensionMm": 0.0005537057190849737, "maxShapeMm": 0.0004718000009233947}
+2026-10-22T23:44:23.7711422Z {"file": "fixtures/f02/foot-translated.ifc", "schemaFindings": 0, "walls": 3, "dimensions": 18, "maxPointMm": 0.0003439846641657688, "maxDimensionMm": 0.00023599981795996428, "maxShapeMm": 0.00010079999998424682}
+2026-10-22T23:44:23.7712599Z {"file": ".cc-test/f02/foot-translated.ifc", "schemaFindings": 0, "walls": 3, "dimensions": 18, "maxPointMm": 0.0009972582476862656, "maxDimensionMm": 0.0005537058459594846, "maxShapeMm": 0.0004718000009233947}
+2026-10-22T23:44:30.3128481Z {"file": "fixtures/f04/layered-plans.ifc", "schemaFindings": 0, "walls": 9, "openings": 5, "modelDataIdentical": true, "membranesZero": true, "cavitiesVentilatedUnfilled": true}
+2026-10-22T23:44:30.3129650Z {"file": ".cc-test/f04/styled-reopened.ifc", "schemaFindings": 0, "walls": 9, "openings": 5, "modelDataIdentical": true, "membranesZero": true, "cavitiesVentilatedUnfilled": true}
+2026-10-22T23:44:30.3130472Z {"file": ".cc-test/f04/fine-reopened.ifc", "schemaFindings": 0, "walls": 9, "openings": 5, "modelDataIdentical": true, "membranesZero": true, "cavitiesVentilatedUnfilled": true}
+2026-10-22T23:44:37.8438651Z {"file": "seed.ifc", "schema": "IFC4", "schemaFindings": 0, "authoredWalls": 2, "stableIdentities": true, "cavitiesBlank": true, "membranesZero": true}
+2026-10-22T23:44:37.8439284Z {"file": "styled.ifc", "schema": "IFC4", "schemaFindings": 0, "authoredWalls": 2, "stableIdentities": true, "cavitiesBlank": true, "membranesZero": true}
+2026-10-22T23:44:37.8439840Z {"file": "edited.ifc", "schema": "IFC4", "schemaFindings": 0, "authoredWalls": 2, "stableIdentities": true, "cavitiesBlank": true, "membranesZero": true}
+2026-10-22T23:44:37.8440429Z {"file": "ifc2x3.ifc", "schema": "IFC2X3", "schemaFindings": 0, "authoredWalls": 1, "stableIdentities": true, "cavitiesBlank": true, "membranesZero": true}
+2026-10-22T23:44:44.2515747Z {"file": "seed.ifc", "schemaFindings": 0, "types": 2, "membranes": 3, "cavityWidths": [25.4, 38.1], "csvComparedToAuthoritativeRecords": false}
+2026-10-22T23:44:44.2516669Z {"file": "styled.ifc", "schemaFindings": 0, "types": 2, "membranes": 3, "cavityWidths": [25.4, 38.1], "csvComparedToAuthoritativeRecords": false}
+2026-10-22T23:44:44.2517540Z {"file": "edited.ifc", "schemaFindings": 0, "types": 2, "membranes": 3, "cavityWidths": [25.4, 38.1], "csvComparedToAuthoritativeRecords": false}
+2026-10-22T23:44:44.2518649Z {"file": "ifc2x3.ifc", "schemaFindings": 0, "types": 2, "membranes": 3, "cavityWidths": [25.4, 38.1], "csvComparedToAuthoritativeRecords": false}
+2026-10-22T23:44:44.2520985Z {"csvRows": 14, "layerRows": 12, "escaping": true}
+2026-10-22T23:45:11.4644674Z 3 of 3 test files passed
+2026-10-22T23:45:11.7529929Z PASS precision: 7 passed, 0 failed; 0 skip/availability notices
+2026-10-22T23:45:11.9520403Z PASS materials: 8 passed, 0 failed; 0 skip/availability notices
+2026-10-22T23:45:13.1072782Z PASS model: 129 passed, 0 failed; 0 skip/availability notices
+2026-10-22T23:45:14.4024338Z PASS comforts: 106 passed, 0 failed; 0 skip/availability notices
+2026-10-22T23:45:15.0514304Z PASS views2: 105 passed, 0 failed; 0 skip/availability notices
+2026-10-22T23:45:17.9472991Z PASS res: 206 passed, 0 failed; 4 skip/availability notices
+2026-10-22T23:45:17.9474677Z SKIP terrain live source comparison: civilcraft app absent at /home/runner/work/bimcraft-SDH/bimcraft-SDH/.cc-test/public_html/assets/apps/civilcraft; bundled integrity checked separately
+2026-10-22T23:45:17.9475868Z SKIP electrical live source comparison: cadcraft app absent at /home/runner/work/bimcraft-SDH/bimcraft-SDH/.cc-test/public_html/assets/apps/cadcraft; bundled integrity checked separately
+2026-10-22T23:45:17.9476973Z   SKIP RC.8 cross-app reader, quantities, estimate and pack sync: TakeoffCraft directory absent at /home/runner/work/bimcraft-SDH/bimcraft-SDH/.cc-test/public_html/assets/apps/takeoffcraft/dev
+2026-10-22T23:45:20.5206920Z PASS f02-contract: 21 passed, 0 failed; 0 skip/availability notices
+2026-10-22T23:45:21.6852026Z PASS f04-graphics: 13 passed, 0 failed; 0 skip/availability notices
+2026-10-22T23:45:22.6858918Z PASS f05-sections: 18 passed, 0 failed; 0 skip/availability notices
+2026-10-22T23:45:23.0288132Z PASS f06-schedules: 23 passed, 0 failed; 0 skip/availability notices
+2026-10-22T23:45:23.1798829Z PASS fixture: 1 passed, 0 failed; 0 skip/availability notices
+2026-10-22T23:45:24.5544706Z PASS source-sync-contract: 44 passed, 0 failed; 0 skip/availability notices
+2026-10-22T23:45:25.5598625Z PASS runner-contract: 19 passed, 0 failed; 0 skip/availability notices

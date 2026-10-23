@@ -1,0 +1,76 @@
+npm notice run bench:f06
+npm notice run node tests/features/f06/measure.mjs
+(node:938) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///Users/austinhartt/Documents/ChatGPT/BimCraft%20Test/bimcraft-f06/app/ifc/api.js is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /Users/austinhartt/Documents/ChatGPT/BimCraft Test/bimcraft-f06/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[
+  {
+    "assemblies": 2,
+    "pages": 4,
+    "generation": {
+      "n": 30,
+      "p50Ms": 0.07325000000000159,
+      "p95Ms": 0.13074999999999193
+    },
+    "pagination": {
+      "n": 30,
+      "p50Ms": 0.16720800000000224,
+      "p95Ms": 0.26116700000000037
+    },
+    "composition": {
+      "n": 30,
+      "p50Ms": 0.020375000000001364,
+      "p95Ms": 0.049915999999996075
+    },
+    "svg": {
+      "n": 30,
+      "p50Ms": 0.19104100000001267,
+      "p95Ms": 0.23679199999999412
+    },
+    "csv": {
+      "n": 30,
+      "p50Ms": 0.01595899999999517,
+      "p95Ms": 0.0204169999999948
+    },
+    "pdf": {
+      "n": 30,
+      "p50Ms": 1.2204169999999976,
+      "p95Ms": 1.323291999999995
+    }
+  },
+  {
+    "assemblies": 35,
+    "pages": 20,
+    "generation": {
+      "n": 30,
+      "p50Ms": 0.39904200000000856,
+      "p95Ms": 0.5504579999999919
+    },
+    "pagination": {
+      "n": 30,
+      "p50Ms": 1.1014169999999694,
+      "p95Ms": 1.262916999999959
+    },
+    "composition": {
+      "n": 30,
+      "p50Ms": 0.10204099999998562,
+      "p95Ms": 0.3350409999999897
+    },
+    "svg": {
+      "n": 30,
+      "p50Ms": 0.9782500000000027,
+      "p95Ms": 1.3938750000000084
+    },
+    "csv": {
+      "n": 30,
+      "p50Ms": 0.1364590000000021,
+      "p95Ms": 0.18404199999997672
+    },
+    "pdf": {
+      "n": 30,
+      "p50Ms": 6.494708000000003,
+      "p95Ms": 6.771957999999984
+    }
+  }
+]
