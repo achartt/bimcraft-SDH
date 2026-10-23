@@ -1,6 +1,6 @@
 # F28-A review handoff
 
-Approved base: `9667b3c48977ff772c2a4c4785238cb3c4603e0e` (integrated F06). Branch: `feature/f28-a-live-workspace`. Isolated checkout: `bimcraft-f28`. No newer main was adopted. F02 `656d462`, F04 `ff0344b`, and F05 `2eb43b1` ancestry was verified. No merge, deployment, roadmap edit or sibling-checkout modification is part of this change.
+Approved base: `9667b3c48977ff772c2a4c4785238cb3c4603e0e` (integrated F06). Implementation head: `832309805b556cbd50255f7e55f8a946d300b31a`; subsequent commits package verification/evidence. Draft PR: [#9](https://github.com/drsurfbum/bimcraft-SDH/pull/9). Branch: `feature/f28-a-live-workspace`. Isolated checkout: `bimcraft-f28`. No newer main was adopted. F02 `656d462`, F04 `ff0344b`, and F05 `2eb43b1` ancestry was verified. No merge, deployment, roadmap edit or sibling-checkout modification is part of this change.
 
 ## Review and startup
 
@@ -32,9 +32,21 @@ F28-A does not migrate wall creation/type editing, RCP, saved-camera views, shee
 - Existing F02/F04/F05/F06, precision/material/model/comforts/views and source/runner/fixture checks execute without failed assertions. **The aggregate baseline is not green**: both before and after, residential mode reports 194 executed passes against its minimum of 195, with optional reader dependencies absent. The minimum was not weakened. Logs are in `evidence/f28/`.
 - `npm run test:f03`: 4/4 harness checks pass.
 - Same-machine, five-warmup/30-sample F04 Fine scene/vector export and F05 Fine section/composition/SVG/PDF comparisons: `evidence/f28/performance-node.json`. Same approved geometry/export modules and fixtures, no model-open time inside generation timers. These are Node workloads, not browser/GPU latency. Both PERF-F04-01 and PERF-F05-01 remain **OPEN**.
-- The first complete HTTP acceptance run passed at `ab077768d22c4f650a417d328aabc2a76432ef52`: [run 39970898976](https://github.com/achartt/bimcraft-SDH/actions/runs/39970898976), 27 browser checks and independent IfcOpenShell validation with zero schema findings (9 walls, 2 persistent dimensions). Browser acceptance is defined in `tests/features/f28/browser.mjs`, using HTTP devshell and real disk IFCs/downloads. It covers real clicks/edit/validation/range/Undo/Redo/save/reopen, reference preservation, project isolation, normal/narrow screenshots, retained canvases, plan/3D cameras and picking after resize, keyboard/touch-style explanations, and fallback assembly access. Independent IfcOpenShell validation reads its downloaded IFC. Normal/narrow, before/after and wall-selection PNGs are retained in that run’s `f28-browser` artifact. Follow-up keyboard/read-only and entry-preservation checks run on the next head.
+- The implementation-head HTTP acceptance run passed at `832309805b556cbd50255f7e55f8a946d300b31a`: [run 39972805876](https://github.com/drsurfbum/bimcraft-SDH/actions/runs/39972805876), 31 browser checks and independent IfcOpenShell validation with zero schema findings (9 walls, 2 persistent dimensions). Browser acceptance is defined in `tests/features/f28/browser.mjs`, using HTTP devshell and real disk IFCs/downloads. It covers real clicks/edit/validation/range/Undo/Redo/save/reopen, reference preservation, project isolation, normal/narrow screenshots, retained canvases, plan/3D cameras and picking after resize, keyboard/touch-style explanations, and fallback assembly access. Independent IfcOpenShell validation reads its downloaded IFC. Normal/narrow, before/after and wall-selection PNGs are retained in the `f28-browser` Actions artifact and packaged below. The established-layout frame is recaptured after a real Fit and explicit canvas paint readiness. This includes keyboard/read-only explanations, browser selection distinct from activation, immediate View Properties availability and unfinished field entry across resize. The frames were visually inspected at 1440×1000 and 900×700; camera preservation intentionally keeps model zoom as the window narrows.
+- GitHub main Tests, F04, F05 and F06 workflows passed on the implementation head. Canonical repository ownership now resolves to `drsurfbum/bimcraft-SDH` (same repository ID 1428509177 and PR #9).
 - Local Safari rendered the shell and exposed an initial no-document bug, which was fixed. Native file selection was unreliable in this automation session. In-app browser rejected a file URL by protocol policy; that route was stopped. A temporary file-preview experiment is not a supported delivery path. The subsequent successful HTTP workflow supplies real-browser evidence; the local startup restriction remains.
 
 ## Next slice / review gates
 
 Review the HTTP browser report, screenshots and independent IFC result before integration; resolve any reported failures. F28-B should migrate creation/options/type editor through existing authoritative operations. F28-C should migrate real documentation and other existing tools. F28-D completes usability, translations, panel/docking coverage and broader viewport checks. No Add/Cut decision is needed to review this bounded shell; the unavailable inventory is separate from approved scope.
+
+## Review captures
+
+Actual `fixtures/f04/layered-plans.ifc`, not the illustrative mockup house:
+
+- [Default live workspace](../../../evidence/f28/screenshots/after-workspace.png)
+- [Selected wall, real height/base offset](../../../evidence/f28/screenshots/selected-wall.png)
+- [Narrow 900×700 workspace](../../../evidence/f28/screenshots/narrow.png)
+- Established-layout before capture: the `f28-browser` Actions artifact contains `before-established.png`.
+
+The local Node comparison produced F04 Fine scene p50/p95 4.55/6.44 ms before and 4.36/6.66 ms after; F05 Fine section 3.18/4.16 ms before and 3.22/4.12 ms after. These small synthetic workloads and timing variation do not resolve either performance issue. Browser CPU paint data is retained separately in the Actions report.
