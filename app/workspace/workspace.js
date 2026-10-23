@@ -111,8 +111,8 @@ export function mountWorkspace({ root, modelUi, views, commands, props, current,
   function openRangeFor(guid) {
     views.openRange(guid);
     const dlg = root.querySelector('[data-pv-dialog]'); if (!dlg) return;
-    const why = 'Not wired in F28-A. Use Established layout for templates, category visibility, underlays and crop tools. Existing settings are preserved.';
-    dlg.querySelector('h2')?.after(node('p', { className: 'ws-note' }, 'F28-A: edit cut, top, bottom, depth, scale and detail. Other view settings remain in the established layout.'));
+    const why = 'Not wired in this workspace slice. Use Established layout for templates, category visibility, underlays and crop tools. Existing settings are preserved.';
+    dlg.querySelector('h2')?.after(node('p', { className: 'ws-note' }, 'Edit cut, top, bottom, depth, scale and detail. Other view settings remain in the established layout.'));
     for (const b of dlg.querySelectorAll('[data-pv-astpl], [data-pv-cropdraw], [data-pv-cropclear], [data-pv-hidesel], [data-pv-showall]')) {
       b.setAttribute('aria-disabled', 'true'); b.title = why;
       b.addEventListener('click', e => { e.preventDefault(); e.stopImmediatePropagation(); explain('', why); }, true);
@@ -130,7 +130,7 @@ export function mountWorkspace({ root, modelUi, views, commands, props, current,
     const left = root.querySelector('.bc-left'), right = root.querySelector('.bc-right');
     if (on && (current().busy || A.S.busy || A.S.reloading || A.S.chain || A.S.tool !== 'select')) { status('Finish or cancel the current operation in Established layout before switching workspaces.', true); return; }
     if (on && (left?.ownerDocument !== document || right?.ownerDocument !== document || !root.contains(left) || !root.contains(right))) {
-      status('Dock the established panels in this window before enabling F28-A. Existing panel windows are preserved.', true); return;
+      status('Dock the established panels in this window before enabling the live workspace. Existing panel windows are preserved.', true); return;
     }
     if (active === on) return;
     active = on;
@@ -164,7 +164,7 @@ export function mountWorkspace({ root, modelUi, views, commands, props, current,
     if (group) { const summary = group.querySelector('summary'); if (summary) { if (!summary.hasAttribute('data-ws-original-summary')) summary.dataset.wsOriginalSummary = summary.textContent; summary.textContent = A.t('model.pb.views3d') + ' (' + (1 + group.querySelectorAll('[data-pb-3d]').length) + ')'; } }
     for (const btn of b.querySelectorAll('button')) {
       const supported = btn.matches('[data-pb-plan], [data-pb-range], [data-ws-browser-3d]');
-      if (!supported) { if (!btn.hasAttribute('data-ws-original-title')) btn.dataset.wsOriginalTitle = btn.title; btn.setAttribute('aria-disabled', 'true'); btn.title = 'Not wired in F28-A. Switch to Established layout for supported documentation, RCP, saved-camera, family and linked-model actions.'; }
+      if (!supported) { if (!btn.hasAttribute('data-ws-original-title')) btn.dataset.wsOriginalTitle = btn.title; btn.setAttribute('aria-disabled', 'true'); btn.title = 'Not wired in this workspace slice. Switch to Established layout for supported documentation, RCP, saved-camera, family and linked-model actions.'; }
     }
     for (const btn of b.querySelectorAll('[data-pb-plan], [data-ws-browser-3d]')) {
       const v = btn.hasAttribute('data-ws-browser-3d') ? threeView() : snapshot().levels.map(planView).find(x => x.guid === btn.dataset.pbPlan);
@@ -255,7 +255,7 @@ export function mountWorkspace({ root, modelUi, views, commands, props, current,
       const textCopy = input.matches('.bc-copy');
       if (!editable && !textCopy && !restricted.has(input)) {
         restricted.set(input, { disabled: input.disabled, title: input.title, ariaDisabled: input.getAttribute('aria-disabled') });
-        const why = input.matches('[data-mp-assembly]') ? availability('assembly', commands, snapshot()).reason : 'Read-only in F28-A. Use Established layout for other supported property and type actions.';
+        const why = input.matches('[data-mp-assembly]') ? availability('assembly', commands, snapshot()).reason : 'Read-only in this workspace slice. Use Established layout for other supported property and type actions.';
         if (input.tagName === 'BUTTON') { input.disabled = false; input.setAttribute('aria-disabled', 'true'); input.dataset.wsReadonly = why; input.dataset.wsReason = why; }
         else input.disabled = true;
         input.title = why;
@@ -278,7 +278,7 @@ export function mountWorkspace({ root, modelUi, views, commands, props, current,
   function refresh() {
     if (!active) return;
     const c = current();
-    if (!['none', 'ifc'].includes(c.mode)) { setActive(false); status('This file uses the established layout. F28-A supports IFC workspaces.'); return; }
+    if (!['none', 'ifc'].includes(c.mode)) { setActive(false); status('This file uses the established layout. The live workspace supports IFC projects.'); return; }
     if (documentToken !== c.editor) { opened(); return; }
     // A rebuild retains the editor token and therefore retains drawing tabs and cameras.
     attachBrowser();
@@ -326,7 +326,7 @@ export function mountWorkspace({ root, modelUi, views, commands, props, current,
         return node('article', {}, node('strong', {}, t.name + ' · ' + (a.enabled ? 'Wired' : commands.ids.includes(t.key) ? 'Wired · unavailable now' : t.status)), node('p', {}, a.reason || 'Enabled for the current document and view.'), node('small', {}, t.evidence));
       }));
     };
-    const dlg = node('dialog', { className: 'ws-dialog ws-inventory', 'aria-label': 'Tool availability' }, node('h2', {}, 'Tool availability · F28-A'), query, list, button('Close', { 'data-ws-dismiss': '' }));
+    const dlg = node('dialog', { className: 'ws-dialog ws-inventory', 'aria-label': 'Tool availability' }, node('h2', {}, 'Tool availability · F28-B'), query, list, button('Close', { 'data-ws-dismiss': '' }));
     query.addEventListener('input', render); root.append(dlg); render(); dlg.addEventListener('close', () => dlg.remove()); dlg.showModal();
   }
   root.addEventListener('click', e => {
