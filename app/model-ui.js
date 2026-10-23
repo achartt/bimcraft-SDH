@@ -166,7 +166,7 @@ export function mountModel(host) {
     if (fitToo) fitPlan();
   }
   const level = () => S.data?.levels.find((l) => l.id === S.level) || null;
-  const levelAbove = () => { const L = S.data.levels, i = L.findIndex((l) => l.id === S.level); return i >= 0 ? L[i + 1] || null : null; };
+  const levelAbove = () => { const L = S.data?.levels || [], i = L.findIndex((l) => l.id === S.level); return i >= 0 ? L[i + 1] || null : null; };
   const wallsHere = () => (S.data?.walls || []).filter((w) => w.storey === S.level);
   const wallsOn = (storey) => (S.data?.walls || []).filter((w) => w.storey === storey);
   const openingsHere = () => (S.data?.openings || []).filter((o) => o.storey === S.level);

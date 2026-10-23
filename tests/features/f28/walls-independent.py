@@ -19,6 +19,9 @@ for wall in expected['walls']:
  assert p.get('Justification','center')==wall['justification']
  if not wall.get('topLevel'):assert near(p['Height'],wall['height'])
  assert element.get_type(obj).GlobalId==wall['assembly']['guid']
+library=json.loads(element.get_psets(f.by_type('IfcProject')[0])['CadCraft_MaterialLibrary']['Library']);by_id={m['id']:m for m in library['materials']}
+for material in expected['materials']:
+ assert by_id[material['id']]==material
 rows=list(csv.DictReader(io.StringIO((root/'assemblies.csv').read_text(encoding='utf-8-sig'),newline='')))
 for recipe in expected['assemblies']:
  ty=f.by_guid(recipe['guid']);payload=json.loads(element.get_psets(ty)['CadCraft_WallType']['Recipe'])
