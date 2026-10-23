@@ -465,7 +465,7 @@ export function mountModel(host) {
       if ((key === 'shape' && input.value === 'arc' && S.wall.reference.startsWith('core')) || (key === 'reference' && input.value.startsWith('core') && S.wall.shape === 'arc')) { input.value = S.wall[key]; host.status('Core location-line placement is supported for straight walls. Use a center or finish-face reference for the established curved workflow.', true); return; }
       endChain(); S.wall[key] = input.value; if (ui.hint && S.tool === 'wall') ui.hint.textContent = t(S.wall.shape === 'arc' ? 'comforts.hint.arcwall' : 'model.hint.wall'); drawOverlay(); });
     ui.wallTop.addEventListener('change', () => { S.wall.top = ui.wallTop.value; ui.wallH.hidden = S.wall.top !== 'fixed'; });
-    ui.wallH.addEventListener('change', () => { const mm = parseLen(ui.wallH.value, S.units); if (mm > 100) S.wall.height = mm; else host.status(t('model.err.length'), true); ui.wallH.value = fmtLen(S.wall.height, S.units); });
+    ui.wallH.addEventListener('change', () => { const mm = parseLen(ui.wallH.value, S.units); if (mm > 100) { S.wall.height = mm; host.status(t('model.wall.height') + ': ' + fmtLen(mm, S.units)); } else host.status(t('model.err.length'), true); ui.wallH.value = fmtLen(S.wall.height, S.units); });
     ui.wallH.hidden = S.wall.top !== 'fixed';
     ui.wallH.value = fmtLen(S.wall.height, S.units);
   }

@@ -34,7 +34,7 @@ export function mountWorkspace({ root, modelUi, views, commands, props, current,
   const ribbonTabs = addChrome(node('nav', { className: 'ws-ribbon-tabs', role: 'tablist', 'aria-label': 'Ribbon' }));
   const ribbon = addChrome(node('div', { className: 'ws-ribbon', role: 'tabpanel', id: 'ws-ribbon-panel', 'aria-label': 'Architecture tools' }));
   const options = addChrome(node('div', { className: 'ws-options' }, node('strong', {}, 'Modify'), node('span', { 'data-ws-options-text': '' }, 'Open an IFC to begin.'), tool('clear', true)));
-  const elementProps = node('div', { className: 'ws-element-props' }, node('p', { className: 'ws-note' }, 'Authored wall instances: type, location line, top/height, base offset and exterior orientation use existing transactions. Edit Type → Structure changes the shared wall type. Other properties remain read-only.'));
+  const elementProps = node('div', { className: 'ws-element-props' }, node('p', { className: 'ws-note' }, 'Instance settings. Edit Type changes every wall using that type. Other properties are read-only.'));
   const placementProps = node('div', { className: 'ws-placement-props', 'data-ws-placement-props': '', hidden: true });
   const viewProps = node('div', { className: 'ws-view-props' });
   const propHeading = node('span', {}, 'Properties');

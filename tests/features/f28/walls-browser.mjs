@@ -68,7 +68,7 @@ try{
  await page.locator('[data-model-walltype]').selectOption('wall-f04-rainscreen');await page.locator('[data-model-walltop]').selectOption('fixed');
  await page.locator('[data-model-wallh]').fill('bad height');await page.locator('[data-model-wallh]').press('Tab');check('placement invalid length produces existing feedback',await page.locator('[data-status]').evaluate(e=>e.classList.contains('is-error')));
  await page.locator('[data-model-units]').selectOption('ftin');await page.locator('[data-model-wallh]').fill("10'");await page.locator('[data-model-wallh]').press('Tab');
- near(await page.evaluate(()=>bimcraftPlan.state.wall.height),3048);check('imperial placement height uses the existing unit parser');await page.locator('[data-model-units]').selectOption('mm');
+ near(await page.evaluate(()=>bimcraftPlan.state.wall.height),3048);check('imperial placement height uses the existing unit parser');check('valid placement height clears prior validation feedback',!(await page.locator('[data-status]').evaluate(e=>e.classList.contains('is-error'))));await page.locator('[data-model-units]').selectOption('mm');
  await page.screenshot({path:path.join(out,'wall-placement.png')});
  const made=[];
  for(const [i,reference]of ['center','coreCenter','outside','inside','coreExterior','coreInterior'].entries())for(const [j,side]of ['left','right'].entries()){
