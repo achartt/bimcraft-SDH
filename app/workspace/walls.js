@@ -24,11 +24,12 @@ export function mountWallWorkflow({ root, A, commands, defaults, unitsHost, opti
   const typeField = ui.type.closest('label');
   const slot = node('div', { className: 'ws-wall-options', 'data-ws-wall-options': '', hidden: true });
   const note = node('p', { className: 'ws-note' }, 'Placement defaults for new straight walls. Selecting or editing an instance does not assign these defaults to it.');
+  const topNote = node('p', { className: 'ws-note', 'data-ws-top-reason': '' });
   defaults.append(node('div', { className: 'ws-prop-identity' }, node('strong', {}, 'Basic Wall · New placement')), note);
   const edit = button('Edit Type', { 'data-ws-command': 'assembly' });
   const unitsLabel = node('label', { className: 'ws-native-field' }, node('span', {}, 'Entry units '));
   unitsHost.append(unitsLabel);
-  defaults.append(edit, node('p', { className: 'ws-note' }, 'Draw: straight segments. Curved placement remains in Established layout. Escape ends the current chain; Escape again returns to Modify. Numeric entry accepts lengths, coordinates and angles.'));
+  defaults.append(edit, topNote, node('p', { className: 'ws-note' }, 'Draw: straight segments. Curved placement remains in Established layout. Escape ends the current chain; Escape again returns to Modify. Numeric entry accepts lengths, coordinates and angles.'));
   const cancel = button('Cancel placement', { 'data-ws-command': 'cancel' });
   options.append(slot);
   function move(element, parent, before = null) {
@@ -58,20 +59,23 @@ export function mountWallWorkflow({ root, A, commands, defaults, unitsHost, opti
       ui.reference.replaceChildren(...locationChoices.map(([value, text]) => node('option', { value }, text)));
       ui.reference.value = A.S.wall.reference;
       ui.shape.querySelector('[value="arc"]').disabled = true;
+      ui.shape.disabled = true; ui.shape.title = 'Straight placement in this slice. Use Established layout for supported curved placement.';
     } else {
       for (const [element, home] of [...homes].reverse()) if (home.parentNode) { home.after(element); home.remove(); }
-      homes.clear(); ui.shape.querySelector('[value="arc"]').disabled = false;
+      homes.clear(); ui.shape.querySelector('[value="arc"]').disabled = false; ui.shape.disabled = false; ui.shape.title = '';
     }
   }
   function refresh() {
     if (!mounted) return;
     const placing = A.S.tool === 'wall'; slot.hidden = !placing; defaults.hidden = !placing;
+    ui.shape.disabled = true; ui.shape.querySelector('[value="arc"]').disabled = true;
     for (const label of ui.row.querySelectorAll('label')) label.classList.add('ws-native-field');
     typeField.classList.add('ws-native-field');
     if (!slot.contains(cancel)) slot.append(cancel);
     const above = ui.top.querySelector('[value="level"]');
     above.disabled = !A.levelAbove();
     above.title = above.disabled ? 'No level exists above this floor. Choose Fixed height.' : '';
+    topNote.textContent = above.title; topNote.hidden = !above.disabled;
   }
   function start() {
     if (!A.levelAbove() && A.S.wall.top === 'level') { A.S.wall.top = 'fixed'; ui.top.value = 'fixed'; }
@@ -96,7 +100,7 @@ export function mountWallWorkflow({ root, A, commands, defaults, unitsHost, opti
     dlg.append(node('h2', {}, 'Type Properties — Basic Wall'), node('dl', { className: 'ws-view-dl' },
       node('dt', {}, 'Family'), node('dd', {}, 'Basic Wall'), node('dt', {}, 'Type'), node('dd', {}, typeName(type)),
       node('dt', {}, 'Structure'), node('dd', {}, structure), node('dt', {}, 'Width'), node('dd', {}, fmtLen(typeThickness(type), A.units()))),
-      node('p', { 'data-ws-type-effects': '' }, 'Editing this type changes all ' + count + ' existing wall instance(s) using it. Use Duplicate type inside Structure to keep the original type.'),
+      node('p', { 'data-ws-type-effects': '' }, type.custom ? 'Editing this type changes all ' + count + ' existing wall instance(s) using it. Use Duplicate type inside Structure to keep the original type.' : 'This is a built-in starter type. Structure creates an editable copy with a distinct identity and assigns it to the selection; existing instances of the starter retain their type.'),
       node('p', { className: 'ws-note' }, typeContext.placement ? 'This is the type used for future placement.' : 'A duplicate will be assigned to the ' + typeContext.assign.length + ' selected wall(s). Other instances retain their original type.'),
       button('Close', { 'data-ws-dismiss': '' }));
     root.append(dlg); dlg.addEventListener('close', () => dlg.remove()); dlg.showModal();
