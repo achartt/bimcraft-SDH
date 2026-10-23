@@ -24,7 +24,9 @@
  * per system, CadCraft_Pipe / CadCraft_Duct / CadCraft_MepFitting / CadCraft_Valve, and for segments Pset_PipeSegmentTypeCommon
  * (pipes) and Qto_PipeSegmentBaseQuantities / Qto_DuctSegmentBaseQuantities.
  * Slope (drains): a run falls by `slope` (rise per run) along its horizontal length from its first point; sanitary and
- * storm systems start at the International Plumbing Code minimum for the size (tables.js minDrainSlope).
+ * storm systems start at the smallest slope their standard allows the size (mep/pipes.js drainSlope: the International
+ * Plumbing Code for the US tables, NBR 8160 for the Brazilian ones).
+ * Pipes come from mep/pipes.js: the US tables, or the Brazilian ones (PVC soldável, PVC esgoto) named by DN.
  *
  *   PIPE_SYSTEMS, DUCT_SYSTEMS, VALVE_KINDS, RUN_PSET
  *   sectionOf(run) → { kind, round, od, wall, w, h, shape, label } | null      runVertices(run) → [[x, y, z]] (slope applied)
@@ -41,7 +43,7 @@ import { op } from './model-ops.js';
 import { ids, val } from './ifc-util.js';
 import { round } from './model-write.js';
 import { t as tr } from './i18n.js';
-import { pipeSize, bendRadius, minDrainSlope, DEFAULT_CLASS, sizesFor } from './mep/tables.js';
+import { pipeSize, bendRadius, drainSlope, DEFAULT_CLASS, sizesFor, SYSTEM_MATERIALS } from './mep/pipes.js';
 import { sizeSection, sectionLoss } from './mep/sizing.js';
 import { CONNECTOR_PSET } from './family-model.js';
 
@@ -88,7 +90,7 @@ export function sectionOf(r) {
   if (r.kind === 'pipe') {
     const p = pipeSize(r.mat, r.cls, r.size);
     if (!p) return null;
-    return { kind: 'pipe', round: true, shape: 'round', od: p.od * IN, wall: p.wall * IN, id: p.id * IN, nps: p.nps, w: p.od * IN, h: p.od * IN, R: bendRadius(p) * IN, label: p.size + '"', p };
+    return { kind: 'pipe', round: true, shape: 'round', od: p.od * IN, wall: p.wall * IN, id: p.id * IN, nps: p.nps, w: p.od * IN, h: p.od * IN, R: bendRadius(p) * IN, label: p.label || p.size + '"', p };
   }
   const w = Number(r.w), h = r.shape === 'round' ? w : Number(r.h);
   if (!(w >= 50) || !(h >= 50) || !DUCT_SHAPES.includes(r.shape)) return null;
@@ -399,7 +401,7 @@ function loft(w, part, A, B) {
   return w.make('IFCFACETEDBREP', w.H(w.make('IFCCLOSEDSHELL', faces)));
 }
 
-const MAT_NAMES = { steel: 'mep.mat.steel', copper: 'mep.mat.copper', pvc: 'mep.mat.pvc', pex: 'mep.mat.pex' };
+const MAT_NAMES = { steel: 'mep.mat.steel', copper: 'mep.mat.copper', pvc: 'mep.mat.pvc', pex: 'mep.mat.pex', 'pvc-sold': 'mep.mat.pvc-sold', 'pvc-esg': 'mep.mat.pvc-esg' };
 const sysOf = (r) => (r.kind === 'pipe' ? PIPE_SYSTEMS[r.system] : DUCT_SYSTEMS[r.system]) || (r.kind === 'pipe' ? PIPE_SYSTEMS.cw : DUCT_SYSTEMS.supply);
 export const systemLabel = (kind, key) => tr('mep.sys.' + (kind === 'pipe' ? (PIPE_SYSTEMS[key] ? key : 'cw') : (DUCT_SYSTEMS[key] ? key : 'supply')));
 function typeOf(w, cls, name, predefined) {
@@ -645,19 +647,20 @@ function portOwner(w, id) {
   return null;
 }
 
-/** A run's defaults: material and class from the system, the drain slope from the plumbing code's table. */
-export function runDefaults(kind, system, size) {
+/** A run's defaults: material and class from the system under a standard ('us' or 'br'), the drain slope from its code. */
+export function runDefaults(kind, system, size, std = 'us') {
   if (kind === 'duct') return { kind, system: DUCT_SYSTEMS[system] ? system : 'supply', shape: 'rect', w: 300, h: 200, slope: 0 };
-  const S = PIPE_SYSTEMS[system] || PIPE_SYSTEMS.cw, mat = S.mat, cls = DEFAULT_CLASS[mat];
-  const sizes = sizesFor(mat, cls), sz = sizes.includes(size) ? size : (sizes.includes(S.drain ? '3' : '3/4') ? (S.drain ? '3' : '3/4') : sizes[0]);
+  const key = PIPE_SYSTEMS[system] ? system : 'cw', S = PIPE_SYSTEMS[key];
+  const mat = (SYSTEM_MATERIALS[std] || SYSTEM_MATERIALS.us)[key] || S.mat, cls = DEFAULT_CLASS[mat];
+  const usual = mat === 'pvc-esg' ? '100' : mat === 'pvc-sold' ? '25' : S.drain ? '3' : '3/4';
+  const sizes = sizesFor(mat, cls), sz = sizes.includes(size) ? size : (sizes.includes(usual) ? usual : sizes[0]);
   const p = pipeSize(mat, cls, sz);
-  return { kind, system: PIPE_SYSTEMS[system] ? system : 'cw', mat, cls, size: sz, slope: S.drain && p ? minDrainSlope(p.nps) : 0 };
+  return { kind, system: key, mat, cls, size: sz, slope: S.drain && p ? drainSlope(p) : 0 };
 }
-/** The smallest drain slope the plumbing code allows this run (null when it is not a drain). */
+/** The smallest drain slope the run's code allows it (null when it is not a drain). */
 export function drainMinimum(r) {
   if (r.kind !== 'pipe' || !PIPE_SYSTEMS[r.system]?.drain) return null;
-  const p = pipeSize(r.mat, r.cls, r.size);
-  return p ? minDrainSlope(p.nps) : null;
+  return drainSlope(pipeSize(r.mat, r.cls, r.size));
 }
 
 export function placeRun(spec) {

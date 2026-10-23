@@ -3,7 +3,7 @@ title: Pipes and ducts
 summary: Draw pipe and duct runs on the plan by their centre lines; the elbows, tees, reducers and transitions are made for you, the runs belong to systems with connected ports in the IFC file, and they show in plans, schedules and the takeoff.
 section: tasks
 order: 36
-keywords: pipe, pipes, piping, plumbing, duct, ducts, ductwork, hvac, mep, mechanical, elbow, tee, reducer, transition, fitting, fittings, valve, valves, gate valve, ball valve, globe valve, check valve, riser, slope, drain, sanitary, storm, vent, cold water, hot water, chilled water, heating, gas, fire protection, supply air, return air, exhaust, system, systems, port, ports, connector, connectors, fixture, fixtures, plumbing fixture, basin, sink, toilet, water closet, lavatory, kitchen sink, shower, laundry tub, fixture units, uhc, dfu, airflow, cfm, friction, equal friction, sizing, schedule, takeoff
+keywords: pipe, pipes, piping, plumbing, duct, ducts, ductwork, hvac, mep, mechanical, elbow, tee, reducer, transition, fitting, fittings, valve, valves, gate valve, ball valve, globe valve, check valve, riser, slope, drain, sanitary, storm, vent, cold water, hot water, chilled water, heating, gas, fire protection, supply air, return air, exhaust, system, systems, port, ports, connector, connectors, fixture, fixtures, plumbing fixture, basin, sink, toilet, water closet, lavatory, kitchen sink, shower, laundry tub, fixture units, uhc, dfu, airflow, cfm, friction, equal friction, sizing, schedule, takeoff, nbr, nbr 5648, nbr 5688, nbr 8160, pvc soldável, esgoto, dn
 ---
 
 ## What you'll do
@@ -13,7 +13,7 @@ Draw the pipes and ducts of a building the way you draw walls: click the corners
 ## Draw a pipe
 
 1. Turn on {{ui:Draw}}, open {{ui:Build}} and choose {{ui:Pipe}}.
-2. In the bar, pick the **system** (cold water, hot water, sanitary drain, gas…). It sets a usual material: copper for water, PVC for drains and vents, steel for heating, chilled water, gas and fire protection. Change the **material**, **class** and **size** if you need to. Sizes and walls come from public standards: steel pipe ASME B36.10M, copper tube ASTM B88, PVC ASTM D1785 and PEX ASTM F876.
+2. In the bar, pick the **system** (cold water, hot water, sanitary drain, gas…). It sets a usual material: copper for water, PVC for drains and vents, steel for heating, chilled water, gas and fire protection. Change the **material**, **class** and **size** if you need to. Sizes and walls come from public standards: steel pipe ASME B36.10M, copper tube ASTM B88, PVC ASTM D1785 and PEX ASTM F876. Brazilian projects can use **PVC water pipe (NBR 5648)**, the solvent-weld PVC for cold water, and **PVC drain pipe (NBR 5688)**, série normal or reforçada, for drains and vents: their sizes are named by DN (DN 25, DN 100). Once you pick one of them, choosing another system keeps to the Brazilian pipes (PVC drain pipe for a sanitary drain after PVC water pipe).
 3. Set **At**: the height of the pipe's centre line above the level.
 4. Click where the pipe starts, then each corner. Double-click, or press {{key:Enter}}, at the last point. {{key:Backspace}} takes back the last corner; {{key:Esc}} drops the run.
 
@@ -62,7 +62,7 @@ While drawing, type a new height in **At** and press {{key:Enter}}: the run goes
 
 ## Drains and their slope
 
-Sanitary and storm drains start at the smallest slope the International Plumbing Code allows for their size: 1/4 in. per foot up to 2-1/2 in., 1/8 in. per foot from 3 to 6 in., 1/16 in. per foot from 8 in. Type another slope in the bar or in Properties: `1/4"/ft`, `2 %` or `1:50`. The run falls from its first point, so draw drains in the direction they flow. The plan shows the fall and an arrow. Properties warns when a drain is flatter than the code's minimum.
+Sanitary and storm drains start at the smallest slope the International Plumbing Code allows for their size: 1/4 in. per foot up to 2-1/2 in., 1/8 in. per foot from 3 to 6 in., 1/16 in. per foot from 8 in. Brazilian PVC drain pipe starts at the slope of NBR 8160: 2 % up to DN 75, 1 % from DN 100. Type another slope in the bar or in Properties: `1/4"/ft`, `2 %` or `1:50`. The run falls from its first point, so draw drains in the direction they flow. The plan shows the fall and an arrow. Properties warns when a drain is flatter than the code's minimum.
 
 ## Valves
 
@@ -78,7 +78,7 @@ Pick any part of a run, in the plan or the 3D view. In Properties:
 - **System**, **Material**, **Class** and **Size** (pipes), or **Shape**, **Width**, **Height** (ducts).
 - **Height above the level** moves the whole run up or down.
 - **Slope** (pipes).
-- **Flow** with {{ui:Size it}}: for water, the smallest size that keeps the water at 8 ft/s (2.4 m/s), or 5 ft/s (1.5 m/s) for hot water. For ducts, the velocity and friction rate of the duct as drawn. Drains are sized by fixture units, which BimCraft does not do yet: pick their size yourself.
+- **Flow** with {{ui:Size it}}: for water, the smallest size that keeps the water at 8 ft/s (2.4 m/s), or 5 ft/s (1.5 m/s) for hot water; at 3 m/s for the Brazilian PVC water pipe (NBR 5626). For ducts, the velocity and friction rate of the duct as drawn. Drains are sized by fixture units, which BimCraft does not do yet: pick their size yourself.
 
 Each change is one step of {{ui:Undo}}. {{key:Delete}} removes the whole run.
 

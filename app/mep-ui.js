@@ -19,7 +19,7 @@
  */
 import { readRuns, placeRun, changeRun, removeRuns, addValve, removeValve, mepLayout, sectionOf, runVertices, runDefaults, drainMinimum, along, runLength, readFixturePorts,
   PIPE_SYSTEMS, DUCT_SYSTEMS, VALVE_KINDS, DUCT_SHAPES, systemLabel, pipeForFlow, ductForFlow, ductLoss, runSchedules } from './mep-model.js';
-import { MATERIALS, CLASSES, DEFAULT_CLASS, sizesFor, pipeSize } from './mep/tables.js';
+import { MATERIALS, CLASSES, DEFAULT_CLASS, sizesFor, pipeSize, standardOf, BR_MAX_VELOCITY } from './mep/pipes.js';
 import { ModelWriter } from './model-write.js';
 import { fmtLen, parseLen, isMetric } from './model-units.js';
 import { el } from './ui-util.js';
@@ -64,7 +64,7 @@ export function mountMep(modelUi) {
   const opts = () => (A.S.tool === 'duct' ? R.duct : R.pipe);
   const kindNow = () => (A.S.tool === 'duct' ? 'duct' : 'pipe');
   const imperial = () => A.units() !== 'mm';
-  const sizeLabel = (sec) => (sec.kind === 'pipe' && !imperial() && sec.p?.dn ? 'DN' + sec.p.dn : sec.kind === 'duct' && imperial() ? (sec.round ? Math.round(sec.w / IN) + '"Ø' : Math.round(sec.w / IN) + '×' + Math.round(sec.h / IN)) : sec.label);   // i18n-ignore: size marks
+  const sizeLabel = (sec) => (sec.kind === 'pipe' && sec.p?.metric ? sec.label : sec.kind === 'pipe' && !imperial() && sec.p?.dn ? 'DN' + sec.p.dn : sec.kind === 'duct' && imperial() ? (sec.round ? Math.round(sec.w / IN) + '"Ø' : Math.round(sec.w / IN) + '×' + Math.round(sec.h / IN)) : sec.label);   // i18n-ignore: size marks
   const elevOf = (storey) => A.S.data.levels.find((l) => l.id === storey)?.elevation ?? 0;
 
   function read() {
@@ -302,14 +302,17 @@ export function mountMep(modelUi) {
   // ---- option rows ----
   const fill = (sel, list, value) => { if (!sel) return; const have = [...sel.options].map((o) => o.value).join('|'); if (have !== list.map((x) => x[0]).join('|')) sel.replaceChildren(...list.map(([v, l]) => el('option', { value: v }, l))); if (document.activeElement !== sel) sel.value = value; };
   const sysList = (kind) => Object.keys(kind === 'pipe' ? PIPE_SYSTEMS : DUCT_SYSTEMS).map((k) => [k, systemLabel(kind, k)]);
-  const pipeSizes = (o) => sizesFor(o.mat, o.cls).map((s) => [s, imperial() ? s + '"' : 'DN' + (pipeSize(o.mat, o.cls, s)?.dn ?? s)]);   // i18n-ignore: size marks
+  /** A size as people name it: DN for the Brazilian tables (PVC soldável with its inch reference size), else inches or DN. */
+  const sizeName = (mat, cls, s) => { const p = pipeSize(mat, cls, s); return p?.metric ? p.label + (p.ref ? ' (' + p.ref + '")' : '') : imperial() ? s + '"' : 'DN' + (p?.dn ?? s); };   // i18n-ignore: size marks
+  const pipeSizes = (o) => sizesFor(o.mat, o.cls).map((s) => [s, sizeName(o.mat, o.cls, s)]);
   function bindRows() {
     const root = A.root, q = (s) => root.querySelector(s);
     const P = R.pipe, D = R.duct;
     if (q('[data-mep-sys]') && !q('[data-mep-sys]').dataset.bound) {
       q('[data-mep-sys]').dataset.bound = '1';
       const len = (sel, fn) => { const i = q(sel); i?.addEventListener('change', () => { const mm = parseLen(i.value, A.units()); if (Number.isFinite(mm)) fn(mm); else A.host.status(t('model.err.length'), true); bindRows(); A.drawOverlay(); }); i?.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); i.dispatchEvent(new Event('change')); } }); };
-      q('[data-mep-sys]').addEventListener('change', (e) => { const d = runDefaults('pipe', e.target.value); Object.assign(P, { system: d.system, mat: d.mat, cls: d.cls, size: d.size }); if (P.slopeAuto) P.slope = d.slope; bindRows(); });
+      // another system: its usual material under the standard of the material in use (PVC esgoto after PVC soldável)
+      q('[data-mep-sys]').addEventListener('change', (e) => { const d = runDefaults('pipe', e.target.value, undefined, standardOf(P.mat)); Object.assign(P, { system: d.system, mat: d.mat, cls: d.cls, size: d.size }); if (P.slopeAuto) P.slope = d.slope; bindRows(); });
       q('[data-mep-mat]')?.addEventListener('change', (e) => { P.mat = e.target.value; P.cls = DEFAULT_CLASS[P.mat]; const s = sizesFor(P.mat, P.cls); if (!s.includes(P.size)) P.size = s[Math.min(s.length - 1, Math.floor(s.length / 3))]; autoSlope(); bindRows(); });
       q('[data-mep-cls]')?.addEventListener('change', (e) => { P.cls = e.target.value; const s = sizesFor(P.mat, P.cls); if (!s.includes(P.size)) P.size = s[0]; bindRows(); });
       q('[data-mep-size]')?.addEventListener('change', (e) => { P.size = e.target.value; autoSlope(); bindRows(); });
@@ -343,7 +346,7 @@ export function mountMep(modelUi) {
     const fu = q('[data-mep-flowunit]'); if (fu) fu.textContent = t(imperial() ? 'mep.unit.cfm' : 'mep.unit.ls');
     const ru = q('[data-mep-rateunit]'); if (ru) ru.textContent = t(imperial() ? 'mep.unit.inwg' : 'mep.unit.pam');
   }
-  function autoSlope() { const P = R.pipe; if (P.slopeAuto) P.slope = runDefaults('pipe', P.system, P.size).slope ? drainMinimum(P) || 0 : 0; }
+  function autoSlope() { const P = R.pipe; if (P.slopeAuto) P.slope = PIPE_SYSTEMS[P.system]?.drain ? drainMinimum(P) || 0 : 0; }
   function sizeDuct() {
     const D = R.duct;
     const rate = D.rate || (imperial() ? 0.08 : 0.8);
@@ -391,9 +394,12 @@ export function mountMep(modelUi) {
       const fb = el('input', { type: 'text', className: 'bc-input bc-num', value: r.flow ? String(r.flow) : '', 'data-mp-mepgpm': '', size: 6 });
       const go = kit.button(t('mep.sizeit'), 'data-mp-mepsizeit', () => {
         const q = Number(fb.value.replace(',', '.'));
-        const v = PIPE_SYSTEMS[r.system]?.drain ? null : pipeForFlow(r.mat, r.cls, q, imperial() ? (r.system === 'hw' || r.system === 'hwr' ? 5 : 8) : (r.system === 'hw' || r.system === 'hwr' ? 1.5 : 2.4), imperial() ? 'in' : 'mm');
+        // the Brazilian tables keep the water at or under 3 m/s (NBR 5626); the others at 8 ft/s, 5 ft/s for hot water
+        const hot = r.system === 'hw' || r.system === 'hwr', br = standardOf(r.mat) === 'br';
+        const vmax = br ? (imperial() ? BR_MAX_VELOCITY / 0.3048 : BR_MAX_VELOCITY) : imperial() ? (hot ? 5 : 8) : (hot ? 1.5 : 2.4);
+        const v = PIPE_SYSTEMS[r.system]?.drain ? null : pipeForFlow(r.mat, r.cls, q, vmax, imperial() ? 'in' : 'mm');
         if (!v) { A.host.status(t(PIPE_SYSTEMS[r.system]?.drain ? 'mep.err.drainsize' : 'mep.err.sizeit'), true); return; }
-        A.host.status(t('mep.pipesized', { size: imperial() ? v.size + '"' : 'DN' + (pipeSize(r.mat, r.cls, v.size)?.dn ?? v.size), v: v.v.toFixed(1) + ' ' + t(imperial() ? 'mep.unit.fps' : 'mep.unit.ms') }));   // i18n-ignore: size mark
+        A.host.status(t('mep.pipesized', { size: sizeName(r.mat, r.cls, v.size), v: v.v.toFixed(1) + ' ' + t(imperial() ? 'mep.unit.fps' : 'mep.unit.ms') }));
         run({ size: v.size, flow: q });
       });
       kit.field(t('mep.flow', { unit: t(imperial() ? 'mep.unit.gpm' : 'mep.unit.ls') }), fb, go);
@@ -412,7 +418,7 @@ export function mountMep(modelUi) {
     const fits = S.fittings.sort((a, b) => (a.kind + a.system + a.what).localeCompare(b.kind + b.system + b.what));
     R.sched = { pipes, ducts, mepfit: fits };
     return {
-      pipes: { head: [t('mep.system'), t('mep.material'), t('mep.size'), t('mep.length'), t('mep.pieces')], rows: pipes.map((x) => [sys('pipe', x.system), t('mep.cls.' + x.mat, { c: x.cls }), imperial() ? x.size + '"' : 'DN' + (x.p?.dn ?? x.size), len(x.length), String(x.n)]), total: ['', '', '', len(pipes.reduce((s, x) => s + x.length, 0)), String(pipes.reduce((s, x) => s + x.n, 0))] },   // i18n-ignore: size mark
+      pipes: { head: [t('mep.system'), t('mep.material'), t('mep.size'), t('mep.length'), t('mep.pieces')], rows: pipes.map((x) => [sys('pipe', x.system), t('mep.cls.' + x.mat, { c: x.cls }), sizeName(x.mat, x.cls, x.size), len(x.length), String(x.n)]), total: ['', '', '', len(pipes.reduce((s, x) => s + x.length, 0)), String(pipes.reduce((s, x) => s + x.n, 0))] },   // i18n-ignore: size mark
       ducts: { head: [t('mep.system'), t('mep.shape'), t('mep.size'), t('mep.length'), t('mep.surface')], rows: ducts.map((x) => [sys('duct', x.system), t('mep.shape.' + x.shape), sizeLabel({ kind: 'duct', round: x.shape === 'round', w: x.w, h: x.h, label: x.label }), len(x.length), area(x.area)]), total: ['', '', '', len(ducts.reduce((s, x) => s + x.length, 0)), area(ducts.reduce((s, x) => s + x.area, 0))] },
       mepfit: { head: [t('mep.system'), t('mep.fitting'), t('mep.size'), t('mep.count')], rows: fits.map((x) => [sys(x.kind, x.system), x.valve ? t('mep.valve.' + x.what) : t('mep.fit.' + x.what + (x.kind === 'duct' && x.what === 'reducer' ? '.duct' : '')) + (x.angle ? ' ' + Math.round(x.angle) + '°' : ''), x.size, String(x.n)]), total: ['', '', '', String(fits.reduce((s, x) => s + x.n, 0))] },
     };
