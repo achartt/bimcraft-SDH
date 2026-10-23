@@ -122,6 +122,7 @@ export function mountWorkspace({ root, modelUi, views, commands, props, current,
 
   function setActive(on) {
     const left = root.querySelector('.bc-left'), right = root.querySelector('.bc-right');
+    if (on && (current().busy || A.S.busy || A.S.reloading || A.S.chain || A.S.tool !== 'select')) { status('Finish or cancel the current operation in Established layout before switching workspaces.', true); return; }
     if (on && (left?.ownerDocument !== document || right?.ownerDocument !== document || !root.contains(left) || !root.contains(right))) {
       status('Dock the established panels in this window before enabling F28-A. Existing panel windows are preserved.', true); return;
     }

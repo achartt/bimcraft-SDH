@@ -839,7 +839,7 @@ function init(root) {
     treeView.reveal([...viewer.selection]);
   }
   /** After any change of the pick: the Show menu's states and the tree's marks follow. */
-  function afterPick() { syncVis(); if (tree) treeView.reveal([...viewer.selection]); if (qtoScope === 'pick') renderQto(); modelUi?.picked(); analysisUi?.picked(); pointsUi?.picked(); assetsUi?.picked(); }
+  function afterPick() { syncVis(); if (tree) treeView.reveal([...viewer.selection]); if (qtoScope === 'pick') renderQto(); modelUi?.picked(); workspace?.picked(); analysisUi?.picked(); pointsUi?.picked(); assetsUi?.picked(); }
   window.bimcraftTree = () => ({ tree, view: treeView });   // for tests
 
   // ---- Find (0.4 B14) ----
