@@ -45,6 +45,7 @@ try{
  await open(page,fixture);check('real IFC opens in opt-in live layout',(await snap(page)).walls.length===9);
  const initial=await snap(page);await page.locator('[data-pb-plan]').first().click();check('browser selection does not activate or select model elements',(await snap(page)).ui.view.kind==='3d'&&(await snap(page)).ui.selection.length===0);await page.locator('[data-pb-plan]').first().press('Enter');await settle(page);
  check('floor plan activates real storey and drawing tab',(await snap(page)).ui.view.kind==='plan');
+ check('newly activated view immediately exposes live Properties controls',await page.locator('.ws-view-props [data-ws-command="range"]').getAttribute('aria-disabled')==='false'&&await page.locator('.ws-view-props [data-ws-setting="detail"]').isEnabled());
  await page.screenshot({path:path.join(out,'after-workspace.png')});
  const guid=await pickWall(page),selected=await snap(page);check('canvas and Properties select a real wall',selected.ui.selection.length===1&&selected.walls.some(w=>w.guid===guid));
  await page.screenshot({path:path.join(out,'selected-wall.png')});

@@ -4,6 +4,7 @@ import { availability } from './availability.js';
 import { createDrawingTabs, isTextEntry } from './commands.js';
 import { node, icon, button } from './dom.js';
 import { fmtLen } from '../model-units.js';
+import { scalesFor } from '../res-sheets.js';
 
 /** F28-A owns chrome and layout only. Editors, canvases and extension nodes retain their identity and bindings. */
 export function mountWorkspace({ root, modelUi, views, commands, props, current, status }) {
@@ -61,8 +62,9 @@ export function mountWorkspace({ root, modelUi, views, commands, props, current,
 
   function settingsSelect(key) {
     const select = node('select', { 'data-ws-setting': key, 'aria-label': key === 'detail' ? 'Detail Level' : 'View Scale' });
-    const choices = key === 'detail' ? [['coarse', 'Coarse'], ['medium', 'Medium'], ['fine', 'Fine']] : [[0, 'Fit'], [20, '1 : 20'], [24, '1 : 24'], [48, '1 : 48'], [50, '1 : 50'], [96, '1 : 96'], [100, '1 : 100'], [200, '1 : 200']];
+    const choices = key === 'detail' ? [['coarse', 'Coarse'], ['medium', 'Medium'], ['fine', 'Fine']] : [[0, A.t('model.pv.scale.fit')], ...scalesFor(A.units()).map(x => [x.ratio, x.label])];
     for (const [value, text] of choices) select.append(node('option', { value }, text));
+    if (key === 'scale') select.dataset.wsScaleUnits = A.units();
     return select;
   }
   function snapshot() {
@@ -153,6 +155,7 @@ export function mountWorkspace({ root, modelUi, views, commands, props, current,
       if (!list.parentNode) group.append(list);
       list.prepend(node('li', {}, button('{3D}', { className: 'bc-pb-go', 'data-ws-browser-3d': '' })));
     }
+    if (group) { const summary = group.querySelector('summary'); if (summary) { if (!summary.hasAttribute('data-ws-original-summary')) summary.dataset.wsOriginalSummary = summary.textContent; summary.textContent = A.t('model.pb.views3d') + ' (' + (1 + group.querySelectorAll('[data-pb-3d]').length) + ')'; } }
     for (const btn of b.querySelectorAll('button')) {
       const supported = btn.matches('[data-pb-plan], [data-pb-range], [data-ws-browser-3d]');
       if (!supported) { if (!btn.hasAttribute('data-ws-original-title')) btn.dataset.wsOriginalTitle = btn.title; btn.setAttribute('aria-disabled', 'true'); btn.title = 'Not wired in F28-A. Switch to Established layout for supported documentation, RCP, saved-camera, family and linked-model actions.'; }
@@ -198,6 +201,7 @@ export function mountWorkspace({ root, modelUi, views, commands, props, current,
   }
   function syncSelect(select, value) {
     if (document.activeElement === select) return;
+    if (select.dataset.wsSetting === 'scale' && select.dataset.wsScaleUnits !== A.units()) { const fresh = settingsSelect('scale'); select.replaceChildren(...fresh.options); select.dataset.wsScaleUnits = A.units(); }
     if (![...select.options].some(o => o.value === String(value))) select.append(node('option', { value }, '1 : ' + value));
     select.value = String(value);
   }
@@ -211,7 +215,7 @@ export function mountWorkspace({ root, modelUi, views, commands, props, current,
   function renderViewProperties() {
     const v = browserView || tabs.active, s = snapshot();
     const setting = v?.kind === 'plan' ? views.workspaceSettings(v.levelId) : null;
-    const signature = JSON.stringify([v, setting, s.document?.mid]);
+    const signature = JSON.stringify([v, setting, s.document?.mid, tabs.active?.id]);
     if (signature === viewPropsSignature || viewProps.contains(document.activeElement)) return;
     viewPropsSignature = signature;
     const dl = node('dl', { className: 'ws-view-dl' });
@@ -219,7 +223,7 @@ export function mountWorkspace({ root, modelUi, views, commands, props, current,
     if (!s.document) { viewProps.replaceChildren(node('p', { className: 'ws-note' }, 'Open an existing IFC. Live geometry, names and values come from that file.'), tool('open')); return; }
     if (!v) { viewProps.replaceChildren(node('p', { className: 'ws-note' }, 'Open a drawing from Project Browser. The IFC remains open.')); return; }
     row('View name', v.name); row('View type', v.kind === 'plan' ? 'Floor Plan' : '3D View');
-    row('Document', s.name); row('View identity', v.id);
+    row('Document', s.name);
     if (v.kind === 'plan') {
       const isActive = tabs.active?.id === v.id;
       const ds = settingsSelect('detail'), sc = settingsSelect('scale');
@@ -261,6 +265,7 @@ export function mountWorkspace({ root, modelUi, views, commands, props, current,
     restricted.clear();
     for (const b of browser?.querySelectorAll('[data-ws-original-title]') || []) { b.removeAttribute('aria-disabled'); b.title = b.dataset.wsOriginalTitle; delete b.dataset.wsOriginalTitle; }
     browser?.querySelector('[data-ws-browser-3d]')?.closest('li')?.remove();
+    for (const summary of browser?.querySelectorAll('[data-ws-original-summary]') || []) { summary.textContent = summary.dataset.wsOriginalSummary; delete summary.dataset.wsOriginalSummary; }
   }
   function refresh() {
     if (!active) return;
