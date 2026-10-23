@@ -91,7 +91,9 @@ import { t, has } from './i18n.js';
 import { IfcModel, keyOf, KEY_SPAN } from './ifc-model.js';
 import { IfcEditor } from './ifc-edit.js';
 import { newBuilding, stackLevels, levelsProblem } from './new-model.js';   // 0.5 part 3: File › New building
-import { mountModel } from './model-ui.js';   // 0.5 part 3, track BM: Draw (plan view, walls, levels)
+import { mountModel } from './model-ui.js';
+import { mountWorkspace } from './workspace/workspace.js';
+import { createCommands, shortcutCommand, isTextEntry } from './workspace/commands.js';   // 0.5 part 3, track BM: Draw (plan view, walls, levels)
 import { mountRes } from './res-ui.js';   // 0.5 part 4, track RC: the residential tools in the plan (roof planes, …)
 import { isCloudFile, cloudSignature, CLOUD_ACCEPT } from './cloud-types.js';   // 0.6 PF (session pointcloud): which files are point clouds
 import { mountCoords } from './coords-ui.js';   // 0.6 DF.15 (bim-draw): coordinate readouts, project origin and survey point
@@ -218,6 +220,7 @@ function init(root) {
   let placing = null;      // { entry, rot, snap, faces, at } while placing an item
   let swapTarget = null;   // { id, name } after "Swap item…"
   let modelTag = '';       // this open IFC's session tag: a clip copied from it can be pasted "like" its source
+  let workspace = null, planViews = null, coreCommands = null;
   let modelUi = null;      // Draw (0.5 track BM, model-ui.js): mounted at the end of init
   let coordsUi = null;     // where am I working (0.6 DF.15, coords-ui.js): mounted with the 3D view
   let scanUi = null;       // a point cloud's slice on the plan (0.6 DF.22, cloud-slice-ui.js)
@@ -244,7 +247,7 @@ function init(root) {
     if (busy) { status(t('busy.wait')); return; }
     busy = true;
     // an error made for the person (err.userFacing: a refusal with its reason) goes to the status line only
-    try { await fn(); } catch (err) { if (!err.userFacing) console.error(err); status(err.message || String(err), true); } finally { busy = false; }
+    try { await fn(); } catch (err) { if (!err.userFacing) console.error(err); status(err.message || String(err), true); } finally { busy = false; workspace?.refresh(); }
   };
 
   // ---- Settings › BimCraft (settings.inc; per viewer conveniences, localStorage "bimcraft.settings") ----
@@ -745,6 +748,7 @@ function init(root) {
     syncEdit();
     status(t('ifc.opened', { file: file.name, n: model.elements, count: num(model.elements), s: ((performance.now() - t0) / 1000).toFixed(1) }), false, true);
     modelUi?.opened();
+    workspace?.opened();
     coordsUi?.modelChanged();   // 0.6 DF.15
     linksUi?.modelChanged();   // 0.6 DF.21: the model's links (not loaded until their files are chosen)
   }
@@ -1719,6 +1723,7 @@ function init(root) {
       basics, ...sets].filter(Boolean));
     modelUi?.decorate(ui.props);   // a drawn wall, door or window: its numbers to change (0.5 BM.5)
     syncEdit();
+    workspace?.propertiesChanged();
     addonSections([id], token);   // 0.5 AO.7
   }
 
@@ -2075,17 +2080,22 @@ function init(root) {
   }
   const fmtVal = (v) => v === null || v === undefined || v === '' ? t('prop.empty') : v === true ? t('prop.yes') : v === false ? t('prop.no') : typeof v === 'string' ? '"' + v + '"' : String(v);   // i18n-ignore: quotes round a text value
 
-  ui.undo.addEventListener('click', () => {
+  function undo() {
     if (!editor) return;
     const c = editor.undo();
     if (!c) return;
     if (c.journal) { guard(async () => { await rebuild(null); status(t('edit.undid.step', { what: c.label || c.kind })); }); return; }
     status(t('edit.undid', { what: c.kind === 'attr' ? c.attr : c.propName })); afterEdit();
-  });
-  ui.save.addEventListener('click', () => saveIfc());
+  }
+  ui.undo.addEventListener('click', () => coreCommands?.execute('undo'));
+  ui.save.addEventListener('click', () => coreCommands?.execute('save'));
   document.addEventListener('keydown', (e) => {
-    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's' && unsavedIn(editor)) { e.preventDefault(); saveIfc(); }
-    if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase() === 'z' && editor && editor.dirty && !e.target.closest('input, textarea, select')) { e.preventDefault(); ui.undo.click(); }
+    if (document.querySelector('dialog[open]')) return;
+    const id = shortcutCommand(e);
+    // Escape / fit retain established tool cancellation and camera behavior in the fallback.
+    if (!id || (!workspace?.active && (id === 'clear' || id === 'fit' || id === 'open'))) return;
+    e.preventDefault();
+    coreCommands?.execute(id);
   });
 
   /** Download a new IFC with every change. The original file is never touched. */
@@ -3518,6 +3528,7 @@ function init(root) {
 
   // ---- Stage + toolbar ----
   function showStage(which) {
+    if (workspace?.active && which !== 'ifc') workspace.established();
     ui.empty.hidden = true;
     modelUi?.stage(which);
     ui.canvasWrap.hidden = which !== 'ifc';
@@ -3578,7 +3589,7 @@ function init(root) {
       }
     }
     // keys typed in a dialog (Settings, …) are the dialog's: Esc there closes it, and must not stop measuring or walking
-    if (!viewer || ui.canvasWrap.hidden || e.target.closest('input, textarea, select, dialog')) return;
+    if (e.defaultPrevented || isTextEntry(e.target) || workspace?.active || !viewer || ui.canvasWrap.hidden) return;
     if (e.key === 'f' || e.key === 'F') viewer.view('iso');
     if ((e.key === 'x' || e.key === 'X') && e.shiftKey && !e.ctrlKey && !e.metaKey && !e.altKey && !placing && mode === 'ifc') { e.preventDefault(); visAct('secbox'); return; }
     if ((e.key === 'x' || e.key === 'X') && !e.ctrlKey && !e.metaKey && !e.altKey && !placing) toolButton('section')?.click();
@@ -4078,6 +4089,7 @@ function init(root) {
     }
   }
   function syncEdit() {
+    workspace?.refresh();
     for (const b of editButtons) {
       const why = whyNot(b.dataset.act);
       b.setAttribute('aria-disabled', why ? 'true' : 'false');
@@ -4118,7 +4130,7 @@ function init(root) {
     if (addons?.runCommand(name)) return;   // 0.5 AO.7: an add-on's command
     if (modelUi?.edit(name)) return;   // drawn walls, doors and windows (model-ui.js): their own delete; copy not yet
     const why = whyNot(name);
-    if (name === 'undo') { if (why) status(why); else ui.undo.click(); return; }
+    if (name === 'undo') { if (why) status(why); else undo(); return; }
     if (name === 'redo') { if (why) status(why); else redo(); return; }
     if (name === 'select-none') {
       if (placing) { stopPlacing(); status(t('place.stopped')); return; }
@@ -4338,6 +4350,7 @@ function init(root) {
     const t = e.target;
     if (t.closest?.('input, textarea, select, [contenteditable="true"], dialog, [data-help-panel], [data-app-settings]')) return;
     if (document.querySelector('dialog[open]')) return;
+    if (workspace?.active) return;   // F28-A exposes only its bounded commands; no hidden wall delete/copy.
     const mod = e.ctrlKey || e.metaKey, k = e.key.toLowerCase();
     if (mode === 'dwg' && !ui.dwg.hidden && mod && k === 'c' && !e.shiftKey) {
       if (String(window.getSelection?.() || '')) return;   // copying text selected on the page: the browser's own copy
@@ -4469,7 +4482,7 @@ function init(root) {
   if (modelUi) mountWallAssemblies(modelUi);
   if (modelUi) mountWallDimensions(modelUi);
   if (modelUi) mountFamilies(modelUi);   // 0.6 DC.114 (family-ui.js): Families (before the project browser, which lists them)
-  if (modelUi) mountViewsBim(modelUi);   // 0.6 DF.19 (views-ui.js): the project browser, view ranges, templates, sheets
+  if (modelUi) planViews = mountViewsBim(modelUi);   // 0.6 DF.19 (views-ui.js): the project browser, view ranges, templates, sheets
   if (modelUi) mountComforts(modelUi);   // 0.6 round 2 (comforts-ui.js): drawing comforts — moving library items, dormers
   // 0.6 DF.25 (agents.js): an assistant draws walls, doors, windows, floors, levels and grids, each one undo step "Assistant: …"
   if (modelUi) installAgents(modelUi, {
@@ -4478,7 +4491,7 @@ function init(root) {
     selection: () => (viewer ? [...viewer.selection] : []),
     select: (keys) => { if (!viewer) return; viewer.select(keys.length ? keys : null); afterPick(); if (viewer.selection.size > 1) showMany(); else if (viewer.selection.size) showProps(viewer.selected); else clearProps(); },
     save: () => saveIfc(),
-    undo: async () => { ui.undo.click(); },
+    undo: async () => { coreCommands?.execute('undo'); },
     busy: () => (busy ? 'opening or saving a file' : placing ? 'placing a library item' : null),   // i18n-ignore: read by the assistant
   });
   // 0.6 DF.22 (cloud-slice-ui.js): a point cloud's slice on the plan; the cloud is cloud-ui.js's (pc, made on its first open)
@@ -4534,6 +4547,38 @@ function init(root) {
     a.onChange(sync); sync();
   })
     .catch((e) => console.warn('add-ons did not start:', e));   // i18n-ignore: a console note
+
+
+  // F28-A is opt-in during review. Both startup paths call this same mount after every extension is installed.
+  if (modelUi && planViews) {
+    coreCommands = createCommands({
+      state: () => workspace?.state() || {
+        document: mode === 'ifc' ? editor : null, busy, dirty: unsavedIn(editor),
+        canUndo: !!editor?.changes.length, canRedo: !!editor?.canRedo,
+        selection: viewer ? [...viewer.selection] : [], levels: [], view: null,
+      },
+      explain: (why) => status(why),
+      actions: {
+        open: () => fileHost.kind === 'desktop'
+          ? guard(async () => { const [hf] = await fileHost.openFile({ types: IFC_TYPES }); await openHost(hf); })
+          : ui.file.click(),
+        save: () => guard(saveIfc), undo, redo,
+        select: () => workspace.selectTool(),
+        clear: () => act('select-none'),
+        three: () => workspace.activate3d(), plan: () => workspace.activatePlan(),
+        range: () => workspace.openRange(),
+        detail: (detail) => workspace.setSettings({ detail }), scale: (scale) => workspace.setSettings({ scale }),
+        fit: () => workspace.fit(),
+      },
+    });
+    workspace = mountWorkspace({
+      root, modelUi, views: planViews, commands: coreCommands, props: ui.props, status,
+      current: () => ({ editor: mode === 'ifc' ? editor : null, name: ifcName, busy: busy || !!placing,
+        dirty: unsavedIn(editor), canUndo: !!editor?.changes.length, canRedo: !!editor?.canRedo,
+        selection: viewer ? [...viewer.selection] : [], viewer, mode }),
+    });
+    window.bimcraftWorkspace = Object.freeze({ snapshot: workspace.inspect, commands: () => coreCommands.ids.map(coreCommands.describe) });
+  }
 
   // ?library=<uuid>: open the panel on that item.
   const deep = new URLSearchParams(location.search).get('library');
