@@ -1,0 +1,95 @@
+{
+  "base": "0ccb30d735554b012cf21e02252ded4612fd2f54",
+  "head": "ad5d5ddca2290bcb6188be1ef5d25e34d368873d",
+  "run": "https://github.com/drsurfbum/bimcraft-SDH/actions/runs/40014799527",
+  "artifact": "https://github.com/drsurfbum/bimcraft-SDH/actions/runs/40014799527/artifacts/12527699195",
+  "environment": {
+    "cpu": "AMD EPYC 9V45 96-Core Processor",
+    "platform": "linux",
+    "node": "v22.23.3"
+  },
+  "boundaries": "Same CI runner: baseline and head on identical F04/F05 fixtures and prepared model/triangles; five warmups, 30 samples each. Scene/projection, composition, SVG and PDF serialization timed separately. Full raw Node samples are in the artifact's evidence/f28-b/performance-node.json. Raw browser CPU submission samples are in browser.json. Earlier local raw samples in performance-node.json are a separate pre-polish run, not this CI result.",
+  "results": [
+    {
+      "label": "approved-baseline",
+      "f04FineScene": {
+        "n": 30,
+        "p50Ms": 10.881873999999925,
+        "p95Ms": 14.665341000000126
+      },
+      "f04PlanPdf": {
+        "n": 30,
+        "p50Ms": 31.168123000000037,
+        "p95Ms": 35.95966799999974
+      },
+      "f05FineSection": {
+        "n": 30,
+        "p50Ms": 6.33206099999984,
+        "p95Ms": 13.438539999999875
+      },
+      "f05Composition": {
+        "n": 30,
+        "p50Ms": 0.09702700000002551,
+        "p95Ms": 0.30169499999999516
+      },
+      "f05Svg": {
+        "n": 30,
+        "p50Ms": 0.3745850000000246,
+        "p95Ms": 0.6305409999999938
+      },
+      "f05Pdf": {
+        "n": 30,
+        "p50Ms": 1.590949000000137,
+        "p95Ms": 2.802284000000327
+      },
+      "outputs": {
+        "planBytes": 446173,
+        "sectionSvgSHA256": "c932f161e66572f9662a193515a36e49d8c8b6fca85e232a7cc24ca201f332be",
+        "sheetPdfBytes": 21956
+      }
+    },
+    {
+      "label": "workspace-head",
+      "f04FineScene": {
+        "n": 30,
+        "p50Ms": 10.158541000000241,
+        "p95Ms": 19.689605999999912
+      },
+      "f04PlanPdf": {
+        "n": 30,
+        "p50Ms": 30.854163000000426,
+        "p95Ms": 39.307944000000134
+      },
+      "f05FineSection": {
+        "n": 30,
+        "p50Ms": 6.757214000000204,
+        "p95Ms": 9.367248000000018
+      },
+      "f05Composition": {
+        "n": 30,
+        "p50Ms": 0.09600399999999354,
+        "p95Ms": 0.2280439999999544
+      },
+      "f05Svg": {
+        "n": 30,
+        "p50Ms": 0.3713599999996404,
+        "p95Ms": 0.6467139999999745
+      },
+      "f05Pdf": {
+        "n": 30,
+        "p50Ms": 1.6024059999999736,
+        "p95Ms": 2.7928200000001198
+      },
+      "outputs": {
+        "planBytes": 446173,
+        "sectionSvgSHA256": "16325f2472d14dfa7a189bd35da6e396baea62e0c8278a4cc97c506e7be1066e",
+        "sheetPdfBytes": 21960
+      }
+    }
+  ],
+  "performanceIssues": [
+    "PERF-F04-01 OPEN",
+    "PERF-F05-01 OPEN"
+  ],
+  "claim": "No GPU completion, interaction latency, representative-house or performance improvement claim."
+}
