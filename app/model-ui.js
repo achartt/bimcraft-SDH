@@ -967,7 +967,7 @@ export function mountModel(host) {
         const b = lst.snap.p, L = Math.hypot(b[0] - a[0], b[1] - a[1]);
         if (L >= 1) {
           const type = projectWallType(S.wall.typeKey), seg = { a, b, t: typeThickness(type) };
-          const path = root.classList.contains('ws-active') ? placementPath([...pts, b], type, S.wall.reference, S.wall.side) : wallPath([...pts, b], seg.t, S.wall.reference, S.wall.side);
+          const path = root.classList.contains('ws-active') || S.wall.reference.startsWith('core') ? placementPath([...pts, b], type, S.wall.reference, S.wall.side) : wallPath([...pts, b], seg.t, S.wall.reference, S.wall.side);
           o.walls.push(previewOutline(path.at(-1) || seg));
           const ang = Math.atan2(b[1] - a[1], b[0] - a[0]) * 180 / Math.PI;
           o.hud = { p: b, text: fmtLen(L, S.units) + '  ' + fmtAngle(ang) + (closesChain(pts, b, 1) ? '\n' + t('model.hud.close') : '') };
