@@ -132,8 +132,8 @@ export function drawWalls({ storey, segs, typeKey, baseOffset = 0, topLevel = ''
 }
 
 /** Extend a face-referenced chain and settle its corners in the same undo step. */
-export function drawWallPath({ storey, points, guids, typeKey, thickness, reference, extSide, ...top }) {
-  const segs = wallPath(points, thickness, reference, extSide);
+export function drawWallPath({ storey, points, guids, typeKey, thickness, reference, extSide, axisOffset, ...top }) {
+  const segs = wallPath(points, thickness, reference, extSide, axisOffset);
   let existing = null;
   return op((w) => {
     existing ??= guids.slice();

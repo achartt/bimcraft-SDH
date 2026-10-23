@@ -39,7 +39,7 @@ test('drawing closure and re-opening retain document ownership; a new editor res
 test('scope evidence never auto-enables inherited, planned, audit or uncertain commands', () => {
   const s = valid(), c = createCommands({ state: () => s, actions: {} });
   assert.match(availability('copy', c, s).reason, /Wall Copy is not supported/);
-  assert.match(availability('assembly', c, s).reason, /Not wired in F28-A/);
+  assert.match(availability('assembly', c, s).reason, /Not wired in this workspace slice/);
   assert.match(availability('attach', c, s).reason, /F13/);
   assert.match(availability('modelline', c, s).reason, /Mapping uncertain/);
   assert.equal(availability('curtain', c, s).reason, 'Not currently on the roadmap — decision needed.');

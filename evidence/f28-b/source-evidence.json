@@ -1,0 +1,57 @@
+{
+  "approvedBase": "0ccb30d735554b012cf21e02252ded4612fd2f54",
+  "validatedSourceAndTestHead": "ad5d5ddca2290bcb6188be1ef5d25e34d368873d",
+  "sourceRootTree": "7121c39aafc00a5ee61d8260a6f6171de6ecf5fb",
+  "applicationTree": "47fa8e7f8c2fe13d20ee7a2afb5772a78cbfd373",
+  "testsTree": "548e8b3369355aad66270c97cfac071559e0f989",
+  "branch": "feature/f28-b-wall-editing",
+  "repository": "drsurfbum/bimcraft-SDH",
+  "baselineVerification": {
+    "exactSha": true,
+    "completeHistoryBundle": "f28-b-approved-baseline.bundle",
+    "parents": [
+      "9667b3c48977ff772c2a4c4785238cb3c4603e0e",
+      "36691442b521c0a6ada366210bf6c065b02367f6"
+    ],
+    "approvedRootTree": "ed31b2a8143fc8b7050647a1e644f82dd0445c9d",
+    "newerBaselineAdopted": false
+  },
+  "referenceSources": [
+    {
+      "path": "reviews/F28-A-integration-2026-10-23/F28-B-START-PROMPT.md",
+      "read": "complete",
+      "location": "parent project review folder"
+    },
+    {
+      "path": "reviews/F28-A-integration-2026-10-23/README.md",
+      "read": "complete",
+      "location": "parent project review folder"
+    },
+    {
+      "path": "reviews/F28-draft-2026-10-23/index.html",
+      "read": "reviewed visual specification",
+      "location": "parent project review folder"
+    },
+    {
+      "path": "reviews/F28-draft-2026-10-23/PM-REVIEW.md",
+      "read": "complete",
+      "location": "parent project review folder"
+    }
+  ],
+  "instructions": {
+    "applicableAGENTSFilesFound": [],
+    "repositoryLocalAuthor": {
+      "name": "DrSurfBum",
+      "email": "80549907+drsurfbum@users.noreply.github.com"
+    }
+  },
+  "deliveryPackaging": "Documentation and final CI-derived evidence only after this validated source/test head; verify unchanged app/tests trees on packaging commit.",
+  "localEnvironment": {
+    "checkout": "/Users/austinhartt/Documents/ChatGPT/BimCraft Test/bimcraft-f28-b",
+    "headBeforeEnvironmentBecameUnavailable": "ad5d5ddca2290bcb6188be1ef5d25e34d368873d",
+    "previewPort": 8034,
+    "listener": "Denied by session: listen EPERM",
+    "activePreview": false,
+    "finalEvidencePackaging": "Published through GitHub after local environment became unavailable; local checkout not claimed synchronized with packaging commit."
+  }
+}

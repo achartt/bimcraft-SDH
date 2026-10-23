@@ -1,0 +1,218 @@
+{
+  "base": "0ccb30d735554b012cf21e02252ded4612fd2f54",
+  "head": "ad5d5ddca2290bcb6188be1ef5d25e34d368873d",
+  "environment": {
+    "cpu": "AMD EPYC 9V45 96-Core Processor",
+    "platform": "linux",
+    "node": "v22.23.3"
+  },
+  "checks": [
+    "same-environment baseline and F28-B Fine CPU submission workload",
+    "real core-anchored fixture has cavity, zero membrane and persistent dimensions",
+    "Architecture Wall keeps the live layout and actual default controls",
+    "six location lines are discoverable",
+    "unsupported curved placement is unavailable in this slice",
+    "placement invalid length produces existing feedback",
+    "imperial placement height uses the existing unit parser",
+    "valid placement height clears prior validation feedback",
+    "real typed placement verifies six location lines × two exterior orientations",
+    "canceling a pending first point adds no wall and exits placement",
+    "native pointer endpoint snapping and numeric continuation stay active",
+    "real instance height and base use imperial transactions",
+    "instance type assignment is distinct from placement defaults",
+    "instance location line and exterior side use existing operations",
+    "Edit Type Structure opens the authoritative editor without fallback",
+    "invalid layer width refuses the transaction",
+    "assembly entry and focus survive resize",
+    "shared type edit updates two or more real instances and retains type identity",
+    "persistent dimension identities and references survive instance and shared edits",
+    "core location anchor survives the shared thickness edit",
+    "type duplication explains single-selection assignment",
+    "duplicate type gets a distinct identity and assigns only the selected wall",
+    "authoritative layer reorder preserves cavity ventilation, zero membrane and contiguous core",
+    "duplicated and reordered layers retain the original core anchor",
+    "derived F06 documentation reflects actual type changes",
+    "editing the duplicated type leaves every other wall unchanged",
+    "material styles/defaults use the real library without resizing existing layers",
+    "Undo Redo restores the real type and layer transaction",
+    "Redo reapplies material styles/defaults without changing layer widths",
+    "in-progress instance entry survives narrow resize",
+    "Properties and Browser remain independently scrollable",
+    "camera and picking survive new controls and palette resize",
+    "model shortcuts do not fire while entering an instance value",
+    "actual downloaded IFC reopens with wall, layer, material, dimension and F06 schedule data",
+    "separately opened original project remains unchanged",
+    "established fallback restores bound controls and existing workflows",
+    "fallback exports actual edited F06 layer CSV and vector plan PDF",
+    "template-controlled view settings remain protected",
+    "level-above placement uses the real upper storey on a template-controlled plan",
+    "unsupported authored records refuse wall creation",
+    "unsupported record refusal is discoverable",
+    "no application exceptions"
+  ],
+  "errors": [],
+  "console": [],
+  "performanceIssues": [
+    "PERF-F04-01 OPEN",
+    "PERF-F05-01 OPEN"
+  ],
+  "browser": "141.0.7390.37",
+  "before": {
+    "raw": [
+      1.599999999976717,
+      1.6999999999534339,
+      1.3000000000465661,
+      2.5,
+      1.5,
+      1.5,
+      1.400000000023283,
+      1.3999999999068677,
+      1.400000000023283,
+      1.5,
+      1.3000000000465661,
+      1.2999999999301508,
+      1.400000000023283,
+      1.3000000000465661,
+      1.400000000023283,
+      2.5,
+      1.8999999999068677,
+      3.5,
+      1.7000000000698492,
+      1.2999999999301508,
+      1.8000000000465661,
+      1.400000000023283,
+      1.5,
+      1.400000000023283,
+      1.2999999999301508,
+      1.400000000023283,
+      1.3000000000465661,
+      2.3999999999068677,
+      1.5,
+      1.3000000000465661
+    ],
+    "n": 30,
+    "p50Ms": 1.400000000023283,
+    "p95Ms": 2.5,
+    "canvas": [
+      900,
+      600
+    ],
+    "camera": [
+      3500,
+      4000,
+      0.05
+    ],
+    "detail": "fine",
+    "boundary": "Existing synchronous PlanView.draw CPU submission; no GPU completion or user latency claim."
+  },
+  "after": {
+    "raw": [
+      2.200000000069849,
+      1.7999999999301508,
+      2.6000000000931323,
+      2,
+      2.099999999976717,
+      2.199999999953434,
+      2,
+      1.900000000023283,
+      2.199999999953434,
+      2.1000000000931323,
+      1.7999999999301508,
+      2,
+      1.8000000000465661,
+      2.299999999930151,
+      1.900000000023283,
+      2.800000000046566,
+      1.900000000023283,
+      2,
+      1.8999999999068677,
+      2.200000000069849,
+      3.699999999953434,
+      1.900000000023283,
+      2,
+      1.8000000000465661,
+      2.3999999999068677,
+      1.7000000000698492,
+      1.900000000023283,
+      4.599999999976717,
+      4.799999999930151,
+      1.900000000023283
+    ],
+    "n": 30,
+    "p50Ms": 2,
+    "p95Ms": 4.599999999976717,
+    "canvas": [
+      900,
+      600
+    ],
+    "camera": [
+      3500,
+      4000,
+      0.05
+    ],
+    "detail": "fine",
+    "boundary": "Existing synchronous PlanView.draw CPU submission; no GPU completion or user latency claim."
+  },
+  "status": "PASS",
+  "verification": {
+    "run": "https://github.com/drsurfbum/bimcraft-SDH/actions/runs/40014799527",
+    "jobId": 120623984067,
+    "artifact": "https://github.com/drsurfbum/bimcraft-SDH/actions/runs/40014799527/artifacts/12527699195",
+    "artifactId": 12527699195,
+    "artifactZipSHA256": "f0dbc33f92c866e85b58c5fbd8f62778f5c4a65670b188aceb0f448304095f8c",
+    "independent": {
+      "schemaFindings": 0,
+      "walls": 22,
+      "types": 3,
+      "persistentDimensions": 2,
+      "csvLayers": 17,
+      "vectorPDFPages": 1,
+      "vectorPaths": 19469,
+      "actualDownload": ".cc-test/f28-b-browser/saved.ifc"
+    },
+    "workflowRuns": [
+      {
+        "name": "F04 browser acceptance",
+        "id": 40014799411,
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/drsurfbum/bimcraft-SDH/actions/runs/40014799411"
+      },
+      {
+        "name": "F28 live workspace acceptance",
+        "id": 40014799341,
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/drsurfbum/bimcraft-SDH/actions/runs/40014799341"
+      },
+      {
+        "name": "Tests",
+        "id": 40014799327,
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/drsurfbum/bimcraft-SDH/actions/runs/40014799327"
+      },
+      {
+        "name": "F28-B wall workspace acceptance",
+        "id": 40014799527,
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/drsurfbum/bimcraft-SDH/actions/runs/40014799527"
+      },
+      {
+        "name": "F05 browser acceptance",
+        "id": 40014799417,
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/drsurfbum/bimcraft-SDH/actions/runs/40014799417"
+      },
+      {
+        "name": "F06 browser acceptance",
+        "id": 40014799407,
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/drsurfbum/bimcraft-SDH/actions/runs/40014799407"
+      }
+    ]
+  }
+}

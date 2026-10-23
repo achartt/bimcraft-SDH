@@ -122,3 +122,26 @@ body.has-live-workspace>.app-bar{display:none}
 .ws-active .bc-mp-dl>dt:has(+dd [data-mp-assembly]),.ws-active .bc-mp-dl>dd:has([data-mp-assembly]){order:1!important}
 .ws-active .bc-mp-dl>dt:has(+dd [data-mp-height]),.ws-active .bc-mp-dl>dd:has([data-mp-height]){order:2!important}
 .ws-active .bc-mp-dl>dt:has(+dd [data-mp-base]),.ws-active .bc-mp-dl>dd:has([data-mp-base]){order:3!important}
+
+/* F28-B retains the native placement inputs and authoritative assembly dialog. */
+.ws-active .ws-options.ws-placing{gap:8px}
+.ws-active .ws-options.ws-placing>[data-ws-options-text],.ws-active .ws-options.ws-placing>.ws-tool{display:none}
+.ws-wall-options{display:flex;align-items:center;gap:9px;min-width:0;flex:1}
+.ws-wall-options>[data-mopts="wall"],.ws-wall-options>[data-mtyped-row]{display:flex;flex-wrap:nowrap;align-items:center;gap:7px;margin:0;padding:0;flex-shrink:0}
+.ws-wall-options [data-wall-assemblies],.ws-wall-options [data-model-hint]{display:none!important}
+.ws-active .ws-native-field{display:flex;align-items:center;gap:4px;white-space:nowrap;font-size:11px}
+.ws-active .ws-native-field>.visually-hidden{position:static!important;width:auto!important;height:auto!important;overflow:visible!important;clip:auto!important;clip-path:none!important;margin:0!important;white-space:nowrap!important}
+.ws-wall-options input{font:11px "Segoe UI",Arial,sans-serif;border:1px solid var(--ws-line);border-radius:0;min-width:65px;width:80px;max-width:105px;padding:2px 3px;background:var(--ws-panel-bg);color:var(--ws-ink)}
+.ws-wall-options select{max-width:160px;min-width:60px}
+.ws-placement-props{padding:7px}
+.ws-placement-props>.ws-native-field{display:flex;flex-direction:column;align-items:stretch;margin:8px 0;white-space:normal}
+.ws-placement-props [data-ws-command="assembly"]{display:block;margin:5px 0 10px;width:100%;border-color:var(--ws-line);text-align:right}
+.ws-active [data-assembly-editor]{max-height:92dvh;overflow:auto;box-sizing:border-box;background:var(--ws-panel-bg);color:var(--ws-ink);border:1px solid var(--ws-line);padding:15px;font:12px "Segoe UI",Arial,sans-serif}
+.ws-active [data-assembly-editor] table{min-width:760px;border-collapse:collapse;width:100%}
+.ws-active [data-assembly-editor] td,.ws-active [data-assembly-editor] th{padding:5px;border-bottom:1px solid var(--ws-line);vertical-align:top;text-align:left}
+.ws-active [data-assembly-editor] .bc-input{font:inherit;color:inherit;background:var(--ws-panel-bg);border:1px solid var(--ws-line);padding:4px;max-width:100%;box-sizing:border-box}
+.ws-active [data-assembly-editor] .bc-lib-actions{position:sticky;bottom:-15px;background:var(--ws-panel-bg);padding:8px 0;border-top:1px solid var(--ws-line);display:flex;gap:8px;justify-content:flex-end;z-index:2}
+.ws-active [data-assembly-editor] button{border-color:var(--ws-line);padding:4px 7px}
+.ws-active [data-assembly-effects]{padding:7px;background:var(--ws-soft);border:1px solid var(--ws-line)}
+.ws-type-dialog{width:min(560px,94vw)}
+.ws-props-units{flex-shrink:0;border-top:1px solid var(--ws-line);padding:4px 7px;background:var(--ws-chrome)}

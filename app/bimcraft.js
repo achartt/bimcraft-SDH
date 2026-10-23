@@ -2087,7 +2087,7 @@ function init(root) {
   ui.save.addEventListener('click', () => coreCommands?.execute('save'));
   document.addEventListener('keydown', (e) => {
     if (document.querySelector('dialog[open]')) return;
-    const id = shortcutCommand(e);
+    const id = shortcutCommand(e, workspace?.active ? workspace.state() : {});
     // Escape / fit retain established tool cancellation and camera behavior in the fallback.
     if (!id || (!workspace?.active && (id === 'clear' || id === 'fit' || id === 'open'))) return;
     e.preventDefault();
@@ -4548,6 +4548,8 @@ function init(root) {
         range: () => workspace.openRange(),
         detail: (detail) => workspace.setSettings({ detail }), scale: (scale) => workspace.setSettings({ scale }),
         fit: () => workspace.fit(),
+        wall: () => workspace.startWall(), assembly: () => workspace.editType(), structure: () => workspace.editStructure(),
+        cancel: () => workspace.cancelWall(false), finish: () => workspace.cancelWall(true),
       },
     });
     workspace = mountWorkspace({
