@@ -25,13 +25,13 @@ export function mountWallWorkflow({ root, A, commands, defaults, unitsHost, opti
   const originalShape = { disabled: ui.shape.disabled, title: ui.shape.title, arcDisabled: ui.shape.querySelector('[value="arc"]').disabled };
   const originalTop = { disabled: ui.top.querySelector('[value="level"]').disabled, title: ui.top.querySelector('[value="level"]').title };
   const slot = node('div', { className: 'ws-wall-options', 'data-ws-wall-options': '', hidden: true });
-  const note = node('p', { className: 'ws-note' }, 'Placement defaults for new straight walls. Selecting or editing an instance does not assign these defaults to it.');
+  const note = node('p', { className: 'ws-note' }, 'Defaults for new straight walls. Selected walls keep their instance settings.');
   const topNote = node('p', { className: 'ws-note', 'data-ws-top-reason': '' });
   defaults.append(node('div', { className: 'ws-prop-identity' }, node('strong', {}, 'Basic Wall · New placement')), note);
   const edit = button('Edit Type', { 'data-ws-command': 'assembly' });
   const unitsLabel = node('label', { className: 'ws-native-field' }, node('span', {}, 'Entry units '));
   unitsHost.append(unitsLabel);
-  defaults.append(edit, topNote, node('p', { className: 'ws-note' }, 'Draw: straight segments. Curved placement remains in Established layout. Escape ends the current chain; Escape again returns to Modify. Numeric entry accepts lengths, coordinates and angles.'));
+  defaults.append(edit, topNote, node('p', { className: 'ws-note' }, 'Straight walls. For curves, use Established layout. Escape ends the chain; Escape again returns to Modify. Enter lengths, coordinates or angles.'));
   const cancel = button('Cancel placement', { 'data-ws-command': 'cancel' });
   options.append(slot);
   function move(element, parent, before = null) {
