@@ -1,7 +1,14 @@
 /* SPDX-License-Identifier: Apache-2.0 */
 /** A deliberately small adapter. Every caller gets the same live enablement and action. No DOM-button forwarding. */
 export function createCommands({ state, actions, explain = () => {} }) {
+  const wallReason = s => !s.document ? 'Open an IFC first.' : s.busy ? 'Wait for the current operation.' : s.view?.kind !== 'plan' ? 'Activate a floor plan before placing a wall.' : !s.levels.length ? 'This IFC has no supported storey.' : s.wall?.placementError || '';
+  const typeReason = s => !s.document ? 'Open an IFC first.' : s.busy ? 'Wait for the current operation.' : s.wall?.placing ? s.wall.placementError || '' : !s.wall?.supported ? 'Select supported authored walls, or start Wall placement. Imported, missing and unsupported records cannot use this editor.' : !s.wall.sameType ? 'Select walls of one type to edit that type. Use the instance type selector to assign a common type.' : '';
   const definitions = {
+    wall: { categories: ['floor-plan'], reason: wallReason },
+    assembly: { categories: ['authored-wall-type'], reason: typeReason },
+    structure: { categories: ['authored-wall-type'], reason: typeReason },
+    cancel: { categories: ['wall-placement'], reason: s => s.wall?.placing ? '' : 'No wall placement is active.' },
+    finish: { categories: ['wall-placement'], reason: s => s.wall?.placing ? '' : 'No wall placement is active.' },
     open: { categories: ['document'], reason: s => s.busy ? 'Wait for the current operation.' : '' },
     save: { categories: ['document'], reason: s => !s.document ? 'Open an IFC first.' : s.busy ? 'Wait for the current operation.' : !s.dirty ? 'There are no unsaved IFC changes.' : '' },
     undo: { categories: ['document'], reason: s => !s.document ? 'Open an IFC first.' : s.busy ? 'Wait for the current operation.' : !s.canUndo ? 'There is nothing to undo.' : '' },
@@ -17,7 +24,7 @@ export function createCommands({ state, actions, explain = () => {} }) {
   };
   function describe(id) {
     const d = definitions[id];
-    if (!d || typeof actions[id] !== 'function') return { id, categories: [], enabled: false, reason: 'This command is not wired in F28-A.' };
+    if (!d || typeof actions[id] !== 'function') return { id, categories: [], enabled: false, reason: 'Not wired in this workspace slice.' };
     const reason = d.reason(state());
     return { id, categories: d.categories, enabled: !reason, reason };
   }
@@ -32,7 +39,7 @@ export function createCommands({ state, actions, explain = () => {} }) {
 export function isTextEntry(target) {
   return !!target?.closest?.('input, textarea, select, [contenteditable]:not([contenteditable="false"]), dialog, [data-help-panel], [data-app-settings]');
 }
-export function shortcutCommand(event) {
+export function shortcutCommand(event, state = {}) {
   if (event.defaultPrevented || event.altKey || isTextEntry(event.target)) return null;
   const key = event.key.toLowerCase(), mod = event.ctrlKey || event.metaKey;
   if (mod) {
@@ -40,7 +47,10 @@ export function shortcutCommand(event) {
     if (key === 's' && !event.shiftKey) return 'save';
     if (key === 'z') return event.shiftKey ? 'redo' : 'undo';
     if (key === 'y') return 'redo';
-  } else if (key === 'escape') return 'clear';
+  } else if (key === 'escape') return state.live && state.wall?.placing ? 'cancel' : 'clear';
+  else if (state.live && key === 'enter' && state.wall?.placing) return 'finish';
+  else if (state.live && key === 'w' && !event.shiftKey) return 'wall';
+  else if (state.live && key === 'v' && !event.shiftKey) return 'select';
   else if (key === 'f' && !event.shiftKey) return 'fit';
   return null;
 }

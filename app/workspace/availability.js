@@ -3,13 +3,13 @@ import { catalog } from './catalog.js';
 export function availability(id, commands, state) {
   if (commands.ids.includes(id)) return commands.describe(id);
   const tool = catalog.tools[id];
-  if (!tool) return { enabled: false, reason: 'This action has not been verified for F28-A.' };
+  if (!tool) return { enabled: false, reason: 'This action has not been verified for this workspace slice.' };
   let reason;
   if (tool.status === 'unmapped') reason = 'Not currently on the roadmap — decision needed.';
   else if (tool.status === 'uncertain') reason = 'Mapping uncertain — unavailable pending review. ' + tool.scope;
   else if (id === 'copy' && state.selection.length) reason = 'Wall Copy is not supported in the authored-wall paths. General clipboard support does not enable wall Copy. Scope to be verified in F09 (audit, not a delivery promise).';
   else if (tool.status === 'planned') reason = tool.scope;
-  else reason = 'Not wired in F28-A. Use the established layout for supported actions. ' + tool.scope;
+  else reason = 'Not wired in this workspace slice. Use the established layout for supported actions. ' + tool.scope;
   if (tool.feature) {
     const f = catalog.features[tool.feature];
     reason += ' ' + tool.feature + ' — ' + (f?.title || 'Mapping requires review') + '.';
