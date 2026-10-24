@@ -9,12 +9,15 @@
  *                                (equal friction, the HVAC add-on's sizing) ([data-mep-dsys|shape|w|h|dz|flow|rate|sizeit]).
  *   Valve  [data-mtool="valve"]  click on a pipe: gate, ball, globe or check ([data-mep-valve]).
  * Ending a run on another run's line makes a tee; on its end, an elbow or a reducer (mep-model.js makes the fittings).
+ * Connectors of elements placed from families (a basin's drain, a tap) show as points while drawing and snap: a run started on
+ * one takes its system and size and leaves it the way it points (a riser to the height in the bar when it points up or down);
+ * a run ended on one goes down or up onto it. The run is connected to the element's port when it is made.
  * Plans: pipes under 150 mm as one line, larger pipes and ducts as two, in their system's colour; rises and drops marked;
  * size and system labels; a drain's fall. Runs show on every level their height range reaches (the plan's view range).
  * Properties edit a run; Delete removes it. Schedules: pipes, ducts, fittings and valves. The TakeoffCraft hand-off (res-ui.js
  * makeTakeoff) gets them through `takeoffExtra`. Test hook: window.bimcraftMep = { state, api }.
  */
-import { readRuns, placeRun, changeRun, removeRuns, addValve, removeValve, mepLayout, sectionOf, runVertices, runDefaults, drainMinimum, along, runLength,
+import { readRuns, placeRun, changeRun, removeRuns, addValve, removeValve, mepLayout, sectionOf, runVertices, runDefaults, drainMinimum, along, runLength, readFixturePorts,
   PIPE_SYSTEMS, DUCT_SYSTEMS, VALVE_KINDS, DUCT_SHAPES, systemLabel, pipeForFlow, ductForFlow, ductLoss, runSchedules } from './mep-model.js';
 import { MATERIALS, CLASSES, DEFAULT_CLASS, sizesFor, pipeSize } from './mep/tables.js';
 import { ModelWriter } from './model-write.js';
@@ -46,6 +49,7 @@ export function parseSlope(text) {
 export function mountMep(modelUi) {
   const R = {
     runs: [], lay: new Map(),   // storey → mepLayout result (per refresh)
+    fix: [],                    // ports of elements placed from families (readFixturePorts)
     pts: [], hover: null, snapRun: null, valveHover: null,
     pipe: { ...runDefaults('pipe', 'cw'), z: 2438.4, slopeAuto: true },
     duct: { ...runDefaults('duct', 'supply'), z: 2600, flow: 0, rate: 0 },
@@ -64,12 +68,14 @@ export function mountMep(modelUi) {
   const elevOf = (storey) => A.S.data.levels.find((l) => l.id === storey)?.elevation ?? 0;
 
   function read() {
-    R.runs = []; R.lay = new Map();
+    R.runs = []; R.lay = new Map(); R.fix = [];
     if (!A.ed()) return;
     try {
-      R.runs = readRuns(W()).map((r) => ({ ...r, sec: sectionOf(r), verts: runVertices(r) }));
+      const w = W();
+      R.runs = readRuns(w).map((r) => ({ ...r, sec: sectionOf(r), verts: runVertices(r) }));
       for (const st of new Set(R.runs.map((r) => r.storey))) R.lay.set(st, mepLayout(R.runs.filter((r) => r.storey === st)));
-    } catch (e) { console.error(e); R.runs = []; R.lay = new Map(); }
+      R.fix = readFixturePorts(w);
+    } catch (e) { console.error(e); R.runs = []; R.lay = new Map(); R.fix = []; }
   }
   const partsOf = (r) => R.lay.get(r.storey)?.runs.get(r.guid)?.parts || [];
   /** The run whose plan line passes within tol of p (same kind), with where along it. */
@@ -89,12 +95,19 @@ export function mountMep(modelUi) {
     for (let i = 0; i + 1 < V.length; i++) { const Lg = Math.hypot(V[i + 1][0] - V[i][0], V[i + 1][1] - V[i][1], V[i + 1][2] - V[i][2]); if (s <= Lg || i === V.length - 2) { const u = Lg ? Math.min(1, s / Lg) : 0; return V[i][2] + (V[i + 1][2] - V[i][2]) * u + elevOf(r.storey) - elevOf(A.S.level); } s -= Lg; }
     return V[0][2];
   };
-  /** Snap: the Wall tool's snapping, then another run's corner or line (its height comes too). */
+  /** Free connectors of this kind (pipe / duct) that this level's view range shows, their height above THIS level. */
+  function portsHere(kind) {
+    const g = rangeHere();
+    return R.fix.filter((q) => q.domain === kind && !q.connected).map((q) => ({ ...q, zAbs: q.p[2] + elevOf(q.storey) })).filter((q) => q.zAbs >= g.lo && q.zAbs <= g.hi)
+      .map((q) => ({ ...q, z: q.zAbs - elevOf(A.S.level) }));
+  }
+  /** Snap: an element's connector, the Wall tool's snapping, then another run's corner or line (its height comes too). */
   function at(p, e) {
     const last = R.pts.length ? R.pts[R.pts.length - 1] : null;
     const s = A.snapFrom(p, e, last);
     R.snapRun = null;
     const tol = A.pv().pxToMm(12);
+    for (const q of portsHere(kindNow())) if (Math.hypot(q.p[0] - p[0], q.p[1] - p[1]) <= tol) { R.snapRun = { port: q, z: q.z, kind: 'end' }; return [q.p[0], q.p[1]]; }
     // a run's corner or end
     for (const r of R.runs) {
       if (r.kind !== kindNow() || !visible(r)) continue;
@@ -107,6 +120,22 @@ export function mountMep(modelUi) {
   }
   function addPoint(q) {
     const o = opts();
+    if (R.snapRun?.port) {
+      const c = R.snapRun.port, vertical = Math.abs(c.dir[2]) > 0.9;
+      if (!R.pts.length) {
+        // from a connector: its system and size, out the way it points (up or down to the bar's height)
+        takeFrom(c);
+        R.pts.push([q[0], q[1], c.z]);
+        if (vertical && Math.abs(o.z - c.z) > 1) R.pts.push([q[0], q[1], o.z]);
+        bindRows();
+        return;
+      }
+      const lastZ = R.pts[R.pts.length - 1][2];
+      if (Math.abs(lastZ - c.z) > 1) R.pts.push([q[0], q[1], lastZ]);
+      R.pts.push([q[0], q[1], c.z]);
+      finish();
+      return;
+    }
     if (R.snapRun) {
       const z = R.snapRun.z;
       if (!R.pts.length) { o.z = z; R.pts.push([q[0], q[1], z]); bindRows(); return; }
@@ -118,6 +147,23 @@ export function mountMep(modelUi) {
       return;
     }
     R.pts.push([q[0], q[1], o.z]);
+  }
+  /** A run started on a connector takes its system and size: the pipe of the bar's material nearest at or above its DN, a round
+   *  duct of its diameter. */
+  function takeFrom(c) {
+    if (c.domain === 'pipe') {
+      const P = R.pipe;
+      if (PIPE_SYSTEMS[c.system] && c.system !== P.system) { const d = runDefaults('pipe', c.system); Object.assign(P, { system: d.system, mat: d.mat, cls: d.cls }); }
+      // by nominal size (a table's keys are not in size order: "1", "2" come before "1/2")
+      const sizes = sizesFor(P.mat, P.cls).map((s) => ({ s, p: pipeSize(P.mat, P.cls, s) })).filter((x) => x.p).map((x) => ({ ...x, dn: x.p.dn ?? x.p.nps * IN })).sort((a, b) => a.dn - b.dn);
+      const pick = sizes.find((x) => x.dn >= c.size - 0.5) || sizes.at(-1);
+      if (pick) P.size = pick.s;
+      if (P.slopeAuto) P.slope = PIPE_SYSTEMS[P.system]?.drain ? drainMinimum(P) || 0 : 0;
+    } else {
+      const D = R.duct;
+      if (DUCT_SYSTEMS[c.system]) D.system = c.system;
+      D.shape = 'round'; D.w = D.h = Math.max(50, c.size);
+    }
   }
   function finish() {
     const pts = R.pts.slice();
@@ -451,6 +497,7 @@ export function mountMep(modelUi) {
         return;
       }
       if (!['pipe', 'duct'].includes(A.S.tool)) return;
+      for (const q of portsHere(kindNow())) o.points.push([q.p[0], q.p[1]]);
       if (R.hover) o.snap = { p: R.hover, kind: R.snapRun ? (R.snapRun.kind === 'end' ? 'end' : 'mid') : 'free' };
       if (R.pts.length) {
         const pts = R.hover ? [...R.pts.map((q) => [q[0], q[1]]), R.hover] : R.pts.map((q) => [q[0], q[1]]);

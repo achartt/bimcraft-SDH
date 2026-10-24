@@ -31,6 +31,9 @@
  *   mepLayout(runs) → { runs: Map(guid → { parts }), error? }   pure: what the runs make (parts with their ends)
  *   readRuns(w) · placeRun(spec) → op · changeRun(guid, ch) → op · removeRuns(guids) → op · addValve(guid, at, kind) → op
  *   regenMep(w, storey) · runSchedules(w) → { pipes, ducts, fittings } rows · pipeForFlow(mat, cls, q, vmax) · ductForFlow(…)
+ *   readFixturePorts(w) → [{ id, owner, storey, p, dir, domain, system, size, flow, connected }]   the ports families wrote on
+ *     their elements (CadCraft_Connector; family-ops.js), in their storey's plan mm. A run whose end lies on one (within 0.6 mm)
+ *     is connected to it when the run is made; joinPorts(w, storey, ports) connects new ports to touching free ones.
  *   Errors: mep.err.points, mep.err.size, mep.err.back (a run doubling back on itself), mep.err.short (a leg too short for its
  *   fittings), mep.err.valve, mep.err.none.
  */
@@ -40,6 +43,7 @@ import { round } from './model-write.js';
 import { t as tr } from './i18n.js';
 import { pipeSize, bendRadius, minDrainSlope, DEFAULT_CLASS, sizesFor } from './mep/tables.js';
 import { sizeSection, sectionLoss } from './mep/sizing.js';
+import { CONNECTOR_PSET } from './family-model.js';
 
 export const RUN_PSET = 'CadCraft_MepRun';
 const SYS_PSET = 'CadCraft_MepSystem';
@@ -547,14 +551,23 @@ export function regenMep(w, storey) {
     bySys.get(sys).push(...kids);
   }
   for (const [sys, parts] of bySys) assign(w, sys, parts);
-  // ports that touch, of different parts, are connected once: new ports with new ones, and with the kept runs' free ports
+  // ports that touch, of different parts, are connected once: new ports with new ones, with the kept runs' free ports, and
+  // with the free ports of elements placed from families (a basin's drain, a fan's outlet)
   const keptParts = runs.filter((r) => !changed.includes(r)).flatMap((r) => r.parts);
   const joined = connectedPorts(w);
   const kept = portsOfParts(w, keptParts).filter((id) => !joined.has(id)).map((id) => ({ id, p: portAt(w, id), part: portOwner(w, id) })).filter((q) => q.p);
-  const all = [...fresh, ...kept];
+  const fixtures = readFixturePorts(w).filter((q) => q.storey === storey && !q.connected).map((q) => ({ id: q.id, p: q.p, part: q.owner }));
+  linkTouching(w, fresh, [...kept, ...fixtures]);
+  dropEmptySystems(w);
+  return changed.length;
+}
+/** Connect each of `fresh` to a port of another part within 0.6 mm (among `fresh` and `others`), each port once. */
+function linkTouching(w, fresh, others) {
+  const all = [...fresh, ...others];
   const grid = new Map(), cell = (p) => p.map((x) => Math.round(x)).join(',');
   for (const p of all) { const k = cell(p.p); if (!grid.has(k)) grid.set(k, []); grid.get(k).push(p); }
   const done = new Set();
+  let n = 0;
   for (const p of fresh) {
     if (done.has(p.id)) continue;
     const near = [];
@@ -564,9 +577,44 @@ export function regenMep(w, storey) {
     if (!q) continue;
     w.make('IFCRELCONNECTSPORTS', w.guid(), w.ownerHistory(), null, null, w.H(p.id), w.H(q.id), null);
     done.add(p.id); done.add(q.id);
+    n++;
   }
-  dropEmptySystems(w);
-  return changed.length;
+  return n;
+}
+/** New ports of an element (ids) connected to the free run ports and element ports of its storey that they touch. */
+export function joinPorts(w, storey, portIds) {
+  if (!portIds.length) return 0;
+  const lp = w.api.GetLine(w.mid, storey, false).ObjectPlacement.value;
+  const fresh = portIds.map((id) => ({ id, p: placeIn(w, lp, id).p, part: portOwner(w, id) }));
+  const joined = connectedPorts(w), mine = new Set(portIds);
+  const parts = readRuns(w).filter((r) => r.storey === storey).flatMap((r) => r.parts);
+  const others = [...portsOfParts(w, parts).filter((id) => !joined.has(id)).map((id) => ({ id, p: portAt(w, id), part: portOwner(w, id) })).filter((q) => q.p),
+    ...readFixturePorts(w).filter((q) => q.storey === storey && !q.connected && !mine.has(q.id)).map((q) => ({ id: q.id, p: q.p, part: q.owner }))];
+  return linkTouching(w, fresh, others);
+}
+/** A port's origin and its Z axis (the way out) in the axes of placement `lp` (mm). */
+function placeIn(w, lp, id) {
+  const M = w.relMatrix(lp, w.api.GetLine(w.mid, id, false).ObjectPlacement.value);
+  return { p: [M[12], M[13], M[14]], dir: [M[8], M[9], M[10]] };
+}
+export function readFixturePorts(w) {
+  const owner = new Map();
+  try { for (const rid of ids(w.api, w.mid, 'IFCRELNESTS')) { const r = w.api.GetLine(w.mid, rid, false); for (const h of r.RelatedObjects || []) owner.set(h.value, r.RelatingObject?.value); } } catch (e) { /* none */ }
+  try { for (const rid of ids(w.api, w.mid, 'IFCRELCONNECTSPORTTOELEMENT')) { const r = w.api.GetLine(w.mid, rid, false); if (r.RelatingPort) owner.set(r.RelatingPort.value, r.RelatedElement?.value); } } catch (e) { /* IFC4 files may have none */ }
+  let list = [];
+  try { list = ids(w.api, w.mid, 'IFCDISTRIBUTIONPORT'); } catch (e) { return []; }
+  const so = w.storeyOf(), joined = connectedPorts(w), out = [];
+  for (const id of list) {
+    const ps = w.readPset(id, CONNECTOR_PSET), el = owner.get(id);
+    if (!ps || !el) continue;
+    const storey = so.get(el);
+    const st = storey ? w.api.GetLine(w.mid, storey, false) : null;
+    if (!st?.ObjectPlacement) continue;
+    const at = placeIn(w, st.ObjectPlacement.value, id);
+    out.push({ id, owner: el, storey, p: at.p, dir: at.dir, domain: ps.Domain === 'duct' ? 'duct' : 'pipe', system: String(ps.System || ''), size: (Number(ps.Size) || 0) * w.unitMm,
+      flow: ps.Flow === 'out' ? 'out' : 'in', key: String(ps.Key || ''), connected: joined.has(id) });
+  }
+  return out;
 }
 /** What a run's parts come out as (and what they are made of), as a short hash: unchanged = nothing to write. */
 function fingerprint(r, lay) {
