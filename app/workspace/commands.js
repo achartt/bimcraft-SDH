@@ -1,4 +1,5 @@
 /* SPDX-License-Identifier: Apache-2.0 */
+import { t } from '../i18n.js';
 /** A deliberately small adapter. Every caller gets the same live enablement and action. No DOM-button forwarding. */
 export function createCommands({ state, actions, explain = () => {} }) {
   const plan = v => ['plan','rcp','callout'].includes(v?.kind);
@@ -47,14 +48,17 @@ export function createCommands({ state, actions, explain = () => {} }) {
     scale: { categories: ['view'], reason: settingsReason },
     fit: { categories: ['view'], reason: s => !s.document ? 'Open an IFC first.' : s.busy ? 'Wait for the current operation.' : !s.view ? 'Open a drawing first.' : s.view.kind === 'schedule' ? 'Schedules use table scroll bars. Vector PDF includes every continuation page.' : '' },
   };
-  function describe(id) {
+  function describe(id, target) {
     const d = definitions[id];
     if (!d || typeof actions[id] !== 'function') return { id, categories: [], enabled: false, reason: 'Not wired in this workspace slice.' };
-    const reason = d.reason(state());
+    const s = state();
+    // Properties may display an unopened browser source. Only that source's active editor/view may act.
+    const reason = target && (target.document !== s.document || target.id !== s.view?.id)
+      ? t('workspace.activateSource') : d.reason(s);
     return { id, categories: d.categories, enabled: !reason, reason };
   }
-  function execute(id, value) {
-    const d = describe(id);
+  function execute(id, value, target) {
+    const d = describe(id, target);
     if (!d.enabled) { explain(d.reason); return false; }
     return actions[id](value);
   }

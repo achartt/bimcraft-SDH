@@ -29,6 +29,27 @@ test('shared documentation commands distinguish plan/RCP/projected/template/corr
  s.view.kind='schedule';assert.equal(c.describe('csv').enabled,true);assert.equal(c.describe('detail').enabled,false);s.view.kind='sheet';assert.equal(c.describe('placeview').enabled,true);s.busy=true;assert.equal(c.describe('sheet').enabled,false);assert.equal(c.describe('tools').enabled,true);
  const e={key:'Escape',target:{closest:()=>null}};assert.equal(shortcutCommand(e,{live:true,tool:'dhatch'}),'cancel');assert.equal(shortcutCommand({...e,key:'Enter'},{live:true,tool:'dhatch'}),'finish');assert.equal(shortcutCommand({...e,target:{closest:()=>true}},{live:true,tool:'dhatch'}),null);
 });
+test('Properties commands require the displayed source ID and editor; active-drawing commands stay independent',()=>{
+ const document={},other={},s={document,busy:false,view:{id:'sheet:a',kind:'sheet',name:'Same'},levels:[],selection:[]};
+ const calls=[],c=createCommands({state:()=>s,actions:Object.fromEntries(['editsheet','csv','scale'].map(id=>[id,value=>{calls.push([id,value,s.document,s.view.id]);return true;}]))});
+ const a={document,id:'sheet:a'},b={document,id:'sheet:b'};
+ assert.equal(c.describe('editsheet',a).enabled,true);assert.equal(c.describe('editsheet',b).enabled,false);
+ assert.equal(c.execute('editsheet',undefined,b),false);assert.equal(calls.length,0);
+ assert.equal(c.execute('editsheet'),true); // Ribbon/File continue to act on the active drawing.
+ s.view={id:'sheet:b',kind:'sheet',name:'Same'};
+ assert.equal(c.execute('editsheet',undefined,b),true);assert.equal(c.execute('editsheet',undefined,a),false);
+ s.view={id:'schedule:assemblies',kind:'schedule',name:'Same'};
+ const legend={document,id:'schedule:materialLegend'};
+ assert.equal(c.execute('csv',undefined,legend),false);assert.equal(c.execute('csv'),true);
+ s.view={id:'schedule:materialLegend',kind:'schedule',name:'Same'};
+ assert.equal(c.execute('csv',undefined,legend),true);
+ const before=calls.length;s.document=other;
+ assert.equal(c.execute('csv',undefined,legend),false); // Identical view IDs in another editor are not the same source.
+ assert.equal(calls.length,before);s.document=document;s.busy=true;
+ assert.equal(c.execute('csv',undefined,legend),false);s.busy=false;
+ s.view={id:'plan:b',kind:'plan'};assert.equal(c.execute('scale',100,{document,id:'plan:a'}),false);
+ assert.equal(c.execute('scale',100,{document,id:'plan:b'}),true);
+});
 test('real documentation, continuation references and annotations survive shared type edits, journals and IFC reopen',async()=>{
  const bytes=fs.readFileSync(fixture),m=await model(bytes),original=await model(bytes),lv=readLevels(m.w())[0],initial=readWalls(m.w()),type=readAssemblies(m.w()).find(t=>t.key===initial[0].typeKey);
  const dims=()=>readWallDimensions(m.w()).map(d=>[d.guid,d.refs,resolveDimension(d,readWalls(m.w())).status]);const before=dims(),anchors=initial.map(w=>[w.guid,locationLine(w).a,locationLine(w).b]);

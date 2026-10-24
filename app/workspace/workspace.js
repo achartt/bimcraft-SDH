@@ -15,6 +15,7 @@ export function mountWorkspace({ root, modelUi, views, commands, props, current,
   let active = false, frame = 0, tab = 'Architecture', wallContext = false, browserView = null, propertyMode = 'view';
   let documentToken = null, propsToken = null, tabSignature = '', viewPropsSignature = '', restricted = new Map();
   let lastSettings = null;
+  let viewPropsTarget = null;
   const cameras = new Map();
   const A = modelUi.extend({ refresh: refreshSoon, settled: refreshSoon, toolChanged: refreshSoon });
   const propsHome = document.createComment('F28 Properties home'), browserHome = document.createComment('F28 Project Browser home');
@@ -109,7 +110,7 @@ export function mountWorkspace({ root, modelUi, views, commands, props, current,
     const c = current();
     if (!active) { documentToken = null; refresh(); return; }
     documentToken = c.editor;
-    tabs.reset(documentToken); cameras.clear(); docs.reset(); browserView = null; propsToken = null; lastSettings = null;
+    tabs.reset(documentToken); cameras.clear(); docs.reset(); browserView = null; propsToken = null; lastSettings = null; viewPropsTarget = null; viewPropsSignature = '';
     if (c.editor) { A.prepareWorkspace(); A.setTool('select'); views.render(); }
     if (c.editor) { tabs.open(threeView()); browserView = tabs.active; }
     propertyMode = 'view'; refresh();
@@ -187,16 +188,17 @@ export function mountWorkspace({ root, modelUi, views, commands, props, current,
       large.map(id => tool(id)), stacks.map(ids => node('div', { className: 'ws-stack' }, ids.map(id => tool(id)))), node('span', { className: 'ws-group-title' }, name))));
     refreshTools();
   }
+  function commandTarget(control) { return viewProps.contains(control) ? viewPropsTarget : undefined; }
   function refreshTools() {
     const s = snapshot();
     for (const b of root.querySelectorAll('[data-ws-command]')) {
-      const id = b.dataset.wsCommand, a = availability(id, commands, s);
+      const id = b.dataset.wsCommand, a = availability(id, commands, s, commandTarget(b));
       b.setAttribute('aria-disabled', a.enabled ? 'false' : 'true');
       b.title = (catalog.tools[id]?.name || b.getAttribute('aria-label') || id) + (a.enabled ? '' : ': ' + a.reason);
       b.dataset.wsReason = a.reason || '';
     }
     for (const s of root.querySelectorAll('[data-ws-setting]')) {
-      const a = commands.describe(s.dataset.wsSetting);
+      const a = commands.describe(s.dataset.wsSetting, commandTarget(s));
       s.disabled = !a.enabled;
       s.parentElement.title = a.reason;
       // Focusable explanation next to an unavailable native select also works on touch.
@@ -227,6 +229,8 @@ export function mountWorkspace({ root, modelUi, views, commands, props, current,
     const signature = JSON.stringify([v, setting, s.document?.mid, tabs.active?.id]);
     if (signature === viewPropsSignature || viewProps.contains(document.activeElement)) return;
     viewPropsSignature = signature;
+    // Bind to the rendered palette, which can be retained while a field has focus.
+    viewPropsTarget = s.document && v ? { document: s.document, id: v.id } : null;
     const dl = node('dl', { className: 'ws-view-dl' });
     const row = (label, value) => dl.append(node('dt', {}, label), node('dd', {}, value));
     if (!s.document) { viewProps.replaceChildren(node('p', { className: 'ws-note' }, 'Open an existing IFC. Live geometry, names and values come from that file.'), tool('open')); return; }
@@ -245,9 +249,6 @@ export function mountWorkspace({ root, modelUi, views, commands, props, current,
       row('Bottom', fmtLen(setting?.bottom ?? 0, A.units())); row('View depth', fmtLen(setting?.depth ?? 50, A.units()));
       if (setting?.template) row('View template', setting.template);
       } else { row('Crop (view mm)', setting?.crop?.join(', ') || 'None'); if (setting?.issue) row('Record issue', setting.issue); row('Graphics', tool('viewsettings', true)); }
-      if (tabs.active?.id !== v.id) {
-        for (const control of dl.querySelectorAll('select, button')) { control.disabled = true; control.title = 'Open this view to edit its settings.'; }
-      }
     } else { row('View Range', 'Not applicable to this drawing'); if (v.kind === 'sheet') row('Placement', tool('editsheet', true)); if (v.kind === 'schedule') row('Export', tool('csv', true)); }
     viewProps.replaceChildren(node('div', { className: 'ws-prop-identity' }, icon(catalog.tools[v.kind]?.icon || (isPlanView(v) ? 'plan' : 'cube')), node('strong', {}, v.name)), dl,
       node('p', { className: 'ws-note' }, 'Supported settings and source references are stored in the IFC. Open tabs, viewport zoom and scroll are transient. Scale controls paper output.'));
@@ -372,8 +373,8 @@ export function mountWorkspace({ root, modelUi, views, commands, props, current,
     if (b.hasAttribute('data-ws-file')) { const menu = node('dialog', { className: 'ws-dialog', 'aria-label': 'File' }, node('h2', {}, 'File'), ['open','save','pdf','csv','drawingset','tools'].map(id => tool(id, true)), button('Close', { 'data-ws-dismiss': '' })); root.append(menu); menu.addEventListener('close', () => menu.remove()); menu.showModal(); refreshTools(); return; }
     if (b.dataset.wsTab) { tab = b.dataset.wsTab; renderRibbonTabs(); ribbonTabs.querySelector('[aria-selected="true"]')?.focus(); return; }
     if (b.dataset.wsCommand) {
-      const id = b.dataset.wsCommand, a = availability(id, commands, snapshot());
-      if (!a.enabled) explain(id); else { b.closest('dialog')?.close(); commands.execute(id); }
+      const id = b.dataset.wsCommand, target = commandTarget(b), a = availability(id, commands, snapshot(), target);
+      if (!a.enabled) explain(id, a.reason); else { b.closest('dialog')?.close(); commands.execute(id, undefined, target); }
       return;
     }
     if (b.hasAttribute('data-ws-view-props')) { if (A.S.tool === 'wall') A.setTool('select'); showViewProperties(); return; }
@@ -388,7 +389,7 @@ export function mountWorkspace({ root, modelUi, views, commands, props, current,
   root.addEventListener('change', e => {
     if (active && e.target.matches('[data-msched-kind]')) { const v = docs.sources().find(v => v.kind === 'schedule' && v.ref === e.target.value); if (v) activate(v); return; }
     const key = e.target.dataset.wsSetting; if (!key) return;
-    commands.execute(key, key === 'scale' ? Number(e.target.value) : e.target.value);
+    commands.execute(key, key === 'scale' ? Number(e.target.value) : e.target.value, commandTarget(e.target));
   });
   // Retain real property buttons, but make unavailable actions focusable/touch-discoverable without invoking their handlers.
   root.addEventListener('click', e => {

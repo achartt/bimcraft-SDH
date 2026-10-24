@@ -4575,7 +4575,7 @@ function init(root) {
         dirty: unsavedIn(editor), canUndo: !!editor?.changes.length, canRedo: !!editor?.canRedo,
         selection: viewer ? [...viewer.selection] : [], viewer, mode }),
     });
-    window.bimcraftWorkspace = Object.freeze({ snapshot: workspace.inspect, commands: () => coreCommands.ids.map(coreCommands.describe) });
+    window.bimcraftWorkspace = Object.freeze({ snapshot: workspace.inspect, commands: () => coreCommands.ids.map(id => coreCommands.describe(id)) });
   }
 
   // ?library=<uuid>: open the panel on that item.
