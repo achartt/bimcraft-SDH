@@ -47,6 +47,13 @@ jobs:
           F28_COMPARE_BASE: 3e42c21e33e642d1e07bea2fc3356344f91db00e
           F28_COMPARE_OUTPUT: evidence/f28-c/performance-node.json
         run: node tests/features/f28/measure.mjs
+      - name: Render actual vector exports for review
+        if: ${{ always() && hashFiles('.cc-test/f28-c-browser/edited-section.pdf') != '' && hashFiles('.cc-test/f28-c-browser/drawing-sheet.pdf') != '' }}
+        env:
+          F28_EMIT_REVIEW_FRAMES: '1'
+        run: |
+          if ! command -v pdftoppm; then sudo apt-get install -y poppler-utils; fi
+          node tests/features/f28/render-documentation.mjs
       - name: Retain review evidence
         if: always()
         uses: actions/upload-artifact@v4
