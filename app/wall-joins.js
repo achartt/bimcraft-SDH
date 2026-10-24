@@ -3,6 +3,7 @@
  * One core-first envelope per supported wall. Through T segments are transient.
  * All straight geometry uses mm; detection 1 mm is NOT a measurement tolerance.
  */
+import {wallGeom} from './model-arcs.js';
 export const JOIN_TOL_MM = 1;
 const EPS = 1e-7, ANGLE = Math.PI / 6;
 const sub=(a,b)=>[a[0]-b[0],a[1]-b[1]],add=(a,b)=>[a[0]+b[0],a[1]+b[1]],mul=(a,k)=>[a[0]*k,a[1]*k];
@@ -49,7 +50,7 @@ function prepare(w) {
   if(l.core){lo=Math.min(lo,off,next);hi=Math.max(hi,off,next);}off=next;
  }
  // No invented core when an authored recipe cannot resolve.
- return {...w,L,u,n,lo,hi,coreOK:!!layers?.length&&Number.isFinite(lo)&&hi-lo>EPS&&!w.referenceIssue&&!w.joinIssue,
+ return {...w,L,u,n,g:wallGeom(w),lo,hi,coreOK:!!layers?.length&&Number.isFinite(lo)&&hi-lo>EPS&&!w.referenceIssue&&!w.joinIssue,
    cuts:[],caps:new Map()};
 }
 const rect=w=>[point(w,0,-w.t/2),point(w,w.L,-w.t/2),point(w,w.L,w.t/2),point(w,0,w.t/2)];
@@ -79,6 +80,11 @@ function ray(w,s,end,node) {
  return {w,s,end,d,n,o:point(w,s,0),lo:forward?w.lo:-w.hi,hi:forward?w.hi:-w.lo,node};
 }
 function connected(w,q,tol) {
+ if(w.storey!=null&&q.storey!=null&&w.storey!==q.storey)return false;
+ if(w.bulge||q.bulge){
+  const hits=(a,b)=>[a.a,a.b].some(p=>{const r=b.g.param(p);return r.s>=-tol&&r.s<=b.g.L+tol&&Math.abs(r.off)<=(a.t+b.t)/2+tol;});
+  return hits(w,q)||hits(q,w);
+ }
  const station=p=>dot(sub(p,w.a),w.u),offset=p=>dot(sub(p,w.a),w.n);
  if([w.a,w.b].some(p=>[q.a,q.b].some(r=>dist(p,r)<=tol)))return true;
  if([q.a,q.b].some(p=>station(p)>-tol&&station(p)<w.L+tol&&Math.abs(offset(p))<=(w.t+q.t)/2+tol))return true;
@@ -102,7 +108,7 @@ export function straightWallJoins(rows,legacy,{tol=JOIN_TOL_MM}={}) {
   for(let k=0;k<component.length;k++)for(let j=0;j<W.length;j++)if(!seen.has(j)&&connected(W[component[k]],W[j],tol)){seen.add(j);component.push(j);}
   const ws=component.map(j=>W[j]);
   if(ws.some(w=>w.bulge)) {
-   for(const [key,poly] of legacy(ws,{tol}))out.set(key,poly);
+   for(const [key,poly] of legacy(rows.filter(w=>ws.some(q=>q.key===w.key)),{tol}))out.set(key,poly);
    warn(ws,'curved-legacy');continue;
   }
   // Conservative fallback is component-wide: never leave half of a seam active.

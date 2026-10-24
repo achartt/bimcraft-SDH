@@ -29,3 +29,7 @@ A component falls back together rather than retaining half a failed seam. Curved
 No F28-C branch adoption or owner message. Minimal shared `model-ui.js` changes: pass complete rows into its two authoritative outline calls; call the new `wall-join-ui.js` Properties helper for a single wall. PM should retain both those additions and F28-C's documentation adapters. Dedicated live-workspace join controls remain an adapter follow-up. No edits to app/workspace, bimcraft.js, res-ui.js or views-ui.js. Slab/foundation/terrain outline callers likewise retain complete metadata for agreement with the physical envelope.
 
 F03 instrumentation stays unchanged. PERF-F04-01, PERF-F05-01 and TEST-F28-01 remain OPEN. No roadmap edit, default-layout switch, broad Join/Mirror/Align enablement, merge or deployment.
+
+## Deliberate regression-fixture updates
+
+F04's deterministic synthetic IFC is regenerated because joined bodies now carry core-first seams. F05/F06 fixture bytes match their approved originals after preserving the original unjoined profile start point. The existing model test's T face-to-face assertion becomes a stricter 0.005 mm check of the hand-calculated host core midlines: −9.525 mm and 4009.525 mm for its asymmetric ext-2x6 assembly. No execution-count gate or error bound is reduced.

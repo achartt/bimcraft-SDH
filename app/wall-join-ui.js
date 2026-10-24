@@ -13,7 +13,7 @@ export function wallJoinFields(wall,walls,{field,select,commit,one}) {
   field(t('join.'+end),select([['allow',t('join.allow')],['disallow',t('join.disallow')]],settings[end].allow?'allow':'disallow','data-mp-join-'+end,value=>{
    commit(changeWall(wall.guid,{joinSettings:{...settings,[end]:{...settings[end],allow:value==='allow'}}}),one(t('join.title')));
   }));
-  field(t('join.cap')+' '+t('join.'+end),select([['envelope',t('join.envelope')],['square',t('join.square')]],settings[end].cap,'data-mp-cap-'+end,value=>{
+  field(t('join.cap.'+end),select([['envelope',t('join.envelope')],['square',t('join.square')]],settings[end].cap,'data-mp-cap-'+end,value=>{
    commit(changeWall(wall.guid,{joinSettings:{...settings,[end]:{...settings[end],cap:value}}}),one(t('join.title')));
   }));
  }

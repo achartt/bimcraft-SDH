@@ -85,7 +85,7 @@ export function wallPlanGraphics(walls, outlines, openings, materials, { detail 
     const row = { key: keyBase + wall.id, guid: wall.guid, poly, pieces: sourcePieces.flatMap(p => wallPieces(wall, p, ops, cutZ)) };
     const layers = wall.assembly?.layers;
     if (detail === 'coarse' || !poly.length) return row;
-    if (!materials || !layers?.length || layers.some(l => !Number.isFinite(l.t) || l.t < 0 || (l.kind !== 'cavity' && !byMaterial.has(l.materialId))) || Math.abs(layers.reduce((s, l) => s + l.t, 0) - wall.t) > 0.005) {
+    if (wall.joinIssue || !materials || !layers?.length || layers.some(l => !Number.isFinite(l.t) || l.t < 0 || (l.kind !== 'cavity' && !byMaterial.has(l.materialId))) || Math.abs(layers.reduce((s, l) => s + l.t, 0) - wall.t) > 0.005) {
       row.graphicWarning = 'unavailable'; return row;
     }
     const map = wallMap(wall), local = localEnvelope(poly, map);

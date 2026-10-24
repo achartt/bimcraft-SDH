@@ -17,7 +17,7 @@ export const stages = [
   { name: 'f04-graphics', args: ['--test', '--test-reporter=tap', 'tests/features/f04/graphics.test.mjs'], minimum: 13, tap: true },
   { name: 'f05-sections', args: ['--test', '--test-reporter=tap', 'tests/features/f05/sections.test.mjs'], minimum: 18, tap: true },
   { name: 'f06-schedules', args: ['--test', '--test-reporter=tap', 'tests/features/f06/schedules.test.mjs'], minimum: 23, tap: true },
-  { name: 'f08-joins', args: ['--test', '--test-reporter=tap', 'tests/features/f08/joins.test.mjs'], minimum: 14, tap: true },
+  { name: 'f08-joins', args: ['--test', '--test-reporter=tap', 'tests/features/f08/joins.test.mjs'], minimum: 15, tap: true },
   { name: 'fixture', args: ['tests/features/f01/fixture.mjs', '--verify'], minimum: 1 },
   { name: 'source-sync-contract', args: ['--test', '--test-reporter=tap', 'tests/features/f01/source-sync.test.mjs'], minimum: 44, tap: true },
   { name: 'runner-contract', args: ['--test', '--test-reporter=tap', 'tests/features/f01/runner.test.mjs'], minimum: 19, tap: true },

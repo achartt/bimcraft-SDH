@@ -57,7 +57,7 @@ try{
  const now=edited.anchors.find(([g])=>g===target.guid)[1];near(now.a[1],anchor.a[1]);near(now.b[1],anchor.b[1]);
  assert.deepEqual(edited.walls.map(w=>w.guid),initial.walls.map(w=>w.guid));assert.deepEqual(edited.openings.map(o=>[o.guid,o.wallGuid,o.width,o.height,o.sill]),initial.openings.map(o=>[o.guid,o.wallGuid,o.width,o.height,o.sill]));
  near(edited.dims[0].resolved.value,initial.dims[0].resolved.value);check('shared imperial finish edit preserves core line, persistent core dimension, hosted opening and identities');
- const beforeUndo=semantic(edited);await click(page,'[data-undo]');await settle(page);assert.notDeepEqual(semantic(await snapshot(page)),beforeUndo);await click(page,'[data-redo]');await settle(page);assert.deepEqual(semantic(await snapshot(page)),beforeUndo);check('UI Undo Redo restores shared finish and end settings');
+ const beforeUndo=semantic(edited);await click(page,'[data-undo]');await settle(page);assert.notDeepEqual(semantic(await snapshot(page)),beforeUndo);await click(page,'[data-act="redo"]');await settle(page);assert.deepEqual(semantic(await snapshot(page)),beforeUndo);check('UI Undo Redo restores shared finish and end settings');
  await pick(page,target.guid);await page.locator('[data-mp-join-a]').selectOption('allow');await settle(page);check('reenabling the start restores eligible core-first cleanup',(await snapshot(page)).diagnostics.length===0);
  await frame(page,{x0:10900,y0:10400,x1:12200,y1:11800});await page.screenshot({path:path.join(out,'T-after.png')});
  const save=page.waitForEvent('download');await click(page,'[data-save]');await(await save).saveAs(path.join(out,'saved.ifc'));const saved=await snapshot(page);fs.writeFileSync(path.join(out,'expected.json'),JSON.stringify(saved));

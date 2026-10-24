@@ -350,6 +350,7 @@ export function readWalls(w, storey = null) {
     wall.referenceIssue = records.find(r=>r.key===wall.typeKey && r.issue)?.issue || null;
     wall.assembly = wall.referenceIssue ? null : wallType(wall.typeKey, assemblies);
     if(!wall.assembly) wall.referenceIssue ||= 'corrupt';
+    if(join.issue) wall.referenceIssue ||= join.issue;
     wall.height = wallHeight(wall, levels, base);
     out.push(wall);
   }
@@ -438,7 +439,11 @@ export function updateWall(w, guid, changes = {}, { carryJoined = true, previous
   if (changes.joinSettings !== undefined) {
     if (wall.bulge) throw new Error(tr('join.curvedControl'));
     // Keep the inherited mixed-curve algorithm unchanged; refuse ambiguous control scope.
-    if (all.some(q => q.bulge && q.storey === wall.storey && [q.a,q.b].some(p => [wall.a,wall.b].some(r => dist(p,r) <= wall.t+q.t)))) throw new Error(tr('join.curvedControl'));
+    if (all.some(q => {
+      if(!q.bulge || q.storey !== wall.storey) return false;
+      const hits=(a,b)=>{const g=wallGeom(b);return [a.a,a.b].some(p=>{const r=g.param(p);return r.s>=-1&&r.s<=g.L+1&&Math.abs(r.off)<=(a.t+b.t)/2+1;});};
+      return hits(wall,q)||hits(q,wall);
+    })) throw new Error(tr('join.curvedControl'));
     writeJoinSettings(w, wall.id, changes.joinSettings);
     wall.joinSettings = readJoinRecord(w, wall.id).settings;
   }

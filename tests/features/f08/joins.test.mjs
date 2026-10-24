@@ -122,3 +122,9 @@ test('material-default edit never resizes layers or moves anchors',async()=>{
 test('unrelated regeneration is idempotent and unrelated isolated original is unchanged',async()=>{
  const m=await model(),before=bytes(m);const stats=m.w().run(w=>{for(const st of new Set(readWalls(w).map(w=>w.storey)))assert.equal(regenWalls(w,st).walls,0);});assert.deepEqual(bytes(m),before);
 });
+
+test('unknown join metadata leaves affected persistent references unresolved without a stale value',async()=>{
+ const m=await model(),d=readWallDimensions(m.w())[0],wall=readWalls(m.w()).find(w=>w.guid===d.refs[0].wall);
+ m.w().run(w=>w.upsertPset(wall.id,JOIN_PSET,[['Settings','IFCTEXT',JSON.stringify({...defaultJoinSettings(),version:99})]]));
+ const original=bytes(m),resolved=resolveDimension(d,readWalls(m.w()));assert.notEqual(resolved.status,'ok');assert.ok(!Number.isFinite(resolved.value));assert.deepEqual(bytes(m),original);
+});
