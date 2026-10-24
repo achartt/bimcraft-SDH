@@ -53,7 +53,7 @@ export const CEILING_PATTERNS = [
 // ---------------------------------------------------------------------------------------------------------------- reading
 export function storeyLoops(w, storey) {
   const walls = readWalls(w, storey);
-  const polys = [...wallOutlines(walls.map((x) => ({ key: x.guid, a: x.a, b: x.b, t: x.t, bulge: x.bulge }))).values()];
+  const polys = [...wallOutlines(walls.map((x) => ({ ...x, key: x.guid }))).values()];
   return { walls, ...planLoops(polys), outlines: buildingOutlines(walls) };
 }
 

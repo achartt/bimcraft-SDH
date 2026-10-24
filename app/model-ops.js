@@ -1,3 +1,5 @@
+import { assertWallJoinsEditable } from './wall-join-records.js';
+import { endJoins } from './wall-joins.js';
 /* SPDX-License-Identifier: Apache-2.0 */
 /**
  * model-ops.js — what the building tools do to the model, as changes for IfcEditor.modelChange (0.5 part 3, track BM):
@@ -29,7 +31,7 @@ import { syncResidential } from './res-follow.js';   // 0.5 part 4 track RC: wal
 export function op(fn) {
   return (ed) => {
     const w = new ModelWriter(ed.W, ed.api, ed.mid);
-    return w.run(writer => { assertAssembliesEditable(writer); readMaterials(writer); const result = fn(writer); syncWallDimensions(writer); return result; });
+    return w.run(writer => { assertAssembliesEditable(writer); assertWallJoinsEditable(writer); readMaterials(writer); const result = fn(writer); syncWallDimensions(writer); return result; });
   };
 }
 const storeyId = (w, guid) => {
@@ -80,7 +82,8 @@ export function saveWallAssembly(input, assign = []) {
 function rejoinAssemblyCorners(w, before, changed) {
   const changedSet = new Set(changed), after = new Map(readWalls(w).map(x => [x.guid, x]));
   const buckets = new Map(), nodes = [];
-  for (const wall of before) for (const end of ['a', 'b']) {
+  for (const wall of [...before].sort((a,b)=>a.guid.localeCompare(b.guid))) for (const end of ['a', 'b']) {
+    if (!endJoins(wall, end)) continue;
     const p = wall[end], x = Math.floor(p[0]), y = Math.floor(p[1]);
     let node = null;
     for (let dx = -1; dx <= 1 && !node; dx++) for (let dy = -1; dy <= 1 && !node; dy++) {

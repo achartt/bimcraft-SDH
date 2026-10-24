@@ -1,0 +1,47 @@
+name: F08 straight-wall acceptance
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: f08-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  acceptance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/cache@v4
+        with:
+          path: devshell/vendor
+          key: vendor-${{ hashFiles('devshell/vendor.json') }}
+      - name: Verify vendors
+        run: npm run fetch-vendor
+      - name: Generate F08 fixture and model tests
+        run: |
+          node tests/features/f08/fixture.mjs
+          node --test tests/features/f08/joins.test.mjs
+      - name: Same-environment before and after audit and timing
+        run: node tests/features/f08/measure.mjs
+      - name: Retain F08 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: f08-evidence
+          path: |
+            .cc-test/f08/*
+            fixtures/f08/
+          retention-days: 90

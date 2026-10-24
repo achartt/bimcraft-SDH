@@ -1,3 +1,4 @@
+import {wallJoinFields} from './wall-join-ui.js';
 /* SPDX-License-Identifier: Apache-2.0 */
 /**
  * model-ui.js — the building tools in BimCraft's page (0.5 part 3, track BM): the toolbar's Draw button, the plan view of
@@ -227,7 +228,7 @@ export function mountModel(host) {
   function makeScene() {
     const vr = viewRange();
     const walls = wallsHere().filter((w) => !hiddenOwn(vr, 'IfcWall', w.guid));
-    S.outlines = wallOutlines(walls.map((w) => ({ key: w.guid, a: w.a, b: w.b, t: w.t, bulge: w.bulge })));
+    S.outlines = wallOutlines(walls.map((w) => ({ ...w, key: w.guid })));
     const k = kb(), own = ownKeys(), allOps = openingsHere(), ops = allOps.filter((o) => !hiddenOwn(vr, o.kind === 'window' ? 'IfcWindow' : 'IfcDoor', o.guid));
     const byWall = new Map(walls.map((w) => [w.id, w]));
     let materials = null;
@@ -975,7 +976,7 @@ export function mountModel(host) {
   }
   /** The preview wall joined to the walls already there (so a corner looks as it will). */
   function previewOutline(seg) {
-    const walls = wallsHere().map((w) => ({ key: w.guid, a: w.a, b: w.b, t: w.t, bulge: w.bulge }));
+    const walls = wallsHere().map((w) => ({ ...w, key: w.guid }));
     S.queuedSegs().forEach((q, i) => walls.push({ key: 'q' + i, a: q.a, b: q.b, t: q.t, bulge: q.bulge }));
     walls.push({ key: '*', ...seg });
     return wallOutlines(walls).get('*') || outlineOf(seg);
@@ -1167,6 +1168,7 @@ export function mountModel(host) {
       if (sameType && !typeOpts.some((x) => x[0] === w0.typeKey) && projectWallType(w0.typeKey)) typeOpts.unshift([w0.typeKey, typeName(projectWallType(w0.typeKey))]);
       if (!sameType) typeOpts.unshift(['', t('model.prop.changetype')]);
       field(t('model.wall.type'), select(typeOpts, sameType ? w0.typeKey : '', 'data-mp-type', (v) => { if (v) commit(many ? changeWalls(guids, { typeKey: v }) : changeWall(w0.guid, { typeKey: v }), one(title)); }));
+      if (!many) wallJoinFields(w0, data.walls, {field,select,commit,one});
       if (sameType) field('', button(t('assembly.open'), 'data-mp-assembly', () => api.ask('openAssembly', w0.typeKey, guids)));
       const above = (w) => { const i = levels.findIndex((l) => l.id === w.storey); return i >= 0 ? levels[i + 1] || null : null; };
       if (!many) {
@@ -1341,7 +1343,7 @@ export function mountModel(host) {
   function faceEndsOf(wall, face) {
     if (!S.outlines.has(wall.guid) || wall.storey !== S.level) {
       const here = (S.data?.walls || snapshotModel(ed()).walls).filter((w) => w.storey === wall.storey);
-      const o = wallOutlines(here.map((w) => ({ key: w.guid, a: w.a, b: w.b, t: w.t, bulge: w.bulge })));
+      const o = wallOutlines(here.map((w) => ({ ...w, key: w.guid })));
       const keep = S.outlines; S.outlines = o; const r = faceEnds(wall, face); S.outlines = keep; return r;
     }
     return faceEnds(wall, face);
