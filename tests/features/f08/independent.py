@@ -9,7 +9,7 @@ import ifcopenshell.validate
 import ifcopenshell.util.element as element
 import ifcopenshell.util.placement as placement
 import ifcopenshell.util.unit as unit
-from shapely.geometry import Polygon
+from shapely.geometry import Polygon,LineString
 from shapely.ops import unary_union
 from pypdf import PdfReader
 from pypdf.generic import ContentStream
@@ -59,6 +59,27 @@ def physical(file,expected):
   obj=f.by_guid(o['guid']);assert obj.FillsVoids[0].RelatingOpeningElement.VoidsElements[0].RelatingBuildingElement.GlobalId==o['wallGuid']
   ps=element.get_psets(obj)['CadCraft_Window'];near(ps['Width']*factor,o['width']);near(ps['Height']*factor,o['height'])
  return {'file':str(file),'schemaFindings':0,'walls':len(polygons),'overlapAreaToleranceMm2':.05,'zeroMembranes':True,'ventilatedCavities':True},actual
+def ideal_union(walls,through=False):
+ # Independent ideal envelope: flat-ended segment buffers plus the four-corner
+ # face-intersection patch at this one declared fixture node. Core seams may
+ # divide this union, but must not add gaps or overlaps.
+ p=walls[1]['a'] if through else walls[0]['a']
+ rays=[];parts=[]
+ for index,w in enumerate(walls):
+  a,b=w['a'],w['b'];dx,dy=b[0]-a[0],b[1]-a[1];length=math.hypot(dx,dy);u=(dx/length,dy/length)
+  parts.append(LineString([a,b]).buffer(w['t']/2,cap_style=2,join_style=2))
+  rays.append((u,w['t']/2))
+  if through and index==0:rays.append(((-u[0],-u[1]),w['t']/2))
+ rays.sort(key=lambda r:math.atan2(r[0][1],r[0][0]))
+ for i,(u,h) in enumerate(rays):
+  v,k=rays[(i+1)%len(rays)];n=(-u[1],u[0]);m=(-v[1],v[0]);den=n[0]*m[1]-n[1]*m[0]
+  if abs(den)<1e-10:continue
+  d=n[0]*p[0]+n[1]*p[1]+h;e=m[0]*p[0]+m[1]*p[1]-k
+  c=((d*m[1]-n[1]*e)/den,(n[0]*e-d*m[0])/den)
+  q=(p[0]+n[0]*h,p[1]+n[1]*h);r=(p[0]-m[0]*k,p[1]-m[1]*k)
+  patch=Polygon([p,q,c,r]);assert patch.is_valid
+  if patch.area>1e-9:parts.append(patch)
+ return unary_union(parts)
 reports=[]
 for name in ['seed','edited']:
  path=root/(name+'.ifc')
@@ -111,9 +132,14 @@ if (root/'audit-after.json').exists():
  assert all(p.is_valid and p.area>0 for p in new);assert not after['diagnostics']
  overlap=sum(a.intersection(b).area for i,a in enumerate(new) for b in new[:i])
  assert overlap<.00001,overlap
- union_difference=unary_union(old).symmetric_difference(unary_union(new)).area
+ expected=[];start=0
+ for i,count in enumerate([2,2,2,2,2,4,2]):
+  expected.append(ideal_union(after['walls'][start:start+count],through=i==4));start+=count
+ ideal=unary_union(expected)
+ union_difference=ideal.symmetric_difference(unary_union(new)).area
  assert union_difference<.001,union_difference
- reports.append({'sameOuterUnionDifferenceMm2':union_difference,'newOverlapAreaMm2':overlap})
+ baseline_difference=ideal.symmetric_difference(unary_union(old)).area
+ reports.append({'idealEnvelopeDifferenceMm2':union_difference,'baselineEnvelopeDifferenceFromIdealMm2':baseline_difference,'newOverlapAreaMm2':overlap})
 if (root/'matrix.json').exists():
  matrix=json.loads((root/'matrix.json').read_text());assert len(matrix)==28
  for case in matrix:
@@ -121,7 +147,7 @@ if (root/'matrix.json').exists():
   old=[Polygon(p) for _,p in case['before']]
   assert all(p.is_valid and p.area>0 for p in new),case
   assert new[0].intersection(new[1]).area<.00001,case
-  assert unary_union(new).symmetric_difference(unary_union(old)).area<.001,case
+  assert unary_union(new).symmetric_difference(ideal_union(case['walls'])).area<.001,case
  reports.append({'independentAngleCoreOrientationCases':len(matrix),'angles':[30,45,60,90,120,135,150],'maxAllowedOverlapMm2':.00001})
 assert reports
 (root/'independent.json').write_text(json.dumps(reports,indent=2)+'\n')
