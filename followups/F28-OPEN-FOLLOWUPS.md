@@ -36,3 +36,9 @@ No follow-up is implemented or closed by this integration. The established layou
 At reviewed delivery `e46113bbbdd66b19f07d92d49af6eac907d1f84c`, the complete local C browser suite passes 39/39 and inherited B passes 42/42. Genuine normal-interval autosave/recovery, clean independent contexts and unsupported-record refusals pass; all seven exact-head CI workflows also pass. TEST-F28-01 remains OPEN pending merged-build confirmation and a tracking update. Both performance issues remain OPEN.
 
 PR #12 has a separate correctness finding, F28C-PM-01: when another sheet/schedule is selected in Project Browser, Properties may display it while Edit sheet / CSV targets the active drawing instead. A source-target guard and browser regressions are required before merge. The PR remains draft/unmerged; main stays at `3e42c21`.
+
+## F28-C fix re-review — October 24, 2026
+
+F28C-PM-01 is **CLOSED** at delivery `f956fac00adf1d4d51ddc2e4253fe215a2c50acd`. Fresh PM Mac C browser **47/47** and focused tests **14/14** pass. Source-specific Properties actions check the displayed source ID/editor; toolbar/File actions retain the active drawing. Seven exact-head workflows pass, including B 42/42 and independent IFC/CSV/vector-PDF checks. See [fix re-review](F28-C-REVIEW.md).
+
+The October 23 correctness finding above is historical and resolved by this delivery. PR #12 remains draft/unmerged. Documentation MCP catch-up and upstream integration work remain open. TEST-F28-01 still awaits integrated confirmation; both performance issues remain OPEN. No default-layout change.
