@@ -61,7 +61,7 @@ jobs:
       - name: Review actual saved files
         if: ${{ always() && hashFiles('.cc-test/f08/browser/saved.ifc') != '' }}
         run: |
-          node --input-type=module -e "import fs from 'node:fs'; for (const name of ['saved.ifc','expected.json','plan.pdf','detail.pdf','report.json']) {const p='.cc-test/f08/browser/'+name;if(fs.existsSync(p))console.log('F08_FILE '+name+' '+fs.readFileSync(p).toString('base64'));}"
+          node --input-type=module -e "import fs from 'node:fs'; for (const name of ['saved.ifc','expected.json','report.json']) {const p='.cc-test/f08/browser/'+name;if(fs.existsSync(p))console.log('F08_FILE '+name+' '+fs.readFileSync(p).toString('base64'));}"
       - name: Retain F08 evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -70,7 +70,9 @@ jobs:
           path: |
             .cc-test/f08/*.json
             .cc-test/f08/*.ifc
-            .cc-test/f08/*.pdf
-            .cc-test/f08/browser/
+            .cc-test/f08/browser/*.json
+            .cc-test/f08/browser/*.ifc
+            .cc-test/f08/browser/*.csv
+            .cc-test/f08/browser/*.png
             fixtures/f08/
           retention-days: 90

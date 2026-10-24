@@ -32,7 +32,7 @@ export async function generate(){
  const walls=readWalls(m.w()),wall=walls.find(w=>w.justification==='coreCenter'&&w.extSide==='right');
  m.change(placeOpening({wall:wall.guid,typeKey:'win-fixed',offset:500,width:600,sill:900,height:1200}));
  for(const [i,refs]of [['coreExterior','coreInterior'],['exterior','interior']].entries())m.change(saveWallDimension({level:lv.guid,view:'plan:'+lv.guid,axis:'y',offset:1000+i*500,refs:refs.map(reference=>({wall:wall.guid,reference,station:.8}))}));
- m.change(setPlanView(lv.guid,{detail:'fine',scale:50}));
+ m.change(setPlanView(lv.guid,{detail:'fine',scale:200}));
  const seed=await open(m.ed.save());return seed.w().api.file(seed.w().mid).save({timeStamp:'2026-10-23T12:00:00'});
 }
 export function inspect(m){
