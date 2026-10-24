@@ -212,10 +212,14 @@ export function mountWorkspace({ root, modelUi, views, commands, props, current,
   }
   function renderDrawingTabs() {
     const signature = JSON.stringify([tabs.all.map(v => [v.id, v.name]), tabs.active?.id]); if (signature === tabSignature) return;
+    const hadFocus = drawingTabs.contains(document.activeElement);
     tabSignature = signature;
     drawingTabs.replaceChildren(...tabs.all.map(v => node('div', { className: 'ws-drawing-tab', role: 'presentation' },
-      button((v.kind === '3d' ? '◇ ' : '▱ ') + v.name, { role: 'tab', 'data-ws-drawing': v.id, 'aria-selected': tabs.active?.id === v.id }),
+      button((v.kind === '3d' ? '◇ ' : v.kind === 'rcp' ? '⌑ ' : '▱ ') + v.name, { role: 'tab', 'data-ws-drawing': v.id, 'aria-selected': tabs.active?.id === v.id, 'aria-label': v.kind + ' · ' + v.name, title: v.kind + ' · ' + v.name + ' · ' + (v.ref || v.id) }),
       button('×', { 'aria-label': 'Close drawing ' + v.name, 'data-ws-close': v.id }))));
+    const selected = drawingTabs.querySelector('[aria-selected="true"]');
+    selected?.scrollIntoView({block:'nearest', inline:'nearest'});
+    if (hadFocus) selected?.focus({preventScroll:true});
   }
   function renderViewProperties() {
     const v = browserView || tabs.active, s = snapshot();
@@ -245,7 +249,7 @@ export function mountWorkspace({ root, modelUi, views, commands, props, current,
         for (const control of dl.querySelectorAll('select, button')) { control.disabled = true; control.title = 'Open this view to edit its settings.'; }
       }
     } else { row('View Range', 'Not applicable to this drawing'); if (v.kind === 'sheet') row('Placement', tool('editsheet', true)); if (v.kind === 'schedule') row('Export', tool('csv', true)); }
-    viewProps.replaceChildren(node('div', { className: 'ws-prop-identity' }, icon(v.kind === 'plan' ? 'plan' : 'cube'), node('strong', {}, v.name)), dl,
+    viewProps.replaceChildren(node('div', { className: 'ws-prop-identity' }, icon(catalog.tools[v.kind]?.icon || (isPlanView(v) ? 'plan' : 'cube')), node('strong', {}, v.name)), dl,
       node('p', { className: 'ws-note' }, 'Supported settings and source references are stored in the IFC. Open tabs, viewport zoom and scroll are transient. Scale controls paper output.'));
   }
   function restrictProperties() {
