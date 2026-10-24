@@ -64,6 +64,8 @@ Families placed on a floor (furniture, fixtures and others) have a {{ui:Connecto
 
 The preview draws each connector as a ring with an arrow the way out. Doors and windows have no connectors.
 
+For a plumbing fixture, choose which one it is under **Plumbing fixture** (water closet, lavatory, kitchen sink, shower, laundry tub). The starter fixtures already say so.
+
 Every element placed from the family gets its connectors as ports in the IFC file, and they are made again when the element changes size or the family is saved. Programs that read IFC systems see where each pipe or duct belongs.
 
 ## The preview and its handles

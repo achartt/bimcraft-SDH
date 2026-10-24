@@ -18,6 +18,7 @@
  *     params: [{ key, label?, kind: length | angle | number | yesno, value, formula? }],
  *     solids: [{ id, name?, op: box | extrude | revolve | sweep, style, visible?, …fields }], booleans: [{ id, op: difference |
  *     union, a, b }], connectors?: [{ id, name?, domain: pipe | duct, system, x, y, z, dir, size, flow: in | out }],
+ *     fixture?: wc | lav | sink | shower | laundry (mep/fixtures.js: which plumbing fixture it is, for its fixture units),
  *     sizes?: [{ name, values }] (files only), notes?, license? }
  *   Connectors (unhosted families only) are where a pipe or duct joins the element: a point (x, y, z), the way out of it (dir:
  *   +x, -x, +y, -y, +z or -z in the family's axes), the nominal size (mm: a pipe's DN, a round duct's diameter), the system key
@@ -48,6 +49,7 @@ import { openingType } from './opening-types.js';
 import { round } from './model-write.js';
 import { ids, val, deleteLine } from './ifc-util.js';
 import { t as tr } from './i18n.js';
+import { FIXTURE_KINDS, fixtureOf } from './mep/fixtures.js';
 
 export const FAMILY_FORMAT = 'cadcraft-family';
 export const FAMILY_PSET = 'CadCraft_Family';
@@ -71,6 +73,7 @@ export const STYLES = {
   metal: { name: 'fam.style.metal', rgb: [0.62, 0.64, 0.67], tr: 0 },
   stone: { name: 'fam.style.stone', rgb: [0.82, 0.8, 0.76], tr: 0 },
   solid: { name: 'fam.style.solid', rgb: [0.8, 0.8, 0.8], tr: 0 },
+  ceramic: { name: 'fam.style.ceramic', rgb: [0.96, 0.96, 0.94], tr: 0 },
 };
 export const LIMITS = { params: 60, solids: 200, booleans: 100, connectors: 24, points: 400, expr: 300, sizes: 200, name: 80, notes: 2000, value: 1e7 };
 /** Connectors: what they join, the six ways out of one, and the set each placed element's ports carry. */
@@ -125,6 +128,7 @@ export function readFamily(obj) {
     f.ifc.class = f.kind === 'door' ? 'IfcDoor' : 'IfcWindow';
   } else if (f.ifc.class === 'IfcDoor' || f.ifc.class === 'IfcWindow') f.ifc.class = 'IfcBuildingElementProxy';
   if (obj.starter === true) f.starter = true;
+  if (obj.fixture !== undefined && obj.fixture !== null && obj.fixture !== '') { if (f.host === 'wall' || !FIXTURE_KINDS.includes(obj.fixture)) bad('fam.err.fixture'); else f.fixture = obj.fixture; }
   // parameters
   const params = Array.isArray(obj.params) ? obj.params.slice(0, LIMITS.params + 1) : [];
   if (params.length > LIMITS.params) bad('fam.err.toomany', { what: 'params', n: LIMITS.params });
@@ -617,7 +621,7 @@ function makeType(w, fam, name, op) {
   }
   if (cls === 'IfcFurniture') return w.v4 ? w.make('IFCFURNITURETYPE', ...head, w.L(fam.name), 'NOTDEFINED', pre) : w.make('IFCFURNITURETYPE', ...head, w.L(fam.name), 'NOTDEFINED');
   if (cls === 'IfcFurnishingElement') return w.make('IFCFURNISHINGELEMENTTYPE', ...head, w.L(fam.name));
-  if (cls === 'IfcSanitaryTerminal') return w.make('IFCSANITARYTERMINALTYPE', ...head, w.L(fam.name), 'NOTDEFINED');
+  if (cls === 'IfcSanitaryTerminal') return w.make('IFCSANITARYTERMINALTYPE', ...head, w.L(fam.name), fam.ifc.predefined || fixtureOf(fam.fixture)?.ifc || 'NOTDEFINED');
   if (cls === 'IfcLightFixture') return w.make('IFCLIGHTFIXTURETYPE', ...head, w.L(fam.name), 'NOTDEFINED');
   return w.make('IFCBUILDINGELEMENTPROXYTYPE', ...head, w.L(fam.name), 'NOTDEFINED');
 }

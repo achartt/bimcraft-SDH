@@ -14,6 +14,7 @@
  *   addSolid(fam, op) · removeSolid(fam, id) (its Booleans go too) · duplicateSolid(fam, id) · setSolid(fam, id, patch)
  *   addBoolean(fam, { op, a, b }) · removeBoolean(fam, id) · setBoolean(fam, id, patch) · operands(fam, exceptId) (free ones)
  *   addConnector(fam, { domain, system }) · removeConnector(fam, id) · setConnector(fam, id, patch) (unhosted families only)
+ *   setFixture(fam, kind) ('' = not a plumbing fixture)
  *   points: pointsOf(s) · movePoint(fam, id, i, [u, v]) · insertPoint(fam, id, i, [u, v]) · removePoint(fam, id, i) ·
  *       setBulge(fam, id, i, b) · cycleArc(b) (straight → quarter arc left → quarter arc right → straight) · snap(v, step)
  *   handles: sizeHandles(fam, values, ctx) and solidHandles(fam, values, id, ctx) → [{ p, axis, label, target }] in the
@@ -253,6 +254,11 @@ export function addConnector(fam, { domain = 'pipe', system = '' } = {}) {
     : { id, domain, system: system || 'supply', x: '0', y: '0', z: '0', dir: '+z', size: '150', flow: 'in' };
   f.connectors = [...(f.connectors || []), c];
   return { ...checked(f), id };
+}
+export function setFixture(fam, kind) {
+  const f = copy(fam);
+  if (kind) f.fixture = kind; else delete f.fixture;
+  return checked(f);
 }
 export function removeConnector(fam, id) {
   if (!(fam.connectors || []).some((c) => c.id === id)) return err('fam.err.connector', { id });
