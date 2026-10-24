@@ -30,18 +30,33 @@ jobs:
           key: vendor-${{ hashFiles('devshell/vendor.json') }}
       - name: Verify vendors
         run: npm run fetch-vendor
+      - name: Browser and independent readers
+        run: |
+          npm install --prefix .cc-test/f08-deps --no-package-lock playwright@1.56.1
+          .cc-test/f08-deps/node_modules/.bin/playwright install --with-deps chromium
+          python -m venv .cc-test/f08-reader
+          .cc-test/f08-reader/bin/python -m pip install -r tests/features/f01/requirements-independent.txt -r tests/features/f04/requirements-independent.txt shapely==2.1.2
       - name: Generate F08 fixture and model tests
         run: |
           node tests/features/f08/fixture.mjs
           node --test tests/features/f08/joins.test.mjs
       - name: Same-environment before and after audit and timing
         run: node tests/features/f08/measure.mjs
+      - name: Real browser workflow and actual downloads
+        env:
+          F08_REVIEW_FRAMES: '1'
+        run: node tests/features/f08/browser.mjs
+      - name: Independent actual IFC and vector geometry
+        run: .cc-test/f08-reader/bin/python -I tests/features/f08/independent.py
       - name: Retain F08 evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: f08-evidence
           path: |
-            .cc-test/f08/*
+            .cc-test/f08/*.json
+            .cc-test/f08/*.ifc
+            .cc-test/f08/*.pdf
+            .cc-test/f08/browser/
             fixtures/f08/
           retention-days: 90

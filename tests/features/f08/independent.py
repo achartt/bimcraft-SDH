@@ -1,0 +1,119 @@
+# SPDX-License-Identifier: Apache-2.0
+"""Read actual IFC bodies, layers, joins and vector paths with independent readers.
+Shapely is test-only; no application geometry implementation is imported or copied.
+"""
+import csv,json,math,sys
+from pathlib import Path
+import ifcopenshell
+import ifcopenshell.validate
+import ifcopenshell.util.element as element
+import ifcopenshell.util.placement as placement
+import ifcopenshell.util.unit as unit
+from shapely.geometry import Polygon
+from shapely.ops import unary_union
+from pypdf import PdfReader
+from pypdf.generic import ContentStream
+root=Path(sys.argv[1] if len(sys.argv)>1 else '.cc-test/f08')
+def near(a,b): assert abs(a-b)<.005,(a,b)
+def physical(file,expected):
+ logger=ifcopenshell.validate.json_logger()
+ ifcopenshell.validate.validate(str(file),logger,express_rules=True)
+ assert not logger.statements,(str(file),logger.statements)
+ f=ifcopenshell.open(str(file));factor=unit.calculate_unit_scale(f)*1000
+ gids=[o.GlobalId for o in f.by_type('IfcRoot')];assert len(gids)==len(set(gids))
+ polygons=[];actual={}
+ for wall in expected['walls']:
+  obj=f.by_guid(wall['guid']);ps=element.get_psets(obj)['CadCraft_Wall']
+  assert ps['TypeKey']==wall['typeKey'] and ps.get('ExteriorSide')==wall['extSide']
+  assert element.get_type(obj).GlobalId==wall['assembly']['guid']
+  body=next(r for r in obj.Representation.Representations if r.RepresentationIdentifier=='Body').Items[0]
+  assert body.is_a('IfcExtrudedAreaSolid') and body.SweptArea.is_a('IfcArbitraryClosedProfileDef')
+  near(body.Depth*factor,wall['height'])
+  points=[(float(p.Coordinates[0])*factor,float(p.Coordinates[1])*factor) for p in body.SweptArea.OuterCurve.Points]
+  shape=Polygon(points);assert shape.is_valid and not shape.is_empty and shape.area>0
+  expected_points=next(s['points'] for s in expected['shapes'] if s['guid']==wall['guid'])
+  assert shape.hausdorff_distance(Polygon(expected_points))<.005
+  matrix=placement.get_local_placement(obj.ObjectPlacement)
+  world=[(matrix[0,0]*x+matrix[0,1]*y+matrix[0,3]*factor,matrix[1,0]*x+matrix[1,1]*y+matrix[1,3]*factor) for x,y in points]
+  poly=Polygon(world);polygons.append(poly);actual[wall['guid']]=poly
+  if 'CadCraft_WallJoin' in element.get_psets(obj):
+   settings=json.loads(element.get_psets(obj)['CadCraft_WallJoin']['Settings'])
+   assert settings==wall['joinSettings'] and settings['version']==1
+ for a in range(len(polygons)):
+  for b in range(a):
+   # Strictly joined fixture, not an intentionally disallowed intersecting end.
+   assert polygons[a].intersection(polygons[b]).area<.05,(file,a,b,polygons[a].intersection(polygons[b]).area)
+ for ty in expected['types']:
+  obj=f.by_guid(ty['guid']);recipe=json.loads(element.get_psets(obj)['CadCraft_WallType']['Recipe']);assert recipe['layers']==ty['layers']
+  layers=obj.HasAssociations[0].RelatingMaterial.MaterialLayers
+  assert len(layers)==len(recipe['layers'])
+  for l,r in zip(layers,recipe['layers']):
+   near(l.LayerThickness*factor,r['t'])
+   if r['kind']=='cavity':assert l.Material is None and l.IsVentilated is True and r['t']>0
+   if r['t']==0:assert l.LayerThickness==0 and r['function']=='membrane'
+ for d in expected['dims']:
+  spec=json.loads(element.get_psets(f.by_guid(d['guid']))['CadCraft_WallDimension']['Spec'])
+  assert spec['refs']==d['refs'] and d['resolved']['status']=='ok'
+  for r in spec['refs']:assert f.by_guid(r['wall']).is_a('IfcWall')
+ for o in expected['openings']:
+  obj=f.by_guid(o['guid']);assert obj.FillsVoids[0].RelatingOpeningElement.VoidsElements[0].RelatingBuildingElement.GlobalId==o['wallGuid']
+  ps=element.get_psets(obj)['CadCraft_Window'];near(ps['Width']*factor,o['width']);near(ps['Height']*factor,o['height'])
+ return {'file':str(file),'schemaFindings':0,'walls':len(polygons),'overlapAreaToleranceMm2':.05,'zeroMembranes':True,'ventilatedCavities':True},actual
+reports=[]
+for name in ['seed','edited']:
+ path=root/(name+'.ifc')
+ if path.exists():
+  expected=json.loads((root/(name+'.json')).read_text());report,polys=physical(path,expected);reports.append(report)
+browser=root/'browser'
+if (browser/'saved.ifc').exists():
+ expected=json.loads((browser/'expected.json').read_text());r,polys=physical(browser/'saved.ifc',expected);reports.append(r)
+ rows=list(csv.DictReader((browser/'assemblies.csv').open(encoding='utf-8-sig',newline='')))
+ for ty in expected['types']:
+  layer_rows=[r for r in rows if r['record_kind']=='layer' and r['type_key']==ty['key']]
+  assert len(layer_rows)==len(ty['layers'])
+  for l,r in zip(ty['layers'],layer_rows):
+   near(l['t'],float(r['nominal_thickness_mm']));assert r['core']==str(l['core']).lower()
+   if l['kind']=='cavity':assert r['cavity_ventilation']=='ventilated'
+ # Enlarged detail: compare actual PDF fill path geometry to shared world polygons
+ # at an independently calculated paper transform (A3, ratio 10, declared crop).
+ reader=PdfReader(browser/'detail.pdf');assert len(reader.pages)==1
+ page=reader.pages[0];assert not page.get('/Resources',{}).get('/XObject')
+ fills=[];paths=[];current=[];color=None
+ for args,operator in ContentStream(page.get_contents(),reader).operations:
+  if operator==b'rg':color=tuple(map(float,args))
+  if operator==b'g':color=None
+  if operator==b'm':current=[tuple(map(float,args))];paths.append(current)
+  if operator==b'l':current.append(tuple(map(float,args)))
+  if operator in [b'f',b'f*']:
+   if color:fills.extend(Polygon(p) for p in paths if len(p)>2 and Polygon(p).area>1e-12)
+   paths=[];current=[]
+  if operator in [b'S',b'n']:paths=[];current=[]
+ assert fills and all(p.is_valid for p in fills)
+ PT=72/25.4;ratio=10;crop=[10900,10400,12200,11800];width=crop[2]-crop[0];height=crop[3]-crop[1]
+ ox=12+(396-width/ratio)/2-crop[0]/ratio
+ oy=28+(257-height/ratio)/2-crop[1]/ratio
+ painted=[]
+ for wall in expected['scene']['walls']:
+  for layer in wall.get('layers',[]):
+   if layer['fill']=='none':continue
+   for poly in layer['polys']:
+    if len(poly)>2 and Polygon(poly).area>1e-6:painted.append(Polygon([((ox+x/ratio)*PT,(oy+y/ratio)*PT) for x,y in poly]))
+ assert len(painted)==len(fills),(len(painted),len(fills))
+ max_distance=max(min(p.hausdorff_distance(q) for q in fills) for p in painted)/PT*ratio
+ assert max_distance<.005,max_distance
+ for file in ['plan.pdf','detail.pdf']:
+  pdf=PdfReader(browser/file);assert all(not p.get('/Resources',{}).get('/XObject') for p in pdf.pages)
+ reports.append({'actualDownloadedPlanPDF':True,'detailVectorFillPolygons':len(fills),'maxVectorGeometryErrorMm':max_distance,'rasterImages':0,'csvLayers':len([r for r in rows if r['record_kind']=='layer'])})
+# Compare union/overlap without trusting renderer topology or application tests.
+if (root/'audit-after.json').exists():
+ before=json.loads((root/'audit-before.json').read_text());after=json.loads((root/'audit-after.json').read_text())
+ old=[Polygon(p) for _,p in before['polygons']];new=[Polygon(p) for _,p in after['polygons']]
+ assert all(p.is_valid and p.area>0 for p in new);assert not after['diagnostics']
+ overlap=sum(a.intersection(b).area for i,a in enumerate(new) for b in new[:i])
+ assert overlap<.00001,overlap
+ union_difference=unary_union(old).symmetric_difference(unary_union(new)).area
+ assert union_difference<.001,union_difference
+ reports.append({'sameOuterUnionDifferenceMm2':union_difference,'newOverlapAreaMm2':overlap})
+assert reports
+(root/'independent.json').write_text(json.dumps(reports,indent=2)+'\n')
+print('F08_INDEPENDENT '+json.dumps(reports))

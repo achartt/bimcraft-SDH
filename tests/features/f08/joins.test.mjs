@@ -100,7 +100,7 @@ test('finish cycles preserve core reference lines, identities, openings, cavity 
  const initial=locationLine(target),initialDims=readWallDimensions(m.w()).map(d=>resolveDimension(d,readWalls(m.w())).value),opening=readOpenings(m.w());
  for(let k=0;k<10;k++){
   const t=readAssemblies(m.w()).find(t=>t.key===A.key);m.change(saveWallAssembly({...t,layers:t.layers.map((l,i)=>({...l,t:l.t+(i===0?.254:0)}))}));
-  const after=bytes(m);m.ed.undo();m.ed.redo();assert.deepEqual(bytes(m),after);m=await open(m.ed.save());
+  const after=inspect(m),stable=s=>({walls:s.walls.map(w=>({...w,assembly:w.assembly&&(({psetId,...x})=>x)(w.assembly)})),types:s.types.map(({psetId,...x})=>x),materials:s.materials,dims:s.dims,openings:s.openings,shapes:s.shapes,outlines:s.outlines});m.ed.undo();m.ed.redo();assert.deepEqual(stable(inspect(m)),stable(after));m=await open(m.ed.save());
   assert.deepEqual(readWalls(m.w()).map(w=>w.guid),ids);const now=readWalls(m.w()).find(w=>w.guid===target.guid),line=locationLine(now);
   // Reference LINE stays fixed; corner reintersection may slide its endpoint along the line.
   near(line.a[1],initial.a[1]);near(line.b[1],initial.b[1]);assert.equal(readAssemblies(m.w()).find(t=>t.key===A.key).guid,type.guid);

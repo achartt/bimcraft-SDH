@@ -113,6 +113,28 @@ function rejoinAssemblyCorners(w, before, changed) {
       edits.get(e.wall.guid)[e.end] = p;
     }
   }
+  // Retain an eligible pre-edit T relationship against the FINAL host axis.
+  // Sliding the stem endpoint along its own line preserves its core reference line;
+  // afterWallMove keeps hosted opening world stations when that start slides.
+  const beforeSorted = [...before].sort((a,b)=>a.guid.localeCompare(b.guid));
+  for (const stem of beforeSorted) for (const end of ['a','b']) {
+    if (stem.bulge || !endJoins(stem,end)) continue;
+    const p = stem[end];
+    const hosts = beforeSorted.filter(host => {
+      if (host.guid === stem.guid || host.storey !== stem.storey || host.bulge) return false;
+      const dx=host.b[0]-host.a[0],dy=host.b[1]-host.a[1],s=((p[0]-host.a[0])*dx+(p[1]-host.a[1])*dy)/host.len;
+      return s>1 && s<host.len-1 && Math.abs((p[0]-host.a[0])*dy-(p[1]-host.a[1])*dx)/host.len<=1;
+    });
+    if (hosts.length !== 1 || ![stem.guid,hosts[0].guid].some(g=>changedSet.has(g))) continue;
+    const A=after.get(stem.guid),B=after.get(hosts[0].guid);
+    if (!A || !B) continue;
+    const u=[A.b[0]-A.a[0],A.b[1]-A.a[1]],v=[B.b[0]-B.a[0],B.b[1]-B.a[1]],den=u[0]*v[1]-u[1]*v[0];
+    if (Math.abs(den)<1e-9*A.len*B.len) continue;
+    const s=((B.a[0]-A.a[0])*v[1]-(B.a[1]-A.a[1])*v[0])/den,q=[A.a[0]+s*u[0],A.a[1]+s*u[1]];
+    if (Math.hypot(q[0]-p[0],q[1]-p[1])>4*Math.max(A.t,B.t)) continue;
+    if (!edits.has(stem.guid)) edits.set(stem.guid,{});
+    edits.get(stem.guid)[end]=q;
+  }
   for (const [guid, ch] of edits) { updateWall(w, guid, ch, { carryJoined: false }); changedSet.add(guid); }
   return [...changedSet];
 }
@@ -163,6 +185,7 @@ export function changeWall(guid, changes, opts = {}) {
     if (!wall) throw Object.assign(new Error('model.err.nowall'), { key: 'model.err.nowall' });
     const ops0 = readOpenings(w, null, before);
     const r = updateWall(w, guid, changes, opts);
+    r.guids = rejoinAssemblyCorners(w, before, r.guids);
     afterWallMove(w, before, ops0, r.guids, !!changes.typeKey);
     settle(w, [wall.storey], r.guids);
     return { id: w.byGuid(guid), ids: [w.byGuid(guid)] };
@@ -197,7 +220,8 @@ export function changeWalls(guids, changes) {
       updateWall(w, g, changes, { carryJoined: false });
       storeys.add(wall.storey);
     }
-    afterWallMove(w, all, ops0, guids, !!changes.typeKey);
+    const touched = rejoinAssemblyCorners(w, all, guids);
+    afterWallMove(w, all, ops0, touched, !!changes.typeKey);
     settle(w, storeys, guids);
     const ids = guids.map((g) => w.byGuid(g)).filter(Boolean);
     return { id: ids[0] ?? null, ids };

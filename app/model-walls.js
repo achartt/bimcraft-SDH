@@ -440,6 +440,7 @@ export function updateWall(w, guid, changes = {}, { carryJoined = true, previous
     // Keep the inherited mixed-curve algorithm unchanged; refuse ambiguous control scope.
     if (all.some(q => q.bulge && q.storey === wall.storey && [q.a,q.b].some(p => [wall.a,wall.b].some(r => dist(p,r) <= wall.t+q.t)))) throw new Error(tr('join.curvedControl'));
     writeJoinSettings(w, wall.id, changes.joinSettings);
+    wall.joinSettings = readJoinRecord(w, wall.id).settings;
   }
   const touched = new Set([guid]);
   const moveEnd = (x, end, to) => {

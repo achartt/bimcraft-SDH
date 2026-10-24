@@ -181,7 +181,11 @@ export function straightWallJoins(rows,legacy,{tol=JOIN_TOL_MM}={}) {
     if(!valid(poly)){issue='short-or-invalid-seam';break;}parts.push(poly);
    }
    if(issue)break;
-   const poly=parts.length===1?parts[0]:stitch(parts);
+   let poly=parts.length===1?parts[0]:stitch(parts);
+   if(poly){
+    const target=(w.caps.get('0:a')||squareCap(w,0,'a')).at(-1),index=poly.findIndex(p=>near(p,target));
+    if(index>=0)poly=[...poly.slice(index),...poly.slice(0,index)];
+   }
    if(!poly||!valid(poly)){issue='short-or-invalid-seam';break;}
    poly.joinPieces=parts.map(p=>p.map(q=>[...q]));results.push([w.key,poly]);
   }
