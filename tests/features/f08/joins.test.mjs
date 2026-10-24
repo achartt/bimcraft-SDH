@@ -9,7 +9,7 @@ import {readJoinRecord,writeJoinSettings,defaultJoinSettings,JOIN_PSET} from '..
 import {readAssemblies} from '../../../app/wall-assemblies.js';
 import {readWallDimensions,resolveDimension} from '../../../app/wall-dimensions.js';
 import {readOpenings} from '../../../app/model-openings.js';
-import {changeWall,saveWallAssembly,op} from '../../../app/model-ops.js';
+import {changeWall,changeWalls,saveWallAssembly,op} from '../../../app/model-ops.js';
 import {wallPlanGraphics,wallPlanEdges} from '../../../app/wall-plan-graphics.js';
 import {planPdf} from '../../../app/model-pdf.js';
 import {readMaterials,saveMaterial} from '../../../app/project-materials.js';
@@ -21,13 +21,16 @@ const ringArea=p=>p.reduce((s,a,i)=>{const b=p[(i+1)%p.length];return s+a[0]*b[1
 const canonical=out=>[...out].map(([k,p])=>[k,p.map(q=>q.map(x=>Math.round(x*1e7)/1e7))]).sort((a,b)=>a[0].localeCompare(b[0]));
 const ray=(key,angle,t=209.55,assembly=A,extSide='left')=>({key,guid:key,a:[0,0],b:[4000*Math.cos(angle*Math.PI/180),4000*Math.sin(angle*Math.PI/180)],t,assembly,height:3000,z:0,extSide});
 test('supported angle/core/orientation matrix is deterministic under order and regeneration',()=>{
+ const matrix=[];
  for(const d of [30,45,60,90,120,135,150])for(const side of ['left','right'])for(const dissimilar of [false,true]){
   const ws=[ray('a',0,209.55,A,side),ray('b',d,dissimilar?155.575:209.55,dissimilar?B:A,side)],out=wallOutlines(ws);
   assert.deepEqual(out.diagnostics,[],JSON.stringify({d,side,dissimilar,issues:out.diagnostics}));
   assert.deepEqual(canonical(out),canonical(wallOutlines([...ws].reverse())));
   for(let i=0;i<5;i++)assert.deepEqual(canonical(wallOutlines(ws)),canonical(out));
   for(const p of out.values()){assert.ok(ringArea(p)>0);assert.ok(p.flat().every(Number.isFinite));}
+  matrix.push({angle:d,side,dissimilar,walls:ws,polygons:[...out],before:[...legacyWallOutlines(ws)]});
  }
+ fs.writeFileSync(dir+'/matrix.json',JSON.stringify(matrix));
 });
 test('true T and four-arm X have common core-first seams and no ordering dependence',()=>{
  const stem=ray('a',90,155.575,B),host={...ray('z',0),a:[-4000,0]};
@@ -101,7 +104,7 @@ test('finish cycles preserve core reference lines, identities, openings, cavity 
  for(let k=0;k<10;k++){
   const t=readAssemblies(m.w()).find(t=>t.key===A.key);m.change(saveWallAssembly({...t,layers:t.layers.map((l,i)=>({...l,t:l.t+(i===0?.254:0)}))}));
   const after=inspect(m),stable=s=>({walls:s.walls.map(w=>({...w,assembly:w.assembly&&(({psetId,...x})=>x)(w.assembly)})),types:s.types.map(({psetId,...x})=>x),materials:s.materials,dims:s.dims,openings:s.openings,shapes:s.shapes,outlines:s.outlines});m.ed.undo();m.ed.redo();assert.deepEqual(stable(inspect(m)),stable(after));m=await open(m.ed.save());
-  assert.deepEqual(readWalls(m.w()).map(w=>w.guid),ids);const now=readWalls(m.w()).find(w=>w.guid===target.guid),line=locationLine(now);
+  assert.deepEqual(inspect(m).diagnostics,[]);assert.deepEqual(readWalls(m.w()).map(w=>w.guid),ids);const now=readWalls(m.w()).find(w=>w.guid===target.guid),line=locationLine(now);
   // Reference LINE stays fixed; corner reintersection may slide its endpoint along the line.
   near(line.a[1],initial.a[1]);near(line.b[1],initial.b[1]);assert.equal(readAssemblies(m.w()).find(t=>t.key===A.key).guid,type.guid);
   const dims=readWallDimensions(m.w()).map(d=>resolveDimension(d,readWalls(m.w())));assert.ok(dims.every(d=>d.status==='ok'));near(dims[0].value,initialDims[0]);
@@ -127,4 +130,20 @@ test('unknown join metadata leaves affected persistent references unresolved wit
  const m=await model(),d=readWallDimensions(m.w())[0],wall=readWalls(m.w()).find(w=>w.guid===d.refs[0].wall);
  m.w().run(w=>w.upsertPset(wall.id,JOIN_PSET,[['Settings','IFCTEXT',JSON.stringify({...defaultJoinSettings(),version:99})]]));
  const original=bytes(m),resolved=resolveDimension(d,readWalls(m.w()));assert.notEqual(resolved.status,'ok');assert.ok(!Number.isFinite(resolved.value));assert.deepEqual(bytes(m),original);
+});
+
+test('retained X and T topology survives disallow, finish offsets, reallow, Undo Redo and reopen',async()=>{
+ const m=await model(),initial=readWalls(m.w()),tee=initial[9],host=initial[8],x=initial[10];
+ for(const wall of [tee,x]){const settings={...wall.joinSettings,a:{...wall.joinSettings.a,allow:false}};m.change(changeWall(wall.guid,{joinSettings:settings}));}
+ const type=readAssemblies(m.w()).find(t=>t.key===A.key);m.change(saveWallAssembly({...type,layers:type.layers.map((l,i)=>({...l,t:l.t+(i===0?6.35:0)}))}));
+ for(const guid of [tee.guid,x.guid]){const wall=readWalls(m.w()).find(w=>w.guid===guid);m.change(changeWall(guid,{joinSettings:{...wall.joinSettings,a:{...wall.joinSettings.a,allow:true}}}));}
+ assert.deepEqual(inspect(m).diagnostics,[]);const state=readWalls(m.w());assert.equal(state.find(w=>w.guid===tee.guid).joinSettings.a.tee,host.guid);assert.ok(state.find(w=>w.guid===x.guid).joinSettings.a.node);
+ const logical=()=>readWalls(m.w()).map(w=>[w.guid,w.joinSettings]);const after=logical();m.ed.undo();m.ed.redo();assert.deepEqual(logical(),after);
+ const re=await open(m.ed.save());assert.deepEqual(readWalls(re.w()).map(w=>[w.guid,w.joinSettings]),after);assert.deepEqual(inspect(re).diagnostics,[]);
+});
+test('selection order does not alter final type assignment, core axes or physical seams',async()=>{
+ const first=await model(),second=await model(),guids=readWalls(first.w()).slice(0,2).map(w=>w.guid);
+ first.change(changeWalls(guids,{typeKey:B.key}));second.change(changeWalls([...guids].reverse(),{typeKey:B.key}));
+ const geometry=m=>readWalls(m.w()).map(w=>({guid:w.guid,a:w.a,b:w.b,typeKey:w.typeKey,joinSettings:w.joinSettings}));assert.deepEqual(geometry(first),geometry(second));
+ assert.deepEqual(canonical(wallOutlines(readWalls(first.w()).map(w=>({...w,key:w.guid})))),canonical(wallOutlines(readWalls(second.w()).map(w=>({...w,key:w.guid})))));
 });

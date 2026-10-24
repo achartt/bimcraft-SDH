@@ -20,3 +20,5 @@ All supported joins require full authored wall/type rows, straight constant widt
 | Schedule/material semantics | Existing F06 scope retained | Stable recipes and IDs, nominal widths, cavities/ventilation, zero membranes; no takeoff claim. |
 
 Follow-ups: bound curved-straight L with tangent/height/core identity rules first, then curved-curved cases; separately design opening finish wrapping; review continuous-X split identities, partial-height joins and a dedicated workspace adapter. Full F08 stays partial.
+
+New node discovery remains 1 mm. Existing explicitly saved node relations survive finish offsets within the four-width seam bound; this is retained topology, not a larger snap tolerance or imported-wall repair. Controls persist the membership when an existing join is edited.

@@ -81,6 +81,8 @@ function ray(w,s,end,node) {
 }
 function connected(w,q,tol) {
  if(w.storey!=null&&q.storey!=null&&w.storey!==q.storey)return false;
+ if(['a','b'].some(a=>endJoins(w,a)&&w.joinSettings?.[a]?.tee===q.guid)||['a','b'].some(a=>endJoins(q,a)&&q.joinSettings?.[a]?.tee===w.guid))return true;
+ if(['a','b'].some(a=>endJoins(w,a)&&w.joinSettings?.[a]?.node&&['a','b'].some(b=>endJoins(q,b)&&q.joinSettings?.[b]?.node===w.joinSettings[a].node)))return true;
  if(w.bulge||q.bulge){
   const hits=(a,b)=>[a.a,a.b].some(p=>{const r=b.g.param(p);return r.s>=-tol&&r.s<=b.g.L+tol&&Math.abs(r.off)<=(a.t+b.t)/2+tol;});
   return hits(w,q)||hits(q,w);
@@ -118,19 +120,28 @@ export function straightWallJoins(rows,legacy,{tol=JOIN_TOL_MM}={}) {
   // Stable order and complete-link clustering; chains wider than tol refuse.
   for(const w of ws)for(const end of ['a','b']){
    if(!endJoins(w,end))continue;
-   const p=w[end],nearNodes=nodes.filter(n=>n.members.some(e=>dist(e.p,p)<=tol));
-   if(nearNodes.length>1||nearNodes.some(n=>n.members.some(e=>dist(e.p,p)>tol))){issue='ambiguous-proximity';continue;}
-   const node=nearNodes[0]||{p,members:[],rays:[]};if(!nearNodes.length)nodes.push(node);
+   const p=w[end],identity=w.joinSettings?.[end]?.node,linked=identity?nodes.find(n=>n.identity===identity):null;
+   const nearNodes=linked?[linked]:nodes.filter(n=>n.members.some(e=>dist(e.p,p)<=tol));
+   if(!linked&&(nearNodes.length>1||nearNodes.some(n=>n.members.some(e=>dist(e.p,p)>tol)))){issue='ambiguous-proximity';continue;}
+   const node=nearNodes[0]||{p,identity,members:[],rays:[]};if(!nearNodes.length)nodes.push(node);
+   if(identity&&node.identity&&identity!==node.identity){issue='ambiguous-proximity';continue;}
+   if(identity)node.identity=identity;
    node.members.push({w,end,p});node.rays.push(ray(w,end==='a'?0:w.L,end,node));
   }
   // Only true near-axis T nodes. Face-near stubs are explicit unsupported cases.
   for(const node of nodes)for(const w of ws){
    if(node.members.some(e=>e.w===w))continue;
    const s=dot(sub(node.p,w.a),w.u),off=Math.abs(dot(sub(node.p,w.a),w.n));
-   if(s<=tol||s>=w.L-tol||off>w.t/2+tol)continue;
-   if(off>tol){issue='near-face-tee';continue;}
+   const linked=node.members.some(e=>e.w.joinSettings?.[e.end]?.tee===w.guid);
+   if(linked&&(s<=tol||s>=w.L-tol)){issue='tee-outside-span';continue;}
+   if(s<=tol||s>=w.L-tol||off>(linked?4*Math.max(w.t,...node.members.map(e=>e.w.t)):w.t/2+tol))continue;
+   if(off>tol&&!linked){issue='near-face-tee';continue;}
    if(w.cuts.some(c=>Math.abs(c.s-s)<=tol&&c.node!==node)){issue='ambiguous-proximity';continue;}
    w.cuts.push({s,node});node.rays.push(ray(w,s,'b',node),ray(w,s,'a',node));
+  }
+  for(const node of nodes)for(const e of node.members){
+   const host=e.w.joinSettings?.[e.end]?.tee;
+   if(host&&!ws.some(w=>w.guid===host))issue='missing-tee-host';
   }
   // Interior/interior crossings cannot be represented as one connected ring
   // for both hosts with the selected ownership rule.
@@ -141,6 +152,7 @@ export function straightWallJoins(rows,legacy,{tol=JOIN_TOL_MM}={}) {
   }
   for(const node of nodes){
    const rays=node.rays;if(rays.length<2)continue;
+   if(node.identity&&node.members.some(e=>dist(e.p,node.p)>4*Math.max(...rays.map(r=>r.w.t)))){issue='unbounded-seam';continue;}
    if(rays.length>4){issue='node-degree';continue;}
    const z=rays[0].w.z??rays[0].w.baseOffset??0,h=rays[0].w.height;
    if(rays.some(r=>Math.abs((r.w.z??r.w.baseOffset??0)-z)>.005||Math.abs(r.w.height-h)>.005)){issue='height-mismatch';continue;}

@@ -5339,5 +5339,7 @@
     "join.reason.unbounded-seam": "The seam exceeds four wall widths. Adjust the angle or separate this join.",
     "join.reason.short-or-invalid-seam": "The join would invert a short wall or create an invalid outline. Lengthen the wall or disallow the join.",
     "join.cap.a": "Start cap (A)",
-    "join.cap.b": "End cap (B)"
+    "join.cap.b": "End cap (B)",
+    "join.reason.missing-tee-host": "The saved T host is missing. Undo its removal or disallow this end; no replacement host is guessed.",
+    "join.reason.tee-outside-span": "The saved T lies beyond its host span. Move the end back within the host or disallow this join."
 }

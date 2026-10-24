@@ -114,6 +114,15 @@ if (root/'audit-after.json').exists():
  union_difference=unary_union(old).symmetric_difference(unary_union(new)).area
  assert union_difference<.001,union_difference
  reports.append({'sameOuterUnionDifferenceMm2':union_difference,'newOverlapAreaMm2':overlap})
+if (root/'matrix.json').exists():
+ matrix=json.loads((root/'matrix.json').read_text());assert len(matrix)==28
+ for case in matrix:
+  new=[Polygon(p) for _,p in case['polygons']]
+  old=[Polygon(p) for _,p in case['before']]
+  assert all(p.is_valid and p.area>0 for p in new),case
+  assert new[0].intersection(new[1]).area<.00001,case
+  assert unary_union(new).symmetric_difference(unary_union(old)).area<.001,case
+ reports.append({'independentAngleCoreOrientationCases':len(matrix),'angles':[30,45,60,90,120,135,150],'maxAllowedOverlapMm2':.00001})
 assert reports
 (root/'independent.json').write_text(json.dumps(reports,indent=2)+'\n')
 print('F08_INDEPENDENT '+json.dumps(reports))

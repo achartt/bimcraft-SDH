@@ -1,4 +1,4 @@
-import { assertWallJoinsEditable } from './wall-join-records.js';
+import { assertWallJoinsEditable, writeJoinSettings } from './wall-join-records.js';
 import { endJoins } from './wall-joins.js';
 /* SPDX-License-Identifier: Apache-2.0 */
 /**
@@ -81,24 +81,37 @@ export function saveWallAssembly(input, assign = []) {
 // against a neighbour's old axis during each update would leave an open L corner.
 function rejoinAssemblyCorners(w, before, changed) {
   const changedSet = new Set(changed), after = new Map(readWalls(w).map(x => [x.guid, x]));
-  const buckets = new Map(), nodes = [];
+  const buckets = new Map(), nodes = [], linkedNodes = new Map();
   for (const wall of [...before].sort((a,b)=>a.guid.localeCompare(b.guid))) for (const end of ['a', 'b']) {
     if (!endJoins(wall, end)) continue;
     const p = wall[end], x = Math.floor(p[0]), y = Math.floor(p[1]);
-    let node = null;
+    const identity=wall.joinSettings?.[end]?.node;
+    let node = identity ? linkedNodes.get(identity) || null : null;
     for (let dx = -1; dx <= 1 && !node; dx++) for (let dy = -1; dy <= 1 && !node; dy++) {
       node = (buckets.get(`${wall.storey}:${x+dx}:${y+dy}`) || []).find(n => Math.hypot(n.p[0]-p[0],n.p[1]-p[1]) <= 1);
     }
     if (!node) {
-      node = { p, ends: [] }; nodes.push(node);
+      node = { p, identity, ends: [] }; nodes.push(node);
       const key = `${wall.storey}:${x}:${y}`;
       if (!buckets.has(key)) buckets.set(key, []);
       buckets.get(key).push(node);
     }
+    if(identity){node.identity=identity;linkedNodes.set(identity,node);}
     node.ends.push({ wall, end });
   }
   const edits = new Map();
   for (const node of nodes) {
+    if(node.ends.length>=2&&node.ends.length<=4&&node.ends.some(e=>changedSet.has(e.wall.guid))){
+      // Explicit edits retain the logical endpoint relation while finish offsets
+      // move analytic axes. The identity is derived from stable wall GUIDs/ends,
+      // so Undo/Redo cannot allocate a different node by accident.
+      const identity=node.identity||'join:'+node.ends.map(e=>e.wall.guid+':'+e.end).sort().join('|');
+      for(const e of node.ends){
+        const current=readWalls(w).find(x=>x.guid===e.wall.guid);
+        if(current&&!current.joinIssue&&current.joinSettings[e.end].node!==identity)
+          writeJoinSettings(w,current.id,{...current.joinSettings,[e.end]:{...current.joinSettings[e.end],node:identity}});
+      }
+    }
     if (node.ends.length !== 2 || !node.ends.some(e => changedSet.has(e.wall.guid))) continue;
     const [a, b] = node.ends, A = after.get(a.wall.guid), B = after.get(b.wall.guid);
     if (!A || !B || A.bulge || B.bulge) continue;
@@ -118,7 +131,7 @@ function rejoinAssemblyCorners(w, before, changed) {
   // afterWallMove keeps hosted opening world stations when that start slides.
   const beforeSorted = [...before].sort((a,b)=>a.guid.localeCompare(b.guid));
   for (const stem of beforeSorted) for (const end of ['a','b']) {
-    if (stem.bulge || !endJoins(stem,end)) continue;
+    if (stem.bulge || !endJoins(stem,end) || stem.joinSettings?.[end]?.node) continue;
     const p = stem[end];
     const hosts = beforeSorted.filter(host => {
       if (host.guid === stem.guid || host.storey !== stem.storey || host.bulge) return false;
@@ -126,6 +139,9 @@ function rejoinAssemblyCorners(w, before, changed) {
       return s>1 && s<host.len-1 && Math.abs((p[0]-host.a[0])*dy-(p[1]-host.a[1])*dx)/host.len<=1;
     });
     if (hosts.length !== 1 || ![stem.guid,hosts[0].guid].some(g=>changedSet.has(g))) continue;
+    const current=readWalls(w).find(x=>x.guid===stem.guid);
+    if(current&&!current.joinIssue&&current.joinSettings[end].tee!==hosts[0].guid)
+      writeJoinSettings(w,current.id,{...current.joinSettings,[end]:{...current.joinSettings[end],tee:hosts[0].guid}});
     const A=after.get(stem.guid),B=after.get(hosts[0].guid);
     if (!A || !B) continue;
     const u=[A.b[0]-A.a[0],A.b[1]-A.a[1]],v=[B.b[0]-B.a[0],B.b[1]-B.a[1]],den=u[0]*v[1]-u[1]*v[0];
