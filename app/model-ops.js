@@ -101,7 +101,7 @@ function rejoinAssemblyCorners(w, before, changed) {
   }
   const edits = new Map();
   for (const node of nodes) {
-    if(node.ends.length>=2&&node.ends.length<=4&&node.ends.some(e=>changedSet.has(e.wall.guid))){
+    if(node.ends.length>=2&&node.ends.length<=4&&node.ends.every(e=>!e.wall.bulge)&&node.ends.some(e=>changedSet.has(e.wall.guid))){
       // Explicit edits retain the logical endpoint relation while finish offsets
       // move analytic axes. The identity is derived from stable wall GUIDs/ends,
       // so Undo/Redo cannot allocate a different node by accident.

@@ -133,6 +133,7 @@ export function straightWallJoins(rows,legacy,{tol=JOIN_TOL_MM}={}) {
    if(node.members.some(e=>e.w===w))continue;
    const s=dot(sub(node.p,w.a),w.u),off=Math.abs(dot(sub(node.p,w.a),w.n));
    const linked=node.members.some(e=>e.w.joinSettings?.[e.end]?.tee===w.guid);
+   if(linked&&off>4*Math.max(w.t,...node.members.map(e=>e.w.t))){issue='unbounded-seam';continue;}
    if(linked&&(s<=tol||s>=w.L-tol)){issue='tee-outside-span';continue;}
    if(s<=tol||s>=w.L-tol||off>(linked?4*Math.max(w.t,...node.members.map(e=>e.w.t)):w.t/2+tol))continue;
    if(off>tol&&!linked){issue='near-face-tee';continue;}
@@ -148,7 +149,8 @@ export function straightWallJoins(rows,legacy,{tol=JOIN_TOL_MM}={}) {
   for(let a=0;a<ws.length;a++)for(let b=a+1;b<ws.length;b++){
    const w=ws[a],q=ws[b],p=meet(w.a,w.u,q.a,q.u);if(!p)continue;
    const s=dot(sub(p,w.a),w.u),t=dot(sub(p,q.a),q.u);
-   if(s>tol&&s<w.L-tol&&t>tol&&t<q.L-tol)issue='interior-crossing';
+   const known=['a','b'].some(a=>endJoins(w,a)&&(w.joinSettings?.[a]?.tee===q.guid||w.joinSettings?.[a]?.node&&['a','b'].some(b=>endJoins(q,b)&&q.joinSettings?.[b]?.node===w.joinSettings[a].node)))||['a','b'].some(b=>endJoins(q,b)&&q.joinSettings?.[b]?.tee===w.guid);
+   if(!known&&s>tol&&s<w.L-tol&&t>tol&&t<q.L-tol)issue='interior-crossing';
   }
   for(const node of nodes){
    const rays=node.rays;if(rays.length<2)continue;

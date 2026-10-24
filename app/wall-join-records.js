@@ -23,6 +23,7 @@ export function readJoinRecord(w,id) {
   if(ps===null)return {settings:defaultJoinSettings()};
   const raw=ps.Settings,settings=validateJoinSettings(parseRecord(raw,'wallJoin'));
   const guid=val(w.api.GetLine(w.mid,id,false)?.GlobalId);
+  for(const end of ['a','b'])if(settings[end].tee===guid)throw recordError('wallJoin','corrupt');
   for(const end of ['a','b'])if(settings[end].node&&!settings[end].node.slice(5).split('|').includes(guid+':'+end))throw recordError('wallJoin','corrupt');
   return {settings,raw};
  }catch(e){return {settings:null,issue:e.recordIssue||'corrupt',message:recordError('wallJoin',e.recordIssue||'corrupt').message};}
