@@ -30,3 +30,9 @@ Completion criteria:
 - Keep the historical failure and document the narrow harness change. Closing this test issue does not close either performance issue.
 
 No follow-up is implemented or closed by this integration. The established layout remains default/fallback; full F28 remains partial.
+
+## F28-C PM review update — October 23, 2026
+
+At reviewed delivery `e46113bbbdd66b19f07d92d49af6eac907d1f84c`, the complete local C browser suite passes 39/39 and inherited B passes 42/42. Genuine normal-interval autosave/recovery, clean independent contexts and unsupported-record refusals pass; all seven exact-head CI workflows also pass. TEST-F28-01 remains OPEN pending merged-build confirmation and a tracking update. Both performance issues remain OPEN.
+
+PR #12 has a separate correctness finding, F28C-PM-01: when another sheet/schedule is selected in Project Browser, Properties may display it while Edit sheet / CSV targets the active drawing instead. A source-target guard and browser regressions are required before merge. The PR remains draft/unmerged; main stays at `3e42c21`.
