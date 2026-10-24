@@ -40,6 +40,9 @@ jobs:
         run: |
           node tests/features/f08/fixture.mjs
           node --test tests/features/f08/joins.test.mjs
+      - name: Review legacy golden fixture changes
+        if: always()
+        run: node tests/features/f08/snapshot-audit.mjs
       - name: Same-environment before and after audit and timing
         run: node tests/features/f08/measure.mjs
       - name: Real browser workflow and actual downloads

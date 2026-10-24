@@ -18,5 +18,15 @@ const results={base,head:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8
 const measure=fn=>{const raw=[];for(let i=-5;i<30;i++){const t=performance.now();fn();if(i>=0)raw.push(performance.now()-t);}const s=[...raw].sort((a,b)=>a-b);return {raw,p50:s[14],p95:s[28]};};
 results.raw.outlineBefore=measure(()=>old.wallOutlines(rows));results.raw.outlineAfter=measure(()=>wallOutlines(rows));
 const baseline=await openOld(m.ed.save()),st=readWalls(m.w())[0].storey;
-results.raw.regenBefore=measure(()=>old.regenWalls(baseline.w(),st));results.raw.regenAfter=measure(()=>regenWalls(m.w(),st));
+results.raw.regenBefore=measure(()=>baseline.w().run(w=>old.regenWalls(w,st)));results.raw.regenAfter=measure(()=>m.w().run(w=>regenWalls(w,st)));
+async function forced(open,regen){
+ const raw=[],bytes=m.ed.save(),guids=walls.map(w=>w.guid);
+ for(let i=-5;i<30;i++){
+  const copy=await open(bytes),w=copy.w(),t=performance.now();
+  w.run(w=>regen(w,st,guids));if(i>=0)raw.push(performance.now()-t);w.api.CloseModel(w.mid);
+ }
+ const s=[...raw].sort((a,b)=>a-b);return {raw,p50:s[14],p95:s[28]};
+}
+results.boundaries.forced='Fresh identical saved IFC per sample (open excluded); journal setup + all wall reads + join computation + forced IFC shape/quantity writes. 5 warmups/30 samples, no filtering.';
+results.raw.forcedBefore=await forced(openOld,old.regenWalls);results.raw.forcedAfter=await forced(model,regenWalls);
 fs.writeFileSync(out+'/performance.json',JSON.stringify(results,null,2));console.log('F08_PERFORMANCE '+JSON.stringify(results));
