@@ -10,7 +10,7 @@ There are 16 upstream-only and 62 fork-only commits (52 non-merge commits on the
 
 Public changes include six display units, centralized unit state/events, view/split controls, language catalogs, framing/roof/symbol changes and family/plumbing work. Preserve those semantics, translation fallback and raw model/MCP units even where Git auto-merges.
 
-The maintainer’s reintegrated docked layout could not yet be identified in this public delta: there are no app/workspace modules, and the shared shell assets match the common base. It may be implemented differently or not yet pushed. Confirm the exact intended branch/SHA before committing to the actual rebase target.
+The maintainer’s reintegrated docked layout could not yet be identified in this public delta: there are no app/workspace modules, and the shared shell assets match the common base. It may be implemented differently or not yet pushed. The user selected the sole published branch, main, pinned above, as the rebase target. Docked-layout equivalence is a compatibility check during preparation, not an outstanding target-confirmation requirement.
 
 ## Execution plan
 
