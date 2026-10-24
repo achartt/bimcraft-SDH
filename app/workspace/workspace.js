@@ -174,7 +174,7 @@ export function mountWorkspace({ root, modelUi, views, commands, props, current,
   function renderRibbonTabs() {
     const names = Object.keys(catalog.ribbon).filter(n => n !== 'Modify | Walls' || wallContext);
     ribbonTabs.replaceChildren(button('File', { className: 'ws-file-tab', 'data-ws-file': '' }), ...names.map(name => button(name, {
-      role: 'tab', id: 'ws-tab-' + name.replace(/\W/g, '-'), 'aria-selected': name === tab, 'aria-controls': 'ws-ribbon-panel',
+      role: 'tab', id: 'ws-tab-' + name.replace(/\W/g, '-'), 'aria-selected': String(name === tab), 'aria-controls': 'ws-ribbon-panel',
       tabindex: name === tab ? 0 : -1, 'data-ws-tab': name, className: name === 'Modify | Walls' ? 'ws-context-tab' : '',
     })));
     renderRibbon();
@@ -215,7 +215,7 @@ export function mountWorkspace({ root, modelUi, views, commands, props, current,
     const hadFocus = drawingTabs.contains(document.activeElement);
     tabSignature = signature;
     drawingTabs.replaceChildren(...tabs.all.map(v => node('div', { className: 'ws-drawing-tab', role: 'presentation' },
-      button((v.kind === '3d' ? '◇ ' : v.kind === 'rcp' ? '⌑ ' : '▱ ') + v.name, { role: 'tab', 'data-ws-drawing': v.id, 'aria-selected': tabs.active?.id === v.id, 'aria-label': v.kind + ' · ' + v.name, title: v.kind + ' · ' + v.name + ' · ' + (v.ref || v.id) }),
+      button((v.kind === '3d' ? '◇ ' : v.kind === 'rcp' ? '⌑ ' : '▱ ') + v.name, { role: 'tab', 'data-ws-drawing': v.id, 'aria-selected': String(tabs.active?.id === v.id), 'aria-label': v.kind + ' · ' + v.name, title: v.kind + ' · ' + v.name + ' · ' + (v.ref || v.id) }),
       button('×', { 'aria-label': 'Close drawing ' + v.name, 'data-ws-close': v.id }))));
     const selected = drawingTabs.querySelector('[aria-selected="true"]');
     selected?.scrollIntoView({block:'nearest', inline:'nearest'});
