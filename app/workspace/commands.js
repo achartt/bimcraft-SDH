@@ -38,7 +38,7 @@ export function createCommands({ state, actions, explain = () => {} }) {
     save: { categories: ['document'], reason: s => !s.document ? 'Open an IFC first.' : s.busy ? 'Wait for the current operation.' : !s.dirty ? 'There are no unsaved IFC changes.' : '' },
     undo: { categories: ['document'], reason: s => !s.document ? 'Open an IFC first.' : s.busy ? 'Wait for the current operation.' : !s.canUndo ? 'There is nothing to undo.' : '' },
     redo: { categories: ['document'], reason: s => !s.document ? 'Open an IFC first.' : s.busy ? 'Wait for the current operation.' : !s.canRedo ? 'There is nothing to redo.' : '' },
-    select: { categories: ['element'], reason: s => !s.document ? 'Open an IFC first.' : s.busy ? 'Wait for the current operation.' : !s.view ? 'Open a drawing first.' : '' },
+    select: { categories: ['element'], reason: s => !s.document ? 'Open an IFC first.' : s.busy ? 'Wait for the current operation.' : !s.view ? 'Open a drawing first.' : !plan(s.view) && s.view.kind !== '3d' ? 'Model picking is available in plan/RCP/callout and 3D. Use Edit sheet for documentation placements.' : '' },
     clear: { categories: ['element'], reason: s => !s.document ? 'Open an IFC first.' : s.busy ? 'Wait for the current operation.' : !s.selection.length ? 'No element is selected.' : '' },
     three: { categories: ['view'], reason: s => !s.document ? 'Open an IFC first.' : s.busy ? 'Wait for the current operation.' : '' },
     plan: { categories: ['view'], reason: s => !s.document ? 'Open an IFC first.' : s.busy ? 'Wait for the current operation.' : !s.levels.length ? 'This IFC has no supported storey plans.' : '' },

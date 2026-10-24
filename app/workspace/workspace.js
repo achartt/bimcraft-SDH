@@ -14,6 +14,7 @@ export function mountWorkspace({ root, modelUi, views, commands, props, current,
   const tabs = createDrawingTabs();
   let active = false, frame = 0, tab = 'Architecture', wallContext = false, browserView = null, propertyMode = 'view';
   let documentToken = null, propsToken = null, tabSignature = '', viewPropsSignature = '', restricted = new Map();
+  let lastSettings = null;
   const cameras = new Map();
   const A = modelUi.extend({ refresh: refreshSoon, settled: refreshSoon, toolChanged: refreshSoon });
   const propsHome = document.createComment('F28 Properties home'), browserHome = document.createComment('F28 Project Browser home');
@@ -75,8 +76,10 @@ export function mountWorkspace({ root, modelUi, views, commands, props, current,
   function snapshot() {
     const c = current();
     const view = tabs.active;
-    return { ...c, document: c.editor, busy: c.busy || !!A.S.busy || !!A.S.reloading,
-      levels: c.editor === documentToken ? A.S.data?.levels || [] : [], view, settings: isPlanView(view) ? views.workspaceSettings(view.levelId, view.rootKind || view.kind, view.kind === 'callout' ? view.ref : null) : docs.settings(view),
+    const busy = c.busy || !!A.S.busy || !!A.S.reloading || !!(c.editor && c.editor.mid == null);
+    if (!busy) lastSettings = isPlanView(view) ? views.workspaceSettings(view.levelId, view.rootKind || view.kind, view.kind === 'callout' ? view.ref : null) : docs.settings(view);
+    return { ...c, document: c.editor, busy,
+      levels: c.editor === documentToken ? A.S.data?.levels || [] : [], view, settings: lastSettings,
       live: active, tool: A.S.tool, wall: walls.metadata() };
   }
   function refreshSoon() { if (!frame) frame = requestAnimationFrame(() => { frame = 0; refresh(); }); }
@@ -90,7 +93,7 @@ export function mountWorkspace({ root, modelUi, views, commands, props, current,
     tabs.open(view); browserView = view; propertyMode = 'view';
     stage.classList.remove('ws-no-view');
     A.setTool('select');
-    A.host.select([]);
+    if (isDocumentView(view)) A.host.select([]);
     A.activateWorkspaceView(isPlanView(view) ? view.levelId : null, cameras.get(view.id), view.rootKind || view.kind, view.kind === 'callout' ? view.ref : null);
     docs.render(view);
     views.render(); refresh();
@@ -106,7 +109,7 @@ export function mountWorkspace({ root, modelUi, views, commands, props, current,
     const c = current();
     if (!active) { documentToken = null; refresh(); return; }
     documentToken = c.editor;
-    tabs.reset(documentToken); cameras.clear(); docs.reset(); browserView = null; propsToken = null;
+    tabs.reset(documentToken); cameras.clear(); docs.reset(); browserView = null; propsToken = null; lastSettings = null;
     if (c.editor) { A.prepareWorkspace(); A.setTool('select'); views.render(); }
     if (c.editor) { tabs.open(threeView()); browserView = tabs.active; }
     propertyMode = 'view'; refresh();
@@ -280,6 +283,7 @@ export function mountWorkspace({ root, modelUi, views, commands, props, current,
     const c = current();
     if (!['none', 'ifc'].includes(c.mode)) { setActive(false); status('This file uses the established layout. The live workspace supports IFC projects.'); return; }
     if (documentToken !== c.editor) { opened(); return; }
+    if (snapshot().busy) { refreshTools(); return; }
     // A rebuild retains the editor token and therefore retains drawing tabs and cameras.
     const sources = docs.sources();
     if (isPlanView(tabs.active) && A.S.on && views.viewKey() !== tabs.active.id) {
@@ -393,6 +397,7 @@ export function mountWorkspace({ root, modelUi, views, commands, props, current,
     if (!active || !browser?.contains(e.target)) return;
     const b = e.target.closest('button'); if (!b) return;
     e.preventDefault(); e.stopImmediatePropagation();
+    if (snapshot().busy) { status('Wait for the current operation.'); return; }
     const source = browserSource(b, docs.sources());
     if (source || b.hasAttribute('data-ws-browser-3d')) {
       browserView = b.hasAttribute('data-ws-browser-3d') ? threeView() : source;
@@ -414,6 +419,7 @@ export function mountWorkspace({ root, modelUi, views, commands, props, current,
   }, true);
   root.addEventListener('dblclick', e => {
     if (!active || !browser?.contains(e.target)) return;
+    if (snapshot().busy) return;
     const b = e.target.closest('button'); if (!b) return;
     const source = b.hasAttribute('data-ws-browser-3d') ? threeView() : browserSource(b, docs.sources()); if (!source) return;
     e.preventDefault(); e.stopImmediatePropagation();
@@ -427,7 +433,7 @@ export function mountWorkspace({ root, modelUi, views, commands, props, current,
       const next = e.key === 'Home' ? items[0] : e.key === 'End' ? items.at(-1) : items[(i + (e.key === 'ArrowRight' ? 1 : items.length - 1)) % items.length];
       e.preventDefault(); tab = next.dataset.wsTab; renderRibbonTabs(); ribbonTabs.querySelector('[aria-selected="true"]').focus();
     }
-    if (e.key === 'Enter' && browser?.contains(b)) { const source = b.hasAttribute('data-ws-browser-3d') ? threeView() : browserSource(b, docs.sources()); if (source) { e.preventDefault(); e.stopImmediatePropagation(); activate(source); } }
+    if (e.key === 'Enter' && browser?.contains(b) && !snapshot().busy) { const source = b.hasAttribute('data-ws-browser-3d') ? threeView() : browserSource(b, docs.sources()); if (source) { e.preventDefault(); e.stopImmediatePropagation(); activate(source); } }
     if (e.key === 'Enter' && !isTextEntry(b) && b.dataset.wsReason && !b.matches('button')) { e.preventDefault(); explain('', b.dataset.wsReason); }
   }, true);
   function showTooltip(e) {

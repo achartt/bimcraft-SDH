@@ -1,34 +1,34 @@
 npm notice run test:f28
 npm notice run node --test tests/features/f28/*.test.mjs
-(node:81658) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///Users/austinhartt/Documents/ChatGPT/BimCraft%20Test/bimcraft-f28-c/app/workspace/commands.js is not specified and it doesn't parse as CommonJS.
+(node:82654) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///Users/austinhartt/Documents/ChatGPT/BimCraft%20Test/bimcraft-f28-c/app/workspace/commands.js is not specified and it doesn't parse as CommonJS.
 Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
 To eliminate this warning, add "type": "module" to /Users/austinhartt/Documents/ChatGPT/BimCraft Test/bimcraft-f28-c/package.json.
 (Use `node --trace-warnings ...` to show where the warning was created)
-✔ quick access, ribbon and shortcuts can share exactly one action and live enablement (0.572416ms)
-✔ selection, view type, undo history and template restrictions have distinct reasons (0.140083ms)
-✔ shortcuts respect typing, contenteditable, dialogs, modifiers and prior cancellation (0.091166ms)
-✔ drawing closure and re-opening retain document ownership; a new editor resets tabs (0.0935ms)
-✔ scope evidence never auto-enables inherited, planned, audit or uncertain commands (0.109625ms)
-(node:81659) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///Users/austinhartt/Documents/ChatGPT/BimCraft%20Test/bimcraft-f28-c/app/ifc/api.js is not specified and it doesn't parse as CommonJS.
+✔ quick access, ribbon and shortcuts can share exactly one action and live enablement (0.808459ms)
+✔ selection, view type, undo history and template restrictions have distinct reasons (0.255042ms)
+✔ shortcuts respect typing, contenteditable, dialogs, modifiers and prior cancellation (0.124916ms)
+✔ drawing closure and re-opening retain document ownership; a new editor resets tabs (0.110292ms)
+✔ scope evidence never auto-enables inherited, planned, audit or uncertain commands (0.129666ms)
+(node:82655) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///Users/austinhartt/Documents/ChatGPT/BimCraft%20Test/bimcraft-f28-c/app/ifc/api.js is not specified and it doesn't parse as CommonJS.
 Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
 To eliminate this warning, add "type": "module" to /Users/austinhartt/Documents/ChatGPT/BimCraft Test/bimcraft-f28-c/package.json.
 (Use `node --trace-warnings ...` to show where the warning was created)
-✔ documentation selection uses source IDs and resets editor ownership despite duplicate names (0.5295ms)
-✔ shared documentation commands distinguish plan/RCP/projected/template/corrupt and typing state (0.546791ms)
-✔ real documentation, continuation references and annotations survive shared type edits, journals and IFC reopen (31.964833ms)
-(node:81660) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///Users/austinhartt/Documents/ChatGPT/BimCraft%20Test/bimcraft-f28-c/app/ifc/api.js is not specified and it doesn't parse as CommonJS.
+✔ documentation selection uses source IDs and resets editor ownership despite duplicate names (0.6635ms)
+✔ shared documentation commands distinguish plan/RCP/projected/template/corrupt and typing state (0.515542ms)
+✔ real documentation, continuation references and annotations survive shared type edits, journals and IFC reopen (58.243208ms)
+(node:82656) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///Users/austinhartt/Documents/ChatGPT/BimCraft%20Test/bimcraft-f28-c/app/ifc/api.js is not specified and it doesn't parse as CommonJS.
 Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
 To eliminate this warning, add "type": "module" to /Users/austinhartt/Documents/ChatGPT/BimCraft Test/bimcraft-f28-c/package.json.
 (Use `node --trace-warnings ...` to show where the warning was created)
-✔ F28 bounded height/base transactions preserve identities, core references, materials and persistent dimensions through undo/redo and actual bytes (40.482167ms)
-✔ detail/scale transactions preserve all other view settings and template semantics (6.052ms)
-(node:81661) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///Users/austinhartt/Documents/ChatGPT/BimCraft%20Test/bimcraft-f28-c/app/ifc/api.js is not specified and it doesn't parse as CommonJS.
+✔ F28 bounded height/base transactions preserve identities, core references, materials and persistent dimensions through undo/redo and actual bytes (43.034792ms)
+✔ detail/scale transactions preserve all other view settings and template semantics (6.1475ms)
+(node:82657) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///Users/austinhartt/Documents/ChatGPT/BimCraft%20Test/bimcraft-f28-c/app/ifc/api.js is not specified and it doesn't parse as CommonJS.
 Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
 To eliminate this warning, add "type": "module" to /Users/austinhartt/Documents/ChatGPT/BimCraft Test/bimcraft-f28-c/package.json.
 (Use `node --trace-warnings ...` to show where the warning was created)
-✔ all six placement lines and both exterior orientations use actual IFC axes and journals (108.551208ms)
-✔ shared type edits, duplicate assignment and layer reordering preserve identities, core anchors and dimensions (44.820416ms)
-✔ wall commands separate placement, instance type editing, missing records, busy state and cancellation (0.366292ms)
+✔ all six placement lines and both exterior orientations use actual IFC axes and journals (115.630167ms)
+✔ shared type edits, duplicate assignment and layer reordering preserve identities, core anchors and dimensions (45.352958ms)
+✔ wall commands separate placement, instance type editing, missing records, busy state and cancellation (0.658083ms)
 ℹ tests 13
 ℹ suites 0
 ℹ pass 13
@@ -36,4 +36,4 @@ To eliminate this warning, add "type": "module" to /Users/austinhartt/Documents/
 ℹ cancelled 0
 ℹ skipped 0
 ℹ todo 0
-ℹ duration_ms 285.23875
+ℹ duration_ms 306.475667

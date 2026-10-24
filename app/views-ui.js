@@ -90,7 +90,7 @@ export function mountViewsBim(modelUi, o = {}) {
   const R = { views: new Map(), rcps: new Map(), templates: [], sheets: [], callouts: [], open: new Set(['plans', 'rcp', 'callouts', 'missing', 'sheets', 'tpl', 'families']), sec: null, crop: null, under: null, co: null, chip: null };
   let A = null;
   const t = (...a) => A.t(...a);
-  const W = () => (A.ed() ? new ModelWriter(A.ed().W, A.ed().api, A.ed().mid) : null);
+  const W = () => (A.ed()?.mid != null ? new ModelWriter(A.ed().W, A.ed().api, A.ed().mid) : null);
   const L = (mm) => fmtLen(mm, A.units());
   const field = (label, input, attrs = {}) => el('label', { className: 'bc-dlg-field', ...attrs }, el('span', {}, label), input);
   const icon = (c) => el('i', { className: 'bi ' + c, 'aria-hidden': 'true' });
@@ -711,7 +711,7 @@ export function mountViewsBim(modelUi, o = {}) {
   }
   // Read-only descriptors. IDs are source keys owned by the current editor, never display labels.
   function workspaceSources() {
-    if (!W()) return [];
+    if (!A.ed() || A.ed().mid == null) return [];
     const levels = A.S.data?.levels || [];
     const out = levels.flatMap(l => ['plan', 'rcp'].map(kind => ({ id: kind + ':' + l.guid, kind, ref: l.guid, guid: l.guid, levelId: l.id, name: l.name })));
     for (const c of R.callouts) { const r = rootOf(c.id), lv = r && levelByGuid(r.level); out.push({ id: 'callout:' + c.id, kind: 'callout', ref: c.id, name: c.name, levelId: lv?.id, guid: lv?.guid, rootKind: r?.kind, missing: !lv }); }
