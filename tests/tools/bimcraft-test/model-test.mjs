@@ -464,6 +464,7 @@ export async function modelMode({ APP, ROOT, WebIFC, IfcModel, quiet, require, a
     s = OPS.snapshotModel(ed4);
     txt = new TextDecoder().decode(ed4.save());
     ok(s.derived.roofs[0].parts.length === 6 && /\.GABLE_ROOF\./.test(txt) && (txt.match(/\.ROOF\.\)/g) || []).length === 2, 'gable ends on two sides: two faces and two gable walls');
+    const withSoffit = ed4.save(); // Retain the enabled state for the independent before/after reader check.
     ed4.modelChange(OPS.changeDerived([roof.guid], { pitch: Math.atan(8 / 12) * 180 / Math.PI, fascia: 0, soffit: false }));
     s = OPS.snapshotModel(ed4);
     ok(s.derived.roofs[0].pitch > pd && s.derived.roofs[0].fascia === 0 && !s.derived.roofs[0].soffit, 'roof pitch and fascia/soffit changes rebuild the roof');
@@ -490,8 +491,11 @@ export async function modelMode({ APP, ROOT, WebIFC, IfcModel, quiet, require, a
     try {
       const W = require('web-ifc');
       const a = new W.IfcAPI(); await quiet(() => a.Init())();
-      const id = a.OpenModel(ed4.save());
-      ok(a.GetLineIDsWithType(id, W.IFCROOF).size() === 1 && a.GetLineIDsWithType(id, W.IFCSPACE).size() === 2 && a.GetLineIDsWithType(id, W.IFCCOVERING).size() === 2, 'web-ifc (oracle): the roof, two spaces, the ceiling and the roof\'s soffit');
+      const before = a.OpenModel(withSoffit);
+      ok(a.GetLineIDsWithType(before, W.IFCCOVERING).size() === 2, 'web-ifc (oracle): enabled roof soffit and ceiling both exist');
+      a.CloseModel(before);
+      const id = a.OpenModel(ed4.save()), coverings = a.GetLineIDsWithType(id, W.IFCCOVERING);
+      ok(a.GetLineIDsWithType(id, W.IFCROOF).size() === 1 && a.GetLineIDsWithType(id, W.IFCSPACE).size() === 2 && coverings.size() === 1 && a.GetLine(id, coverings.get(0)).PredefinedType.value === 'CEILING', 'web-ifc (oracle): the roof, two spaces and ceiling remain after disabling the soffit');
     } catch (e) { console.log('  --   web-ifc not installed: oracle check skipped'); }
     saved.rooms = ed4.save(); saved.lroof = ed5.save();
     if (args.includes('--keep')) { const out = path.join(ROOT, 'tmp/bimcraft-rooms.ifc'); fs.mkdirSync(path.dirname(out), { recursive: true }); fs.writeFileSync(out, ed4.save()); fs.writeFileSync(path.join(ROOT, 'tmp/bimcraft-lroof.ifc'), ed5.save()); console.log('  (kept ' + out + ')'); }

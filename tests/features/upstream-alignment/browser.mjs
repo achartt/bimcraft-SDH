@@ -11,7 +11,7 @@ const {chromium}=await import(pathToFileURL(path.resolve(process.env.REBASE_PLAY
 const port=Number(process.env.REBASE_PORT||8053),report={head:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),checks:[],errors:[],console:[]};
 let server,browser,page;
 const check=name=>{report.checks.push(name);console.log('PASS',name);};
-const settle=async()=>{await page.waitForFunction(()=>globalThis.bimcraftWorkspace?.snapshot().document&&!bimcraftWorkspace.snapshot().busy&&globalThis.bimcraftPlan?.state?.data&&!bimcraftPlan.state.queue.length);await page.evaluate(()=>new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r))));};
+const settle=async()=>{await page.waitForFunction(()=>globalThis.bimcraftWorkspace?.snapshot().document&&!bimcraftWorkspace.snapshot().busy&&(!globalThis.bimcraftPlan||!bimcraftPlan.state.queue.length));await page.evaluate(()=>new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r))));};
 const records=()=>page.evaluate(async()=>{const pre='/assets/apps/bimcraft/dev/',e=bimcraftLive.editor,[{ModelWriter},{readWalls},{readAssemblies},{readMaterials},{readWallDimensions}]=await Promise.all(['model-write.js','model-walls.js','wall-assemblies.js','project-materials.js','wall-dimensions.js'].map(f=>import(pre+f))),w=new ModelWriter(e.W,e.api,e.mid);return{walls:readWalls(w),assemblies:readAssemblies(w),materials:readMaterials(w),dimensions:readWallDimensions(w)};});
 try{
  server=await start({port,host:'127.0.0.1',offline:true});browser=await chromium.launch({headless:true,args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});report.browser=browser.version();
