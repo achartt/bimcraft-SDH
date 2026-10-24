@@ -5313,5 +5313,11 @@
   "f05.elevation": "Elevations show visible surfaces and openings. Detail settings do not expose hidden wall layers.",
   "f05.crop": "Crop in view mm: left, bottom, right, top (blank = none)",
   "f05.cropError": "Enter four finite millimetre coordinates: left, bottom, right, top.",
-  "f05.diagnostic": "Envelope fallback — inspect view records:"
+  "f05.diagnostic": "Envelope fallback — inspect view records:",
+  "workspace.missing": "Source missing or deleted. The reference is retained; restore the source or edit the sheet placement. No substitute drawing is supplied.",
+  "workspace.nominal": "Authoritative project documentation. Nominal dimensions are displayed in mm; this is not quantity takeoff. Sheet continuation pages are placed explicitly.",
+  "workspace.vector": "Live source drawing. Ctrl/⌘ + wheel zooms this viewport; Fit resets it. Viewport state is transient. Use View settings or Edit sheet for persisted settings and placements.",
+  "workspace.tools": "Existing tools and panels",
+  "workspace.projectChanged": "The project changed while this editor was open. Close it and reopen the editor for the current project; no changes were applied.",
+  "workspace.fallbackRoutes": "These routes restore the established layout without closing the project or discarding edits. Existing controls, unavailable services and validation retain their original behavior."
 }

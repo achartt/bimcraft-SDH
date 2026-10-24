@@ -4550,10 +4550,27 @@ function init(root) {
         fit: () => workspace.fit(),
         wall: () => workspace.startWall(), assembly: () => workspace.editType(), structure: () => workspace.editStructure(),
         cancel: () => workspace.cancelWall(false), finish: () => workspace.cancelWall(true),
+        rcp: () => workspace.openSource('rcp'), elevation: () => workspace.openSource('elevation'),
+        section: () => workspace.startAnnotation('section'), dimension: () => workspace.startAnnotation('wallDimension'),
+        detailline: () => workspace.startAnnotation('dline'), filledregion: () => workspace.startAnnotation('dhatch'), callout: () => workspace.startAnnotation('callout'),
+        assemblyschedule: () => workspace.openSource('schedule', 'assemblies'), legend: () => workspace.openSource('schedule', 'materialLegend'), schedule: () => workspace.openSource('schedule'),
+        sheet: () => workspace.newSheet(), editsheet: () => workspace.editSheet(), placeview: () => workspace.editSheet(),
+        viewsettings: () => workspace.viewSettings(), visibility: () => workspace.openRange(), templates: () => workspace.templates(),
+        drawingset: () => workspace.drawingSet(), materials: () => workspace.materials(),
+        pdf: () => workspace.exportPdf(), csv: () => workspace.exportCsv(), tools: () => workspace.existingTools(),
       },
     });
     workspace = mountWorkspace({
       root, modelUi, views: planViews, commands: coreCommands, props: ui.props, status,
+      existing: (route) => {
+        if (['props','color','issues','analysis','points','assets','daylight','library'].includes(route)) {
+          if (route === 'library' && !libraryOn) { status('Library service is not configured in this edition. Established file and project-material tools remain available.', true); return; }
+          showTab(route);
+        }
+        const target = route === 'links' ? root.querySelector('[data-links-sec]') : route === 'files' ? root.querySelector('.bc-left') : route === 'model' ? root.querySelector('[data-model-toggle]') : document.querySelector('.app-bar');
+        target?.scrollIntoView({ block: 'nearest' });
+        status('Established layout · ' + route + '. Existing controls and service errors retain their original behavior.');
+      },
       current: () => ({ editor: mode === 'ifc' ? editor : null, name: ifcName, busy: busy || !!placing,
         dirty: unsavedIn(editor), canUndo: !!editor?.changes.length, canRedo: !!editor?.canRedo,
         selection: viewer ? [...viewer.selection] : [], viewer, mode }),

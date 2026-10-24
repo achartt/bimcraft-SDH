@@ -58,6 +58,8 @@ export function mountWallWorkflow({ root, A, commands, defaults, unitsHost, opti
     mounted = on;
     if (on) {
       move(ui.row, slot); move(typeField, defaults, edit); move(ui.typedRow, slot); move(ui.units, unitsLabel);
+      for (const row of root.querySelectorAll('[data-mopts="wallDimension"], [data-mopts="dhatch"]')) move(row, slot);
+      move(ui.hint, slot);
       ui.reference.replaceChildren(...locationChoices.map(([value, text]) => node('option', { value }, text)));
       ui.reference.value = A.S.wall.reference;
       ui.shape.querySelector('[value="arc"]').disabled = true;
@@ -70,7 +72,7 @@ export function mountWallWorkflow({ root, A, commands, defaults, unitsHost, opti
   }
   function refresh() {
     if (!mounted) return;
-    const placing = A.S.tool === 'wall'; slot.hidden = !placing; defaults.hidden = !placing;
+    const placing = A.S.tool === 'wall'; slot.hidden = !A.S.on || A.S.tool === 'select'; defaults.hidden = !placing;
     ui.shape.disabled = true; ui.shape.querySelector('[value="arc"]').disabled = true;
     for (const label of ui.row.querySelectorAll('label')) label.classList.add('ws-native-field');
     typeField.classList.add('ws-native-field');
@@ -115,7 +117,7 @@ export function mountWallWorkflow({ root, A, commands, defaults, unitsHost, opti
     A.ask('openAssembly', ctx.key, ctx.assign);
   }
   function key(event) {
-    if (!mounted || A.S.tool !== 'wall' || event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey || isTextEntry(event.target) || document.querySelector('dialog[open]')) return;
+    if (!mounted || !A.S.on || A.S.tool === 'select' || ui.typed.closest('label')?.hidden || event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey || isTextEntry(event.target) || document.querySelector('dialog[open]')) return;
     if (/^[0-9@'"<.,\-\/]$/.test(event.key)) { event.preventDefault(); A.workspaceTyped(event.key); }
   }
   root.addEventListener('click', e => {

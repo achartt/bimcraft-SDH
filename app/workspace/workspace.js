@@ -6,9 +6,10 @@ import { node, icon, button } from './dom.js';
 import { fmtLen } from '../model-units.js';
 import { scalesFor } from '../res-sheets.js';
 import { mountWallWorkflow, INSTANCE_WALL_FIELDS } from './walls.js';
+import { mountDocumentation, browserSource, isPlanView, isDocumentView, ANNOTATION_FIELDS, extraTools } from './documentation.js';
 
 /** F28-A owns chrome and layout only. Editors, canvases and extension nodes retain their identity and bindings. */
-export function mountWorkspace({ root, modelUi, views, commands, props, current, status }) {
+export function mountWorkspace({ root, modelUi, views, commands, props, current, status, existing }) {
   const stage = root.querySelector('.bc-stage');
   const tabs = createDrawingTabs();
   let active = false, frame = 0, tab = 'Architecture', wallContext = false, browserView = null, propertyMode = 'view';
@@ -22,15 +23,15 @@ export function mountWorkspace({ root, modelUi, views, commands, props, current,
   const addChrome = e => { e.classList.add('ws-chrome'); root.append(e); chrome.push(e); return e; };
 
   function tool(id, compact = false) {
-    const t = catalog.tools[id] || { name: id === 'fit' ? 'Zoom to Fit' : id === 'clear' ? 'Clear selection' : id, icon: id === 'fit' ? 'eye' : 'pointer' };
+    const t = catalog.tools[id] || (extraTools[id] && { name: extraTools[id][0], icon: extraTools[id][1] }) || { name: id === 'fit' ? 'Zoom to Fit' : id === 'clear' ? 'Clear selection' : id, icon: id === 'fit' ? 'eye' : 'pointer' };
     return node('button', { type: 'button', className: 'ws-tool' + (compact ? ' ws-compact' : ''), 'data-ws-command': id, 'aria-label': t.name }, icon(t.icon), node('span', {}, t.name));
   }
   const title = node('span', { className: 'ws-project' }, 'No IFC open');
   const header = addChrome(node('header', { className: 'ws-titlebar' },
     node('span', { className: 'ws-brand' }, node('b', {}, 'B'), 'BimCraft'),
     node('div', { className: 'ws-quick', 'aria-label': 'Quick access' }, ['open', 'save', 'undo', 'redo'].map(id => tool(id, true))), title,
-    node('span', { className: 'ws-review-badge' }, 'F28-B · Live workspace'),
-    button('Tool availability', { 'data-ws-inventory': '' }), button('Established layout', { 'data-ws-fallback': '' })));
+    node('span', { className: 'ws-review-badge' }, 'F28-C · Live workspace'),
+    tool('tools', true), button('Tool availability', { 'data-ws-inventory': '' }), button('Established layout', { 'data-ws-fallback': '' })));
   const ribbonTabs = addChrome(node('nav', { className: 'ws-ribbon-tabs', role: 'tablist', 'aria-label': 'Ribbon' }));
   const ribbon = addChrome(node('div', { className: 'ws-ribbon', role: 'tabpanel', id: 'ws-ribbon-panel', 'aria-label': 'Architecture tools' }));
   const options = addChrome(node('div', { className: 'ws-options' }, node('strong', {}, 'Modify'), node('span', { 'data-ws-options-text': '' }, 'Open an IFC to begin.'), tool('clear', true)));
@@ -53,15 +54,16 @@ export function mountWorkspace({ root, modelUi, views, commands, props, current,
   const emptyView = node('div', { className: 'ws-empty-view' }, node('p', {}, 'No drawing is open.'), node('p', {}, 'The project and its unsaved changes remain open. Open a view from Project Browser.'), tool('three'));
   const detailSelect = settingsSelect('detail'), scaleSelect = settingsSelect('scale');
   const bottom = node('div', { className: 'ws-view-controls', 'aria-label': 'View controls' }, drawingTitle,
-    node('label', {}, 'Scale ', scaleSelect), node('label', {}, 'Detail ', detailSelect), tool('range', true), tool('fit', true));
+    node('label', {}, 'Scale ', scaleSelect), node('label', {}, 'Detail ', detailSelect), tool('range', true), tool('fit', true), tool('viewsettings', true), tool('pdf', true));
   const stageChrome = [drawingTabs, bottom, emptyView]; stage.append(...stageChrome);
-  const statusBar = addChrome(node('footer', { className: 'ws-statusbar' }, node('span', { className: 'ws-layout-label' }, 'Live IFC workspace · F28-B'), node('span', { 'data-ws-selection': '' }), node('span', { className: 'ws-status-slot' })));
+  const statusBar = addChrome(node('footer', { className: 'ws-statusbar' }, node('span', { className: 'ws-layout-label' }, 'Live IFC workspace · F28-C'), node('span', { 'data-ws-selection': '' }), node('span', { className: 'ws-status-slot' })));
   const realStatus = root.querySelector('[data-status]'), statusHome = document.createComment('F28 status home'); realStatus.before(statusHome);
   const launch = button('Established layout · Try F28 workspace', { className: 'ws-launch', 'data-ws-launch': '' });
   (document.querySelector('.app-bar') || root).append(launch);
   launch.addEventListener('click', () => setActive(true));
   const tooltip = node('div', { className: 'ws-tooltip', id: 'ws-tool-explanation', role: 'tooltip', hidden: true }); root.append(tooltip);
   const walls = mountWallWorkflow({ root, A, commands, defaults: placementProps, unitsHost: propPalette.querySelector('[data-ws-units-slot]'), options, status });
+  const docs = mountDocumentation({ root, A, views, stage, current, status });
 
   function settingsSelect(key) {
     const select = node('select', { 'data-ws-setting': key, 'aria-label': key === 'detail' ? 'Detail Level' : 'View Scale' });
@@ -74,13 +76,13 @@ export function mountWorkspace({ root, modelUi, views, commands, props, current,
     const c = current();
     const view = tabs.active;
     return { ...c, document: c.editor, busy: c.busy || !!A.S.busy || !!A.S.reloading,
-      levels: c.editor === documentToken ? A.S.data?.levels || [] : [], view, settings: view?.kind === 'plan' ? views.workspaceSettings() : null,
-      live: active, wall: walls.metadata() };
+      levels: c.editor === documentToken ? A.S.data?.levels || [] : [], view, settings: isPlanView(view) ? views.workspaceSettings(view.levelId, view.rootKind || view.kind, view.kind === 'callout' ? view.ref : null) : docs.settings(view),
+      live: active, tool: A.S.tool, wall: walls.metadata() };
   }
   function refreshSoon() { if (!frame) frame = requestAnimationFrame(() => { frame = 0; refresh(); }); }
   function rememberCamera() {
     const v = tabs.active, pv = A.pv();
-    if (v?.kind === 'plan' && pv) cameras.set(v.id, { cx: pv.cx, cy: pv.cy, scale: pv.scale, fitted: pv.fitted });
+    if (isPlanView(v) && pv) cameras.set(v.id, { cx: pv.cx, cy: pv.cy, scale: pv.scale, fitted: pv.fitted });
   }
   function activate(view) {
     if (!current().editor || snapshot().busy) return;
@@ -88,10 +90,12 @@ export function mountWorkspace({ root, modelUi, views, commands, props, current,
     tabs.open(view); browserView = view; propertyMode = 'view';
     stage.classList.remove('ws-no-view');
     A.setTool('select');
-    A.activateWorkspaceView(view.kind === 'plan' ? view.levelId : null, cameras.get(view.id));
+    A.host.select([]);
+    A.activateWorkspaceView(isPlanView(view) ? view.levelId : null, cameras.get(view.id), view.rootKind || view.kind, view.kind === 'callout' ? view.ref : null);
+    docs.render(view);
     views.render(); refresh();
   }
-  function planView(level) { return { id: 'plan:' + level.guid, kind: 'plan', levelId: level.id, guid: level.guid, name: level.name }; }
+  function planView(level) { return { id: 'plan:' + level.guid, kind: 'plan', ref: level.guid, levelId: level.id, guid: level.guid, name: level.name }; }
   function threeView() { return { id: '3d:default', kind: '3d', name: '{3D}' }; }
   function activatePlan(levelGuid) {
     const levels = snapshot().levels;
@@ -102,29 +106,16 @@ export function mountWorkspace({ root, modelUi, views, commands, props, current,
     const c = current();
     if (!active) { documentToken = null; refresh(); return; }
     documentToken = c.editor;
-    tabs.reset(documentToken); cameras.clear(); browserView = null; propsToken = null;
+    tabs.reset(documentToken); cameras.clear(); docs.reset(); browserView = null; propsToken = null;
     if (c.editor) { A.prepareWorkspace(); A.setTool('select'); views.render(); }
     if (c.editor) { tabs.open(threeView()); browserView = tabs.active; }
     propertyMode = 'view'; refresh();
   }
   function showViewProperties() { browserView = tabs.active; propertyMode = 'view'; refresh(); }
-  function openRangeFor(guid) {
-    views.openRange(guid);
-    const dlg = root.querySelector('[data-pv-dialog]'); if (!dlg) return;
-    const why = 'Not wired in this workspace slice. Use Established layout for templates, category visibility, underlays and crop tools. Existing settings are preserved.';
-    dlg.querySelector('h2')?.after(node('p', { className: 'ws-note' }, 'Edit cut, top, bottom, depth, scale and detail. Other view settings remain in the established layout.'));
-    for (const b of dlg.querySelectorAll('[data-pv-astpl], [data-pv-cropdraw], [data-pv-cropclear], [data-pv-hidesel], [data-pv-showall]')) {
-      b.setAttribute('aria-disabled', 'true'); b.title = why;
-      b.addEventListener('click', e => { e.preventDefault(); e.stopImmediatePropagation(); explain('', why); }, true);
-    }
-    for (const input of dlg.querySelectorAll('[data-pv-template], [data-pv-underlay], [data-pv-cat]')) {
-      input.disabled = true; const label = input.closest('label') || input.parentElement;
-      label.tabIndex = 0; label.dataset.wsReason = why; label.title = why;
-    }
-  }
-  function openRange() { const v = tabs.active; if (v?.kind === 'plan') openRangeFor(v.guid); }
-  function setSettings(patch) { const why = views.setWorkspaceSettings(patch); if (why) status(why, true); refreshSoon(); }
-  function fit() { if (tabs.active?.kind === 'plan') A.fitPlan(); else current().viewer?.view('iso'); }
+  function openRangeFor(guid, kind = 'plan') { views.openRange(guid, kind); }
+  function openRange() { const v = tabs.active; if (isPlanView(v) && v.kind !== 'callout') openRangeFor(v.guid, v.kind); }
+  function setSettings(patch) { const why = isPlanView(tabs.active) ? views.setWorkspaceSettings(patch) : docs.setSettings(tabs.active, patch); if (why) status(why, true); refreshSoon(); }
+  function fit() { if (isPlanView(tabs.active)) A.fitPlan(); else if (isDocumentView(tabs.active)) docs.fit(); else current().viewer?.view('iso'); }
 
   function setActive(on) {
     const left = root.querySelector('.bc-left'), right = root.querySelector('.bc-right');
@@ -139,9 +130,12 @@ export function mountWorkspace({ root, modelUi, views, commands, props, current,
     if (on) {
       walls.setActive(true);
       elementProps.append(props); statusBar.querySelector('.ws-status-slot').append(realStatus);
-      opened(); attachBrowser(); restrictProperties();
+      if (documentToken === current().editor && tabs.active) { A.prepareWorkspace(); views.render(); activate(tabs.active); }
+      else opened();
+      attachBrowser(); restrictProperties();
     } else {
       A.setTool('select'); walls.setActive(false);
+      docs.restoreHome();
       rememberCamera(); propsHome.after(props); statusHome.after(realStatus);
       if (browserHome.parentNode && browser) browserHome.after(browser);
       restoreRestrictions(); tooltip.hidden = true;
@@ -162,12 +156,13 @@ export function mountWorkspace({ root, modelUi, views, commands, props, current,
       list.prepend(node('li', {}, button('{3D}', { className: 'bc-pb-go', 'data-ws-browser-3d': '' })));
     }
     if (group) { const summary = group.querySelector('summary'); if (summary) { if (!summary.hasAttribute('data-ws-original-summary')) summary.dataset.wsOriginalSummary = summary.textContent; summary.textContent = A.t('model.pb.views3d') + ' (' + (1 + group.querySelectorAll('[data-pb-3d]').length) + ')'; } }
+    const sources = docs.sources();
     for (const btn of b.querySelectorAll('button')) {
-      const supported = btn.matches('[data-pb-plan], [data-pb-range], [data-ws-browser-3d]');
-      if (!supported) { if (!btn.hasAttribute('data-ws-original-title')) btn.dataset.wsOriginalTitle = btn.title; btn.setAttribute('aria-disabled', 'true'); btn.title = 'Not wired in this workspace slice. Switch to Established layout for supported documentation, RCP, saved-camera, family and linked-model actions.'; }
-    }
-    for (const btn of b.querySelectorAll('[data-pb-plan], [data-ws-browser-3d]')) {
-      const v = btn.hasAttribute('data-ws-browser-3d') ? threeView() : snapshot().levels.map(planView).find(x => x.guid === btn.dataset.pbPlan);
+      const supported = browserSource(btn, sources) || btn.matches('[data-pb-range], [data-pb-rcprange], [data-pb-projected], [data-pb-newsheet], [data-pb-set], [data-pb-tpl], [data-pb-newtpl], [data-pb-coedit], [data-pb-comissing], [data-pb-codel], [data-pb-newcallout], [data-ws-browser-3d]');
+      if (!supported) { if (!btn.hasAttribute('data-ws-original-title')) btn.dataset.wsOriginalTitle = btn.title; btn.setAttribute('aria-disabled', 'true'); btn.title = 'Use Existing tools → Established layout for saved cameras, families, links and other panels. Their existing actions remain available there.'; }
+      else if (btn.hasAttribute('data-ws-original-title')) { btn.removeAttribute('aria-disabled'); btn.title = btn.dataset.wsOriginalTitle; delete btn.dataset.wsOriginalTitle; }
+      const v = btn.hasAttribute('data-ws-browser-3d') ? threeView() : browserSource(btn, sources);
+      if (!v) continue;
       btn.classList.toggle('ws-browser-selected', !!v && browserView?.id === v.id);
       btn.setAttribute('aria-current', tabs.active?.id === v?.id ? 'page' : 'false');
     }
@@ -182,7 +177,8 @@ export function mountWorkspace({ root, modelUi, views, commands, props, current,
     renderRibbon();
   }
   function renderRibbon() {
-    const groups = catalog.ribbon[tab] || [];
+    const groups = [...(catalog.ribbon[tab] || [])];
+    if (tab === 'View') groups.push(['Documentation', ['viewsettings', 'editsheet'], [['drawingset', 'csv']]]);
     ribbon.setAttribute('aria-label', tab + ' tools');
     ribbon.replaceChildren(...groups.map(([name, large, stacks]) => node('section', { className: 'ws-group', 'aria-label': name },
       large.map(id => tool(id)), stacks.map(ids => node('div', { className: 'ws-stack' }, ids.map(id => tool(id)))), node('span', { className: 'ws-group-title' }, name))));
@@ -220,7 +216,7 @@ export function mountWorkspace({ root, modelUi, views, commands, props, current,
   }
   function renderViewProperties() {
     const v = browserView || tabs.active, s = snapshot();
-    const setting = v?.kind === 'plan' ? views.workspaceSettings(v.levelId) : null;
+    const setting = isPlanView(v) ? views.workspaceSettings(v.levelId, v.rootKind || v.kind, v.kind === 'callout' ? v.ref : null) : docs.settings(v);
     const signature = JSON.stringify([v, setting, s.document?.mid, tabs.active?.id]);
     if (signature === viewPropsSignature || viewProps.contains(document.activeElement)) return;
     viewPropsSignature = signature;
@@ -228,29 +224,33 @@ export function mountWorkspace({ root, modelUi, views, commands, props, current,
     const row = (label, value) => dl.append(node('dt', {}, label), node('dd', {}, value));
     if (!s.document) { viewProps.replaceChildren(node('p', { className: 'ws-note' }, 'Open an existing IFC. Live geometry, names and values come from that file.'), tool('open')); return; }
     if (!v) { viewProps.replaceChildren(node('p', { className: 'ws-note' }, 'Open a drawing from Project Browser. The IFC remains open.')); return; }
-    row('View name', v.name); row('View type', v.kind === 'plan' ? 'Floor Plan' : '3D View');
+    row('View name', v.name); row('View type', ({plan:'Floor Plan',rcp:'Reflected ceiling plan',callout:'Callout',section:'Section',elevation:'Elevation',sheet:'Sheet',schedule:'Schedule', '3d':'3D View'})[v.kind]);
+    row('Source ID', v.ref || v.id);
     row('Document', s.name);
-    if (v.kind === 'plan') {
+    if (isPlanView(v) || ['section', 'elevation'].includes(v.kind)) {
       const isActive = tabs.active?.id === v.id;
       const ds = settingsSelect('detail'), sc = settingsSelect('scale');
       syncSelect(ds, setting?.detail || 'coarse'); syncSelect(sc, setting?.scale || 0);
       row('View Scale', isActive ? sc : '1 : ' + (setting?.scale || 'Fit')); row('Detail Level', isActive ? ds : setting?.detail || 'coarse'); row('View Range', isActive ? tool('range', true) : 'Open this view to edit');
+      if (isPlanView(v)) {
       row('Cut plane', fmtLen(setting?.cut ?? 1200, A.units()));
       row('Top', setting?.top ? fmtLen(setting.top, A.units()) : 'Level height (automatic)');
       row('Bottom', fmtLen(setting?.bottom ?? 0, A.units())); row('View depth', fmtLen(setting?.depth ?? 50, A.units()));
       if (setting?.template) row('View template', setting.template);
+      } else { row('Crop (view mm)', setting?.crop?.join(', ') || 'None'); if (setting?.issue) row('Record issue', setting.issue); row('Graphics', tool('viewsettings', true)); }
       if (tabs.active?.id !== v.id) {
         for (const control of dl.querySelectorAll('select, button')) { control.disabled = true; control.title = 'Open this view to edit its settings.'; }
       }
-    } else row('View Range', 'Not applicable to 3D');
+    } else { row('View Range', 'Not applicable to this drawing'); if (v.kind === 'sheet') row('Placement', tool('editsheet', true)); if (v.kind === 'schedule') row('Export', tool('csv', true)); }
     viewProps.replaceChildren(node('div', { className: 'ws-prop-identity' }, icon(v.kind === 'plan' ? 'plan' : 'cube'), node('strong', {}, v.name)), dl,
-      node('p', { className: 'ws-note' }, 'View settings are stored in the IFC. Scale controls paper output; canvas zoom is independent.'));
+      node('p', { className: 'ws-note' }, 'Supported settings and source references are stored in the IFC. Open tabs, viewport zoom and scroll are transient. Scale controls paper output.'));
   }
   function restrictProperties() {
     if (!active) return;
     for (const element of restricted.keys()) if (!element.isConnected) restricted.delete(element);
     for (const input of props.querySelectorAll('input, select, button, textarea')) {
-      const editable = input.matches(INSTANCE_WALL_FIELDS) && walls.metadata().supported;
+      const editable = (input.matches(INSTANCE_WALL_FIELDS) && walls.metadata().supported) || (isPlanView(tabs.active) && input.matches(ANNOTATION_FIELDS));
+      if (editable && restricted.has(input)) { const was = restricted.get(input); input.disabled = was.disabled; input.title = was.title; input.removeAttribute('aria-disabled'); delete input.dataset.wsReadonly; delete input.dataset.wsReason; restricted.delete(input); }
       if (editable && input.matches('[data-mp-assembly]') && !input.hasAttribute('data-ws-wall-label')) { input.dataset.wsWallLabel = input.textContent; input.textContent = 'Edit Type…'; }
       const textCopy = input.matches('.bc-copy');
       if (!editable && !textCopy && !restricted.has(input)) {
@@ -281,6 +281,13 @@ export function mountWorkspace({ root, modelUi, views, commands, props, current,
     if (!['none', 'ifc'].includes(c.mode)) { setActive(false); status('This file uses the established layout. The live workspace supports IFC projects.'); return; }
     if (documentToken !== c.editor) { opened(); return; }
     // A rebuild retains the editor token and therefore retains drawing tabs and cameras.
+    const sources = docs.sources();
+    if (isPlanView(tabs.active) && A.S.on && views.viewKey() !== tabs.active.id) {
+      const actual = sources.find(v => v.id === views.viewKey()); if (actual) { tabs.open(actual); browserView = actual; }
+    }
+    for (const v of tabs.all) { const source = sources.find(s => s.id === v.id); if (source) Object.assign(v, source); }
+    if (browserView) browserView = sources.find(v => v.id === browserView.id) || browserView;
+    docs.render(tabs.active);
     attachBrowser();
     const s = snapshot();
     const isWall = s.selection.length === 1 && !!props.querySelector('[data-mp-height]');
@@ -288,9 +295,9 @@ export function mountWorkspace({ root, modelUi, views, commands, props, current,
     title.textContent = (s.name || 'No IFC open') + (s.dirty ? ' *' : '');
     header.title = s.name || '';
     options.classList.toggle('ws-wall-options', wallContext);
-    options.querySelector('strong').textContent = s.wall.placing ? 'Modify | Place Wall' : wallContext ? 'Modify | Walls' : 'Modify';
+    options.querySelector('strong').textContent = s.wall.placing ? 'Modify | Place Wall' : s.tool !== 'select' ? 'Annotate | ' + s.tool : wallContext ? 'Modify | Walls' : 'Modify';
     options.querySelector('[data-ws-options-text]').textContent = s.busy ? 'Updating real model…' : s.wall.placing ? 'New wall placement defaults' : wallContext ? 'Selected wall · Instance settings in Properties · Edit Type for shared structure' : s.document ? 'Select an element. Open views from Project Browser.' : 'Open an IFC to begin.';
-    options.classList.toggle('ws-placing', s.wall.placing);
+    options.classList.toggle('ws-placing', s.wall.placing || (isPlanView(s.view) && s.tool !== 'select'));
     statusBar.querySelector('[data-ws-selection]').textContent = s.selection.length ? s.selection.length + ' element' + (s.selection.length === 1 ? '' : 's') + ' selected' : 'No element selected';
     drawingTitle.textContent = tabs.active?.name || 'No drawing';
     stage.classList.toggle('ws-no-view', !!s.document && !tabs.active);
@@ -329,12 +336,32 @@ export function mountWorkspace({ root, modelUi, views, commands, props, current,
     const dlg = node('dialog', { className: 'ws-dialog ws-inventory', 'aria-label': 'Tool availability' }, node('h2', {}, 'Tool availability · F28-B'), query, list, button('Close', { 'data-ws-dismiss': '' }));
     query.addEventListener('input', render); root.append(dlg); render(); dlg.addEventListener('close', () => dlg.remove()); dlg.showModal();
   }
+  function existingTools() {
+    const routes = [
+      ['files','Files and folders','Open/new projects, folder browser, federation, file information, bundle/import/export and recovery.'],
+      ['library','Library','Existing library search, attribution, placement, updates and swap. Requires the configured library service; errors remain visible.'],
+      ['links','Links and federation','Existing linked IFC load/reload, transforms and model management.'],
+      ['model','Modeling and Modify','Established wall/curve, openings, family, site, roof, MEP and verified Modify workflows. Unsupported wall-instance clipboard actions stay refused.'],
+      ['props','Properties','All established property actions for supported categories.'],
+      ['color','Color and visibility','Established color rules, clipping, isolation and paint workflows.'],
+      ['issues','Issues','Existing issues and viewpoints.'],
+      ['analysis','Analysis','Existing frame analysis; dependency and geometry limits remain.'],
+      ['points','Field points','Existing field-point and as-built tools.'],
+      ['assets','Assets','Existing asset and maintenance records.'],
+      ['daylight','Daylight','Existing panel only; this does not verify the uncertain ribbon mapping.'],
+      ['shell','Help, Settings and panels','Shared app bar: Help, Settings, recovery, keyboard help, docking, pop-outs and add-ons. Detached panels are preserved.'],
+    ];
+    const dlg = node('dialog', { className: 'ws-dialog ws-existing-tools', 'aria-label': A.t('workspace.tools') }, node('h2', {}, A.t('workspace.tools')),
+      node('p', {}, A.t('workspace.fallbackRoutes')), routes.map(([id,name,scope]) => node('article', {}, button(name + ' → Established layout', {'data-ws-existing':id}), node('p', {}, scope))), button('Close', {'data-ws-dismiss':''}));
+    root.append(dlg); dlg.addEventListener('close', () => dlg.remove()); dlg.showModal();
+  }
   root.addEventListener('click', e => {
     const b = e.target.closest('button, [data-ws-reason]'); if (!b) return;
     if (b.hasAttribute('data-ws-fallback')) { b.closest('dialog')?.close(); setActive(false); return; }
     if (b.hasAttribute('data-ws-dismiss')) { b.closest('dialog').close(); return; }
     if (b.hasAttribute('data-ws-inventory')) { inventory(); return; }
-    if (b.hasAttribute('data-ws-file')) { const menu = node('dialog', { className: 'ws-dialog', 'aria-label': 'File' }, node('h2', {}, 'File'), tool('open', true), tool('save', true), button('Close', { 'data-ws-dismiss': '' })); root.append(menu); menu.addEventListener('close', () => menu.remove()); menu.showModal(); refreshTools(); return; }
+    if (b.dataset.wsExisting) { b.closest('dialog')?.close(); setActive(false); existing(b.dataset.wsExisting); return; }
+    if (b.hasAttribute('data-ws-file')) { const menu = node('dialog', { className: 'ws-dialog', 'aria-label': 'File' }, node('h2', {}, 'File'), ['open','save','pdf','csv','drawingset','tools'].map(id => tool(id, true)), button('Close', { 'data-ws-dismiss': '' })); root.append(menu); menu.addEventListener('close', () => menu.remove()); menu.showModal(); refreshTools(); return; }
     if (b.dataset.wsTab) { tab = b.dataset.wsTab; renderRibbonTabs(); ribbonTabs.querySelector('[aria-selected="true"]')?.focus(); return; }
     if (b.dataset.wsCommand) {
       const id = b.dataset.wsCommand, a = availability(id, commands, snapshot());
@@ -344,11 +371,14 @@ export function mountWorkspace({ root, modelUi, views, commands, props, current,
     if (b.hasAttribute('data-ws-view-props')) { if (A.S.tool === 'wall') A.setTool('select'); showViewProperties(); return; }
     if (b.dataset.wsDrawing) { const v = tabs.all.find(v => v.id === b.dataset.wsDrawing); if (v) activate(v); return; }
     if (b.dataset.wsClose) {
-      rememberCamera(); const next = tabs.close(b.dataset.wsClose); if (next) activate(next); else { browserView = null; propertyMode = 'view'; refresh(); } return;
+      const wasActive = tabs.active?.id === b.dataset.wsClose;
+      if (wasActive) rememberCamera(); const next = tabs.close(b.dataset.wsClose);
+      if (wasActive && next) activate(next); else if (wasActive) { browserView = null; propertyMode = 'view'; refresh(); } else renderDrawingTabs(); return;
     }
     if (b.dataset.wsReason) explain('', b.dataset.wsReason);
   });
   root.addEventListener('change', e => {
+    if (active && e.target.matches('[data-msched-kind]')) { const v = docs.sources().find(v => v.kind === 'schedule' && v.ref === e.target.value); if (v) activate(v); return; }
     const key = e.target.dataset.wsSetting; if (!key) return;
     commands.execute(key, key === 'scale' ? Number(e.target.value) : e.target.value);
   });
@@ -363,18 +393,31 @@ export function mountWorkspace({ root, modelUi, views, commands, props, current,
     if (!active || !browser?.contains(e.target)) return;
     const b = e.target.closest('button'); if (!b) return;
     e.preventDefault(); e.stopImmediatePropagation();
-    if (b.dataset.pbPlan || b.hasAttribute('data-ws-browser-3d')) {
-      browserView = b.hasAttribute('data-ws-browser-3d') ? threeView() : snapshot().levels.map(planView).find(v => v.guid === b.dataset.pbPlan);
+    const source = browserSource(b, docs.sources());
+    if (source || b.hasAttribute('data-ws-browser-3d')) {
+      browserView = b.hasAttribute('data-ws-browser-3d') ? threeView() : source;
       propertyMode = 'view'; refresh();
     } else if (b.dataset.pbRange) {
       if (!snapshot().busy) openRangeFor(b.dataset.pbRange);
-    } else explain('', b.title);
+    } else if (b.dataset.pbRcprange) { if (!snapshot().busy) openRangeFor(b.dataset.pbRcprange, 'rcp'); }
+    else if (b.hasAttribute('aria-disabled')) explain('', b.title);
+    else if (!snapshot().busy) {
+      if (b.dataset.pbProjected) views.openProjected(b.dataset.pbProjected);
+      else if (b.hasAttribute('data-pb-newsheet')) commands.execute('sheet');
+      else if (b.hasAttribute('data-pb-set')) commands.execute('drawingset');
+      else if (b.dataset.pbTpl || b.hasAttribute('data-pb-newtpl')) views.openTemplate(b.dataset.pbTpl || null);
+      else if (b.dataset.pbCoedit || b.dataset.pbComissing) views.editCallout(b.dataset.pbCoedit || b.dataset.pbComissing);
+      else if (b.hasAttribute('data-pb-newcallout')) commands.execute('callout');
+      else if (b.dataset.pbCodel) views.editCallout(b.dataset.pbCodel);
+      else explain('', b.title);
+    }
   }, true);
   root.addEventListener('dblclick', e => {
     if (!active || !browser?.contains(e.target)) return;
-    const b = e.target.closest('[data-pb-plan], [data-ws-browser-3d]'); if (!b) return;
+    const b = e.target.closest('button'); if (!b) return;
+    const source = b.hasAttribute('data-ws-browser-3d') ? threeView() : browserSource(b, docs.sources()); if (!source) return;
     e.preventDefault(); e.stopImmediatePropagation();
-    b.hasAttribute('data-ws-browser-3d') ? activate(threeView()) : activatePlan(b.dataset.pbPlan);
+    activate(source);
   }, true);
   root.addEventListener('keydown', e => {
     if (!active) return;
@@ -384,7 +427,7 @@ export function mountWorkspace({ root, modelUi, views, commands, props, current,
       const next = e.key === 'Home' ? items[0] : e.key === 'End' ? items.at(-1) : items[(i + (e.key === 'ArrowRight' ? 1 : items.length - 1)) % items.length];
       e.preventDefault(); tab = next.dataset.wsTab; renderRibbonTabs(); ribbonTabs.querySelector('[aria-selected="true"]').focus();
     }
-    if (e.key === 'Enter' && b.matches('[data-pb-plan], [data-ws-browser-3d]')) { e.preventDefault(); e.stopImmediatePropagation(); b.hasAttribute('data-ws-browser-3d') ? activate(threeView()) : activatePlan(b.dataset.pbPlan); }
+    if (e.key === 'Enter' && browser?.contains(b)) { const source = b.hasAttribute('data-ws-browser-3d') ? threeView() : browserSource(b, docs.sources()); if (source) { e.preventDefault(); e.stopImmediatePropagation(); activate(source); } }
     if (e.key === 'Enter' && !isTextEntry(b) && b.dataset.wsReason && !b.matches('button')) { e.preventDefault(); explain('', b.dataset.wsReason); }
   }, true);
   function showTooltip(e) {
@@ -416,5 +459,11 @@ export function mountWorkspace({ root, modelUi, views, commands, props, current,
     inspect: () => { const s = snapshot(); return { active, document: s.document ? s.name : null, busy: s.busy, dirty: s.dirty, selection: s.selection, view: s.view, tabs: tabs.all, settings: s.settings, propertyMode }; },
     selectTool: () => { A.setTool('select'); status('Select an element in the active view.'); },
     activatePlan, activate3d: () => activate(threeView()), openRange, setSettings, fit, established: () => setActive(false),
+    openSource: (kind, ref) => { const v = docs.sources().find(v => v.kind === kind && (!ref || v.ref === ref)); if (v) activate(v); else status(A.t('workspace.missing'), true); },
+    startAnnotation: tool => { A.host.select([]); A.setTool(tool); refreshSoon(); },
+    newSheet: () => views.openSheet(null), editSheet: () => views.openSheet(tabs.active?.ref),
+    viewSettings: () => docs.edit(tabs.active), exportPdf: () => docs.exportPdf(tabs.active), exportCsv: () => A.exportSchedule(),
+    drawingSet: () => A.ask('openDrawingSet'), materials: () => A.ask('openProjectMaterials'), templates: () => views.openTemplate(null),
+    existingTools: () => existingTools(),
     startWall: () => walls.start(), editType: () => walls.editType(), editStructure: () => walls.editStructure(), cancelWall: finish => { A.workspaceCancel(finish); refreshSoon(); } };
 }
