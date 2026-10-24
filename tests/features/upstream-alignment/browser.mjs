@@ -29,6 +29,18 @@ try{
  }
  await page.locator('[data-ws-fallback]').first().click();assert.ok(await page.locator('[data-model-units]').evaluate(e=>!!e.closest('.bc-toolbar')));assert.equal(await page.locator('[data-model-units]').inputValue(),'m');await page.locator('[data-model-units]').selectOption('cm');assert.equal(await page.evaluate(()=>bimcraftPlan.state.units),'cm');check('established fallback restores the upstream global control and its handler');
  await page.locator('[data-ws-launch]').click();await settle();assert.equal(await page.locator('[data-model-units]').inputValue(),'cm');assert.deepEqual(await records(),before);check('live workspace round trip preserves units and the exact authored model');
- assert.equal(report.errors.length,0);check('no application exceptions');await page.screenshot({path:path.join(out,'six-units.png')});report.status='PASS';
+ await page.screenshot({path:path.join(out,'six-units.png')});
+ if(process.env.REBASE_REQUIRE_PHP==='1'){
+  execFileSync('php',['-v']);report.locales=[];
+  for(const locale of ['es-MX','id','en-XA']){
+   await page.goto(`http://127.0.0.1:${port}/?lang=${locale}&space=paper`,{waitUntil:'networkidle'});
+   assert.equal(await page.locator('html').getAttribute('lang'),locale);
+   const boot=await page.locator('#cc-lang').textContent(),catalog=JSON.parse(boot);assert.equal(catalog.locale,locale);
+   const label=await page.locator('[data-model-units] option[value="m"]').textContent();assert.equal(label.trim(),catalog.strings['model.units.m']);assert.notEqual(label.trim(),'model.units.m');
+   await page.locator('[data-file]').setInputFiles(path.resolve('fixtures/f04/layered-plans.ifc'));await page.waitForFunction(()=>globalThis.bimcraftLive?.editor,null,{timeout:90000});
+   const result=await records();assert.deepEqual(result,before);report.locales.push({locale,unitLabel:label.trim(),rawRecordsUnchanged:true});check(locale+': real PHP locale and fallback open the authored model unchanged');
+  }
+ }else report.localeLimit='Full PHP-rendered locale checks require REBASE_REQUIRE_PHP=1 and PHP.';
+ assert.equal(report.errors.length,0);check('no application exceptions');report.status='PASS';
 }catch(e){report.status='FAIL';report.error=e.stack||String(e);process.exitCode=1;await page?.screenshot({path:path.join(out,'failure.png')}).catch(()=>{});}
 finally{fs.writeFileSync(path.join(out,'report.json'),JSON.stringify(report,null,2)+'\n');console.log('UPSTREAM_REPORT '+JSON.stringify(report));await browser?.close();if(server)await new Promise(r=>server.close(r));}
