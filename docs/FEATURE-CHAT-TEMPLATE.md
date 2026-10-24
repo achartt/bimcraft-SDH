@@ -38,6 +38,13 @@ Primary code ownership: [modules/areas]. Shared files/contracts needing coordina
 3. [Save/reopen and undo/redo behavior.]
 4. [Invalid/missing/degenerate input behavior.]
 5. [Export/precision/performance evidence relevant to this feature.]
+6. [Agent workflow: registered MCP operations, supported arguments and real transport-level evidence.]
+
+## Agent access is part of the feature
+
+Read `docs/AGENTIC-CORE.md`. Map every new/changed domain capability to shared authoritative operations and registered MCP tools. Record live/headless support, typed arguments/results, stable IDs, units, permissions and gaps. Presentation-only changes may be marked not applicable with a reason; a workspace command or internal function is not automatically an MCP tool.
+
+Prove discovery and execution through the actual transport on the delivery build, including supported custom types, raw precision values, source/document isolation, refusals and applicable Undo/Redo/save/reopen/exports. Add semantic regression checks for registry/schema/package drift. Do not silently defer missing agent coverage or claim an upstream package includes fork changes. New-capability exceptions need an explicit user scope decision; keep inherited gaps recorded separately.
 
 Preserve material and model identities, explicit core anchors, existing associative dimensions, cavity widths, zero-thickness membrane records, and project isolation. Do not implement an imaginary physical thickness or silently rewrite an unsupported file version. Material-library edits must not resize existing assemblies. Use the current IFC2X3/IFC4 behavior as the compatibility baseline and document any deliberate extension.
 
@@ -72,6 +79,7 @@ Complete this bounded feature, create or update a draft PR against [integration 
 - Acceptance checklist with passed, failed or unverified status and evidence.
 - Tests run, browser/export observations and any measurements.
 - Changes to data formats, compatibility or shared contracts.
+- MCP capability mapping, exact tested transport/build, agent workflow evidence and any missing/partial coverage.
 - Known limitations, integration concerns and follow-up work kept outside this PR.
 
 Do not merge, deploy, start unrelated features, or send instructions to other chats unless I authorize that separately. Give me a concise handoff I can paste into the PM chat. Update feature-specific documentation; let the PM reconcile the shared roadmap status after integration.
@@ -88,6 +96,7 @@ PR:
 Acceptance: [criterion → result/evidence]
 Validation:
 Compatibility and shared contracts:
+MCP tools / transport / agent workflow evidence / gaps:
 Known limits:
 Recommended next action:
 ```
