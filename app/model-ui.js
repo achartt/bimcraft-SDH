@@ -1372,7 +1372,7 @@ export function mountModel(host) {
       if (S.chain) { endChain(); host.status(t('model.chain.ended')); } else if (!finishOnly) setTool('select'); for (const x of exts) x.toolChanged?.(S.tool);
     },
     workspaceTyped(key) { ui.typed.focus(); ui.typed.value += key; },
-    workspaceSchedule(kind) { S.sched = kind; if (ui.schedKind) ui.schedKind.value = kind; renderSchedule(true); },
+    workspaceSchedule(kind) { S.sched = kind; renderSchedule(true); if (ui.schedKind) ui.schedKind.value = kind; },
     exportSchedule, exportPlan,
     /** F28: prepare real browser data without creating/replacing a canvas or activating a drawing tool. */
     prepareWorkspace() {

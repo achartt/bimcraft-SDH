@@ -69,7 +69,9 @@ export async function verifySourceActions({newContext,openProject,settle,out,che
     await choose('sheet',a.id,true);await props('editsheet').click();await page.locator('[data-sh-title]').fill('Only intended A');await page.locator('[data-sh-save]').click();await settle(page);
     changed=await records();assert.equal(changed.find(s=>s.id===a.id).title,'Only intended A');assert.equal(changed.find(s=>s.id===b.id).title,a.title);
     result.duplicateNamesVerified=true;check('duplicate sheet names retain ID routing, touch explanations and correct positive edit targets');
-    await choose('schedule','assemblies',true);await choose('schedule','materialLegend');
+    await choose('schedule','assemblies',true);assert.equal(await page.locator('[data-msched-kind]').inputValue(),'assemblies');
+    check('first schedule activation synchronizes its native selector with the actual source');
+    await choose('schedule','materialLegend');assert.equal(await page.locator('[data-msched-kind]').inputValue(),'assemblies');
     assert.equal((await state()).view.id,'schedule:assemblies');assert.ok((await page.locator('.ws-view-props').textContent()).includes('materialLegend'));
     await page.screenshot({path:path.join(out,'properties-source-csv-inactive.png')});
     await blocked('csv','keyboard');assert.equal((await state()).view.id,'schedule:assemblies');
@@ -78,7 +80,7 @@ export async function verifySourceActions({newContext,openProject,settle,out,che
     assert.equal(await fileMenu.locator('[data-ws-command="csv"]').getAttribute('aria-disabled'),'false');
     await csv('dialog[open] [data-ws-command="csv"]','assemblies','source-actions-active-assemblies.csv');
     check('File CSV still exports the actual active assembly schedule while Properties displays the legend');
-    await choose('schedule','materialLegend',true);assert.equal(await props('csv').getAttribute('aria-disabled'),'false');
+    await choose('schedule','materialLegend',true);assert.equal(await page.locator('[data-msched-kind]').inputValue(),'materialLegend');assert.equal(await props('csv').getAttribute('aria-disabled'),'false');
     await csv('.ws-view-props [data-ws-command="csv"]','materialLegend','source-actions-intended-legend.csv');
     assert.equal(downloads.length,2);assert.equal((await state()).view.id,'schedule:materialLegend');
     await page.screenshot({path:path.join(out,'properties-source-csv-active.png')});
