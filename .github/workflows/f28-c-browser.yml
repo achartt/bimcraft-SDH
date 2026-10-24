@@ -1,0 +1,67 @@
+name: F28-C documentation workspace acceptance
+on:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: f28-c-browser-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/cache@v4
+        with:
+          path: devshell/vendor
+          key: vendor-${{ hashFiles('devshell/vendor.json') }}
+      - run: npm run fetch-vendor
+      - name: Browser and independent IFC/PDF readers
+        run: |
+          npm install --prefix .cc-test/f28-c-browser-deps --no-package-lock playwright@1.56.1
+          .cc-test/f28-c-browser-deps/node_modules/.bin/playwright install --with-deps chromium
+          python -m venv .cc-test/f28-c-reader
+          .cc-test/f28-c-reader/bin/python -m pip install -r tests/features/f01/requirements-independent.txt -r tests/features/f04/requirements-independent.txt
+      - name: Focused state and documentation checks
+        run: npm run test:f28
+      - name: Real documentation and recovery browser acceptance
+        env:
+          F28_EMIT_REVIEW_FRAMES: '1'
+        run: node tests/features/f28/documentation-browser.mjs
+      - name: Independent actual IFC CSV and vector PDF downloads
+        if: ${{ always() && hashFiles('.cc-test/f28-c-browser/saved.ifc') != '' }}
+        run: .cc-test/f28-c-reader/bin/python -I tests/features/f28/documentation-independent.py
+      - name: Comparable F04 and F05 geometry export workloads
+        env:
+          F28_COMPARE_BASE: 3e42c21e33e642d1e07bea2fc3356344f91db00e
+          F28_COMPARE_OUTPUT: evidence/f28-c/performance-node.json
+        run: node tests/features/f28/measure.mjs
+      - name: Render actual vector exports for review
+        if: ${{ always() && hashFiles('.cc-test/f28-c-browser/edited-section.pdf') != '' && hashFiles('.cc-test/f28-c-browser/drawing-sheet.pdf') != '' }}
+        env:
+          F28_EMIT_REVIEW_FRAMES: '1'
+        run: |
+          if ! command -v pdftoppm; then sudo apt-get install -y poppler-utils; fi
+          node tests/features/f28/render-documentation.mjs
+      - name: Retain review evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: f28-c-browser
+          path: |
+            .cc-test/f28-c-browser/*.json
+            .cc-test/f28-c-browser/*.csv
+            .cc-test/f28-c-browser/*.pdf
+            .cc-test/f28-c-browser/*.png
+            evidence/f28-c/performance-node.json

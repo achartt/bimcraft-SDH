@@ -113,6 +113,7 @@ export function mountWallAssemblies(modelUi) {
   A=modelUi.extend({openAssembly});
   const row=A.root.querySelector('[data-mopts="wall"]');
   row?.append(button(t('open'),()=>openAssembly(),{'data-wall-assemblies':''}));
+  modelUi.extend({ openProjectMaterials: () => openMaterialLibrary(A) });
   A.root.querySelector('[data-annot-tools]')?.before(button(A.t('materials.title'),()=>openMaterialLibrary(A),{'data-materials-menu':''}));
   // A project-wide entry point remains available when the Wall tool is not active.
   A.root.querySelector('[data-annot-tools]')?.before(button(t('open'),()=>openAssembly(),{'data-wall-assemblies-menu':''}));

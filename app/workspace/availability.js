@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: Apache-2.0 */
 import { catalog } from './catalog.js';
-export function availability(id, commands, state) {
-  if (commands.ids.includes(id)) return commands.describe(id);
+export function availability(id, commands, state, target) {
+  if (commands.ids.includes(id)) return commands.describe(id, target);
   const tool = catalog.tools[id];
   if (!tool) return { enabled: false, reason: 'This action has not been verified for this workspace slice.' };
   let reason;
