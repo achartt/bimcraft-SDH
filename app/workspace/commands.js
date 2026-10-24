@@ -45,7 +45,7 @@ export function createCommands({ state, actions, explain = () => {} }) {
     range: { categories: ['floor-plan'], reason: s => documentReason(s) || (!['plan','rcp'].includes(s.view?.kind) ? 'Activate a floor plan or RCP first. 3D and documentation drawings have no independent View Range.' : '') },
     detail: { categories: ['view'], reason: settingsReason },
     scale: { categories: ['view'], reason: settingsReason },
-    fit: { categories: ['view'], reason: s => !s.document ? 'Open an IFC first.' : s.busy ? 'Wait for the current operation.' : !s.view ? 'Open a drawing first.' : '' },
+    fit: { categories: ['view'], reason: s => !s.document ? 'Open an IFC first.' : s.busy ? 'Wait for the current operation.' : !s.view ? 'Open a drawing first.' : s.view.kind === 'schedule' ? 'Schedules use table scroll bars. Vector PDF includes every continuation page.' : '' },
   };
   function describe(id) {
     const d = definitions[id];

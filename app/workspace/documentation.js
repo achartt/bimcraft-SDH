@@ -27,9 +27,11 @@ export function mountDocumentation({ root, A, views, stage, current, status }) {
   const schedule = root.querySelector('[data-msched-sec]'), home = document.createComment('F28-C schedule home'); schedule.before(home);
   let owner = null, data = null, input = null, signature = null, active = null, renderedSheet = null, opts = null;
   const positions = new Map(); let zoom = 100;
+  function layout() { if (host.hidden || !opts) return; const [w,h] = PAPERS[opts.paper]; const fit = Math.min(viewport.clientWidth - 24, (viewport.clientHeight - 24) * w / h); if (fit > 0) paper.style.width = Math.round(fit * zoom / 100) + 'px'; }
+  new ResizeObserver(layout).observe(viewport);
   function reset() { remember(); owner = current().editor; data = input = signature = active = renderedSheet = null; positions.clear(); }
   function remember() { if (active) positions.set(active.id, { left: viewport.scrollLeft, top: viewport.scrollTop, zoom }); }
-  function restore() { const p = positions.get(active.id) || { left: 0, top: 0, zoom: 100 }; zoom = p.zoom; paper.style.width = zoom + '%'; viewport.scrollLeft = p.left; viewport.scrollTop = p.top; }
+  function restore() { const p = positions.get(active.id) || { left: 0, top: 0, zoom: 100 }; zoom = p.zoom; layout(); viewport.scrollLeft = p.left; viewport.scrollTop = p.top; }
   function sources() { return views.workspaceSources(); }
   function render(view) {
     if (owner !== current().editor) reset();
@@ -83,9 +85,9 @@ export function mountDocumentation({ root, A, views, stage, current, status }) {
   }
   viewport.addEventListener('wheel', e => {
     if (!e.ctrlKey && !e.metaKey) return;
-    e.preventDefault(); zoom = Math.max(50, Math.min(400, zoom + (e.deltaY > 0 ? -10 : 10))); paper.style.width = zoom + '%';
+    e.preventDefault(); zoom = Math.max(50, Math.min(400, zoom + (e.deltaY > 0 ? -10 : 10))); layout();
   }, { passive: false });
-  function fit() { zoom = 100; paper.style.width = '100%'; viewport.scrollTo(0, 0); remember(); }
+  function fit() { zoom = 100; layout(); viewport.scrollTo(0, 0); remember(); }
   return { sources, render, hide, reset, restoreHome, exportPdf, fit, host,
     settings: v => ['section', 'elevation'].includes(v?.kind) ? views.projected(v.id) : null,
     setSettings: (v, patch) => views.workspaceProjected(v.id, patch),

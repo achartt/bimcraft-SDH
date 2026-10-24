@@ -30,6 +30,8 @@ for guid,refs,resolved in expected['dims']:
 for d in expected['drafting']:
  p=element.get_psets(f.by_guid(d['guid']))['CadCraft_Drafting'];assert p['View']==d['view'];assert p['Kind']==d['kind'];assert p['Pattern']==d['pattern'];assert near(p['PatternScale'],d['scale'])
 project=element.get_psets(f.by_type('IfcProject')[0]);sheets=project['CadCraft_Sheets']
+for c in expected['callouts']:
+ stored=json.loads(project['CadCraft_CalloutViews'][c['id']]);assert stored['parent']==c['parent'];assert stored['crop']==c['crop'];assert stored['scale']==c['scale']
 for s in expected['sheets']:
  stored=json.loads(sheets[s['id']]);assert stored['views']==s['views'];assert stored['number']==s['number']
  for v in s['views']:
@@ -38,7 +40,7 @@ assert any(v['ref']=='f06-assemblies:2' for s in expected['sheets'] for v in s['
 for guid,v in expected['projected']:assert json.loads(project['CadCraft_ProjectedViews']['section:'+guid])==v
 legend=list(csv.DictReader(io.StringIO((root/'legend.csv').read_text(encoding='utf-8-sig'),newline='')));assert any(r['symbol_kind']=='cavity' for r in legend)
 reports=[];PT=72/25.4
-for filename in ['section.pdf','edited-section.pdf','elevation.pdf','assemblies.pdf','legend.pdf']:
+for filename in ['annotated-plan.pdf','section.pdf','edited-section.pdf','elevation.pdf','assemblies.pdf','legend.pdf','continuation-sheet.pdf','drawing-sheet.pdf']:
  reader=PdfReader(root/filename);paths=0
  for page in reader.pages:
   assert not page.get('/Resources',{}).get('/XObject'),'Unexpected raster XObjects'

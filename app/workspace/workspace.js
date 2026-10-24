@@ -337,7 +337,7 @@ export function mountWorkspace({ root, modelUi, views, commands, props, current,
         return node('article', {}, node('strong', {}, t.name + ' · ' + (a.enabled ? 'Wired' : commands.ids.includes(t.key) ? 'Wired · unavailable now' : t.status)), node('p', {}, a.reason || 'Enabled for the current document and view.'), node('small', {}, t.evidence));
       }));
     };
-    const dlg = node('dialog', { className: 'ws-dialog ws-inventory', 'aria-label': 'Tool availability' }, node('h2', {}, 'Tool availability · F28-B'), query, list, button('Close', { 'data-ws-dismiss': '' }));
+    const dlg = node('dialog', { className: 'ws-dialog ws-inventory', 'aria-label': 'Tool availability' }, node('h2', {}, 'Tool availability · F28-C'), query, list, button('Close', { 'data-ws-dismiss': '' }));
     query.addEventListener('input', render); root.append(dlg); render(); dlg.addEventListener('close', () => dlg.remove()); dlg.showModal();
   }
   function existingTools() {
