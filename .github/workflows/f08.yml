@@ -57,7 +57,8 @@ jobs:
         if: ${{ always() && hashFiles('.cc-test/f08/browser/detail.pdf') != '' }}
         run: |
           pdftoppm -scale-to 1400 -singlefile -png .cc-test/f08/browser/detail.pdf .cc-test/f08/browser/detail-render
-          node --input-type=module -e "import fs from 'node:fs'; console.log('F08_IMAGE detail-render.png '+fs.readFileSync('.cc-test/f08/browser/detail-render.png').toString('base64'));"
+          pdftoppm -scale-to 1400 -singlefile -png .cc-test/f08/browser/plan.pdf .cc-test/f08/browser/plan-render
+          node --input-type=module -e "import fs from 'node:fs'; for(const name of ['detail-render.png','plan-render.png'])console.log('F08_IMAGE '+name+' '+fs.readFileSync('.cc-test/f08/browser/'+name).toString('base64'));"
       - name: Review actual saved files
         if: ${{ always() && hashFiles('.cc-test/f08/browser/saved.ifc') != '' }}
         run: |

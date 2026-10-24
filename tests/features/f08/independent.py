@@ -128,6 +128,16 @@ if (browser/'saved.ifc').exists():
  assert max_distance<.005,max_distance
  for file in ['plan.pdf','detail.pdf']:
   pdf=PdfReader(browser/file);assert all(not p.get('/Resources',{}).get('/XObject') for p in pdf.pages)
+ # Whole-plan export must fit its media box, independently of the cropped detail.
+ whole=PdfReader(browser/'plan.pdf');outside=[];vertices=0
+ for page in whole.pages:
+  width,height=float(page.mediabox.width),float(page.mediabox.height)
+  for args,operator in ContentStream(page.get_contents(),whole).operations:
+   if operator in [b'm',b'l']:
+    x,y=map(float,args);vertices+=1
+    if not (-.001<=x<=width+.001 and -.001<=y<=height+.001):outside.append((x,y))
+ assert vertices>100 and not outside,('Clipped whole-plan export',outside[:10])
+ reports.append({'wholePlanPathVertices':vertices,'outsideMediaBox':len(outside)})
  reports.append({'actualDownloadedPlanPDF':True,'detailVectorFillPolygons':len(fills),'maxVectorGeometryErrorMm':max_distance,'rasterImages':0,'csvLayers':len([r for r in rows if r['record_kind']=='layer'])})
 # Compare union/overlap without trusting renderer topology or application tests.
 if (root/'audit-after.json').exists():
