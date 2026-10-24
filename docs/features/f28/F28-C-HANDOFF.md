@@ -1,5 +1,7 @@
 # F28-C — real documentation workspace
 
+**PM changes update:** F28C-PM-01 is addressed by the subsequent [Properties source ownership fix](F28-C-PM-01.md). Use that addendum and PR #12 for the current exact source/delivery heads and validation. The original delivery evidence below remains historical.
+
 Draft delivery for PM review; established layout remains default and explicit fallback. No merge, deployment, roadmap change, default switch or cross-chat message.
 
 ## Revisions and preview
