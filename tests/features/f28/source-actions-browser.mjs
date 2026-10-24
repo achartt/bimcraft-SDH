@@ -27,10 +27,16 @@ export async function verifySourceActions({newContext,openProject,settle,out,che
   const props=id=>page.locator(`.ws-view-props [data-ws-command="${id}"]`);
   async function blocked(id,gesture='click') {
     const button=props(id),n=downloads.length;
-    assert.equal(await button.getAttribute('aria-disabled'),'true');assert.equal(await button.isDisabled(),false);
+    assert.equal(await button.getAttribute('aria-disabled'),'true');assert.equal(await button.evaluate(el=>el.disabled),false);
     await button.focus();assert.ok((await button.getAttribute('data-ws-reason')).includes('Open the source shown in Properties'));
     assert.equal(await page.locator('[role="tooltip"]').isVisible(),true);
-    if(gesture==='keyboard')await button.press('Enter');else if(gesture==='touch')await button.tap();else await button.click();
+    if(gesture==='keyboard')await button.press('Enter');else {
+      // Playwright's click/tap actionability treats aria-disabled as native disabled. Use real input with a hit-test;
+      // the product intentionally keeps these buttons focusable/clickable to explain unavailability.
+      const box=await button.boundingBox();assert.ok(box);const point={x:box.x+box.width/2,y:box.y+box.height/2};
+      assert.equal(await button.evaluate((el,p)=>document.elementFromPoint(p.x,p.y)?.closest('button')===el,point),true);
+      if(gesture==='touch')await page.touchscreen.tap(point.x,point.y);else await page.mouse.click(point.x,point.y);
+    }
     const dialog=page.getByRole('dialog',{name:'Command availability'});await dialog.waitFor({state:'visible'});
     assert.match(await dialog.textContent(),/Open the source shown in Properties/);
     assert.equal(await page.locator('[data-sh-dialog][open]').count(),0);assert.equal(downloads.length,n);
@@ -78,6 +84,10 @@ export async function verifySourceActions({newContext,openProject,settle,out,che
     await page.screenshot({path:path.join(out,'properties-source-csv-active.png')});
     check('activating the intended legend enables Properties CSV with exact authoritative legend contents');
     return result;
+  } catch(error) {
+    await page.screenshot({path:path.join(out,'properties-source-failure.png')}).catch(()=>{});
+    const diagnostic={...result,error:error.stack||String(error),state:await state().catch(()=>null),properties:await page.locator('.ws-view-props').textContent().catch(()=>null)};
+    fs.writeFileSync(path.join(out,'source-actions-failure.json'),JSON.stringify(diagnostic,null,2)+'\n');console.log('F28C_SOURCE_FAILURE '+JSON.stringify(diagnostic));throw error;
   } finally {await ctx.close();}
 }
 
