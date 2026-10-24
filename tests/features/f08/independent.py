@@ -9,7 +9,7 @@ import ifcopenshell.validate
 import ifcopenshell.util.element as element
 import ifcopenshell.util.placement as placement
 import ifcopenshell.util.unit as unit
-from shapely.geometry import Polygon,LineString
+from shapely.geometry import Polygon
 from shapely.ops import unary_union
 from pypdf import PdfReader
 from pypdf.generic import ContentStream
@@ -30,7 +30,7 @@ def physical(file,expected):
   assert body.is_a('IfcExtrudedAreaSolid') and body.SweptArea.is_a('IfcArbitraryClosedProfileDef')
   near(body.Depth*factor,wall['height'])
   points=[(float(p.Coordinates[0])*factor,float(p.Coordinates[1])*factor) for p in body.SweptArea.OuterCurve.Points]
-  shape=Polygon(points);assert shape.is_valid and not shape.is_empty and shape.area>0
+  shape=Polygon(points);assert shape.is_valid and not shape.is_empty and shape.area>0 and shape.exterior.is_ccw
   expected_points=next(s['points'] for s in expected['shapes'] if s['guid']==wall['guid'])
   assert shape.hausdorff_distance(Polygon(expected_points))<.005
   matrix=placement.get_local_placement(obj.ObjectPlacement)
@@ -60,25 +60,29 @@ def physical(file,expected):
   ps=element.get_psets(obj)['CadCraft_Window'];near(ps['Width']*factor,o['width']);near(ps['Height']*factor,o['height'])
  return {'file':str(file),'schemaFindings':0,'walls':len(polygons),'overlapAreaToleranceMm2':.05,'zeroMembranes':True,'ventilatedCavities':True},actual
 def ideal_union(walls,through=False):
- # Independent ideal envelope: flat-ended segment buffers plus the four-corner
- # face-intersection patch at this one declared fixture node. Core seams may
- # divide this union, but must not add gaps or overlaps.
+ # Independent envelope oracle: intersect offset face support lines, then
+ # cap each ray with a straight seam. The application uses piecewise CORE
+ # seams; only their combined external envelope must equal this analytic one.
  p=walls[1]['a'] if through else walls[0]['a']
- rays=[];parts=[]
+ rays=[]
  for index,w in enumerate(walls):
   a,b=w['a'],w['b'];dx,dy=b[0]-a[0],b[1]-a[1];length=math.hypot(dx,dy);u=(dx/length,dy/length)
-  parts.append(LineString([a,b]).buffer(w['t']/2,cap_style=2,join_style=2))
-  rays.append((u,w['t']/2))
-  if through and index==0:rays.append(((-u[0],-u[1]),w['t']/2))
- rays.sort(key=lambda r:math.atan2(r[0][1],r[0][0]))
- for i,(u,h) in enumerate(rays):
-  v,k=rays[(i+1)%len(rays)];n=(-u[1],u[0]);m=(-v[1],v[0]);den=n[0]*m[1]-n[1]*m[0]
-  if abs(den)<1e-10:continue
-  d=n[0]*p[0]+n[1]*p[1]+h;e=m[0]*p[0]+m[1]*p[1]-k
-  c=((d*m[1]-n[1]*e)/den,(n[0]*e-d*m[0])/den)
-  q=(p[0]+n[0]*h,p[1]+n[1]*h);r=(p[0]-m[0]*k,p[1]-m[1]*k)
-  patch=Polygon([p,q,c,r]);assert patch.is_valid
-  if patch.area>1e-9:parts.append(patch)
+  rays.append((u,w['t']/2,b))
+  if through and index==0:rays.append(((-u[0],-u[1]),w['t']/2,a))
+ rays.sort(key=lambda r:math.atan2(r[0][1],r[0][0]));corners=[]
+ for i,(u,h,far) in enumerate(rays):
+  v,k,_=rays[(i+1)%len(rays)];n=(-u[1],u[0]);m=(-v[1],v[0]);den=n[0]*m[1]-n[1]*m[0]
+  if abs(den)<1e-10:c=(p[0]+n[0]*h,p[1]+n[1]*h)
+  else:
+   d=n[0]*p[0]+n[1]*p[1]+h;e=m[0]*p[0]+m[1]*p[1]-k
+   c=((d*m[1]-n[1]*e)/den,(n[0]*e-d*m[0])/den)
+  corners.append(c)
+ parts=[]
+ for i,(u,h,far) in enumerate(rays):
+  n=(-u[1],u[0]);ring=[corners[(i-1)%len(rays)],(far[0]-n[0]*h,far[1]-n[1]*h),(far[0]+n[0]*h,far[1]+n[1]*h),corners[i]]
+  if len(rays)>2:ring.append(p)
+  polygon=Polygon(ring);assert polygon.is_valid and polygon.area>0
+  parts.append(polygon)
  return unary_union(parts)
 reports=[]
 for name in ['seed','edited']:
